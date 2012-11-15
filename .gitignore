@@ -13,3 +13,4 @@ ICFCode/python/__susy*
 *.log
 *.stdout
 *.stderr
+*.svn-base
