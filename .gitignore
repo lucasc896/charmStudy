@@ -3,7 +3,7 @@
 rootfiles/
 zhaoxiaCode/
 ICFCode/python/__susy*
-ICFCode/*/svn
+ICFCode/*/.svn
 
 ### specific file types ###
 
