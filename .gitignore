@@ -2,11 +2,14 @@
 
 rootfiles/
 zhaoxiaCode/
-
+ICFCode/python/__susy*
 
 ### specific file types ###
 
-*pdf
-*png
-*pyc
-*root
+*.pdf
+*.png
+*.pyc
+*.root
+*.log
+*.stdout
+*.stderr
