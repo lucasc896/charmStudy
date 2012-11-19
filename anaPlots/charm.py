@@ -29,8 +29,5 @@ if runMode=="plotting":
 elif runMode=="yieldTables":
   print "\n  >>>  Making yield tables\n"
 
-  dict = tabl.getSMPred()
-
-  for key, val in dict.iteritems():
-    print key, val
+  tabl.printTable()
   
