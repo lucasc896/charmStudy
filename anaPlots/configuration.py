@@ -11,7 +11,7 @@ from sys import argv, exit
 
 
 def mode():
-  runMode = ["plotting", "yieldTables"][0]
+  runMode = ["plotting", "yieldTables"][1]
 
   return runMode
 
@@ -19,7 +19,7 @@ def mode():
 def switches():
   switches={
           "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][0],
-          "signalSample"  :"T2cc_300"
+          "signalSample"  :"T2cc_225-190"
           }
 
   return switches
@@ -44,9 +44,12 @@ def inFiles():
 
 def sigFile():
   sigFile = {
-          "T2cc_300":["../rootfiles/anaPlots/outT2cc_300_anaPlots.root", 100.],
-          "T2cc_160":["../rootfiles/anaPlots/outT2cc_160_anaPlots.root", 100.],
-          "T2bb_300":["../rootfiles/anaPlots/outT2bb_300_anaPlots.root", 100.],
+          "T2cc_300":     ["../rootfiles/anaPlots/outT2cc_300_anaPlots.root", 100.],
+          "T2cc_160":     ["../rootfiles/anaPlots/outT2cc_160_anaPlots.root", 100.],
+          "T2bb_300":     ["../rootfiles/anaPlots/outT2bb_300_anaPlots.root", 100.],
+          "T2cc_225-190": ["../rootfiles/anaPlots/outT2cc_225-190_anaPlots.root", 100.],
+          "T2cc_225-175": ["../rootfiles/anaPlots/outT2cc_225-175_anaPlots.root", 100.],
+          "T2cc_225-150": ["../rootfiles/anaPlots/outT2cc_225-150_anaPlots.root", 100.],                    
   }
 
   return sigFile
@@ -58,8 +61,9 @@ def comparFiles():
 
 
 def inDirs():
-  dirs=["noCuts_0_10000"]
-  #dirs=["_275_325", "_325_375", "_375_475", "_475_575", "_575_675", "_675_775", "_775_875", "_875"]
+  #dirs=["noCuts_0_10000"]
+  dirs=["inc_275_325", "inc_325_375", "inc_375_475", "inc_475_575", "inc_575_675", "inc_675_775", "inc_775_875", "inc_875"]
+  #dirs=["inc_375_475", "inc_475_575", "inc_575_675", "inc_675_775", "inc_775_875", "inc_875"]
   return dirs
 
 
@@ -99,5 +103,29 @@ def anaHists():
     #"leadJetPt":10,
     #"subLeadJetPt":10}
     }
-    
+
   return hists
+
+
+def histRanges():
+  rangeDict={
+         "stopGenPtScal":[0.,1000.],
+         "stopGenPtVect":[0.,1000.],
+         "delPhi_vs_scalGenPt":[0.,1000.],
+         "dPhiStopCharm":[0.,3.2],
+         "dPhiNeutCharm":[0.,3.2],
+         "dPhiStopNeut":[0.,3.2],
+         "n_Events_1":[0.,1.],
+         "MET":[0.,1000.],
+         "MHT":[0.,1000.],
+         "commHT":[0.,1000.],
+         "hadronicAlphaTZoom":[0., 0.9],
+         "leadJetdelPhi":[0.,3.2],
+         "MHToverMET":[0.,10.],
+         "jetPt":[0.,800.],
+         "leadJetPt":[0.,1000.],
+         "subLeadJetPt":[0.,1000.],         
+  }
+
+  return rangeDict
+
