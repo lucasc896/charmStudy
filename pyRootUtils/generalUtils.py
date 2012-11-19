@@ -11,6 +11,7 @@ import sys
 import os
 import ROOT as r
 import math
+import configuration as conf
 
 ## r.gROOT.SetStyle("Plain") #To set plain bkgds for slides
 #r.gStyle.SetTitleBorderSize(0)
@@ -154,7 +155,6 @@ class anaPlot(object):
   def makeAnaPlot(self, inFiles=None, sigFile=None, bMulti=None, dirs=None):
     """docstring for makeAnaPlot"""
 
-
     c1=r.TCanvas()
     st1 = r.THStack("hs", "test stack 1")
     if self.SetLogy: c1.SetLogy()
@@ -186,6 +186,10 @@ class anaPlot(object):
             h1.GetYaxis().SetTitle(self.yTitle)
             h1.SetTitle(self.canvTitle)
 
+            if self.canvTitle in histRanges():
+              ranges = histRanges[self.canvTitle]
+              #fix me
+              print ranges
           h1.SetLineColor(self.listColors[ctr])
           h1.Rebin(rebin)
           h1.SetLineWidth(2)
@@ -397,12 +401,14 @@ class stackPlots(object):
       h.SetLineWidth(2)
       h.SetLineColor(self.listColors[ctr])
       h.Rebin(rebin)
-
       st1.Add(h)
       lg.AddEntry(h, hT, "L")
-
       ctr+=1
 
+    # do stacks have a setrangeuser?
+    if canvTitle in conf.histRanges():
+      ranges = conf.histRanges()[canvTitle]
+      st1.GetXaxis().SetRangeUser(ranges[0], ranges[1])
     st1.Draw("hist")
 
     if self.sigHist: 
