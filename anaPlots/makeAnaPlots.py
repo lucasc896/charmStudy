@@ -42,11 +42,15 @@ def runAnaPlots():
   hists       = conf.anaHists()
   sigSamp     = conf.switches()["signalSample"]
   sigFile     = conf.sigFile()
-
-  sFile=r.TFile().Open(sigFile[sigSamp][0])
-
+  
   for hT, rVal in hists.iteritems():
     for b in bMulti:
+
+      if sigSamp:
+        sFile=r.TFile().Open(sigFile[sigSamp][0])
+        hS = getPlotsFromFile(hT, dirs, getbMultis(b), sFile, sigFile[sigSamp][1])
+      else: hS=None
+
       bgHists=[]
       bgTitles=[]
       for sName, iF in files.iteritems():
@@ -54,8 +58,6 @@ def runAnaPlots():
         h = getPlotsFromFile(hT, dirs, getbMultis(b), rFile, iF[1])
         bgHists.append(h)
         bgTitles.append(sName)
-
-      hS = getPlotsFromFile(hT, dirs, getbMultis(b), sFile, sigFile[sigSamp][1])
 
       oFileName="Stack_%s_%s.png"%(hT, b)
 
