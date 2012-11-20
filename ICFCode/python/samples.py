@@ -10,15 +10,25 @@ from montecarlo.Summer12.FNAL.charmStudy.T2cc_mGL_300_mLSP_250_v2 import *
 from montecarlo.Summer12.FNAL.charmStudy.T2cc_mGL_600_mLSP_400_v1 import *
 from montecarlo.Summer12.FNAL.HCP.SMS_T2bb_Msbottom_225to1200_mLSP_0to1175_8TeV_Pythia6Z_Summer12_START52_V9_FSIM_v2_V17_5_taus_0_scan_T2bb_beamHaloVars_0_yeshaqJob418 import *
 
+from montecarlo.Summer12.FNAL.charmStudy.T2cc_mSQ_225_mLSP_190_v1 import *
+from montecarlo.Summer12.FNAL.charmStudy.T2cc_mSQ_225_mLSP_175_v1 import *
+from montecarlo.Summer12.FNAL.charmStudy.T2cc_mSQ_225_mLSP_150_v1 import *
+
+T2cc_mGL_300_mLSP_250_v2.File = T2cc_mGL_300_mLSP_250_v2.File[0:1]
+
 sig_T2cc_160 = [T2cc_mGL_160_mLSP_110_v3]
 sig_T2cc_300 = [T2cc_mGL_300_mLSP_250_v2]
 sig_T2cc_600 = [T2cc_mGL_600_mLSP_400_v1]
 sig_T2bb = [SMS_T2bb_Msbottom_225to1200_mLSP_0to1175_8TeV_Pythia6Z_Summer12_START52_V9_FSIM_v2_V17_5_taus_0_scan_T2bb_beamHaloVars_0_yeshaqJob418]
 
+sig_T2cc_225_190 = [T2cc_mSQ_225_mLSP_190_v1]
+sig_T2cc_225_175 = [T2cc_mSQ_225_mLSP_175_v1]
+sig_T2cc_225_150 = [T2cc_mSQ_225_mLSP_150_v1]
 
 #-------------------------------------------------------#
             ###// MonteCarlo Samples //###
             #//           HCP          //#
+#-------------------------------------------------------#
 
 ## TTbar
 from montecarlo.Summer12.FNAL.HCP.TT_CT10_TuneZ2star_8TeV_powheg_tauola_Summer12_DR53X_PU_S10_START53_V7A_V17_5_taus import *
