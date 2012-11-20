@@ -160,6 +160,7 @@ def getDataYields(bM="inc"):
   ent = 0
 
   for d in dirs:
+    ent=0
     dirTitle = d[4:].replace("_","-")
     if d=="inc_875": dirTitle="875-inf"
     for suf in getbMultis(bM):
