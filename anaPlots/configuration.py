@@ -21,7 +21,7 @@ def switches():
           "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][0],
           "signalSample"  :"T2cc_225-190",
           "HTcuts"        :["fullInc","standardHT","highHT","lowHT"][1],
-          "jetMulti"      :["ge4j","ge4j","inc"][2],
+          "jetMulti"      :["le3j","ge4j","inc"][2],
           }
 
   return switches
@@ -85,7 +85,8 @@ def bMulti():
   bMultiAll=["inc", "0b", "1b", "2b", "3b", "4b","ge1b","ge2b","ge3b","ge4b"]
   
   #make selection here
-  include=[0, 1, 2]
+  #include=[0, 1, 2]
+  include=[1]
 
   for val in include:
     bMulti.append(bMultiAll[val])
