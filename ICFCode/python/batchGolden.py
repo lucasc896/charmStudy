@@ -177,7 +177,7 @@ MinObjects    = 2,
 MaxObjects    = 15,
 isData        = False,
 BTagAlgo      = 5,
-BTagAlgoCut   = 0.898,
+BTagAlgoCut   = 0.679,
 StandardPlots = True,
 minDR         = 0.5,
 threshold     = 50.,
@@ -189,7 +189,7 @@ MinObjects    = 2,
 MaxObjects    = 15,
 isData        = True,
 BTagAlgo      = 5,
-BTagAlgoCut   = 0.898,
+BTagAlgoCut   = 0.679,
 StandardPlots = True,
 minDR         = 0.5,
 threshold     = 50.,
@@ -348,6 +348,7 @@ jet_g3 = OP_NumComJets(">",3)
 jet_g4= OP_NumComJets(">",4)
 jet_ge4 = OP_NumComJets(">",3)
 jet_le3 = OP_NumComJets("<",4)
+jet_ge2  = OP_NumComJets(">",1)
 
 jet_e2_du = OP_NumComJets("==",2)
 jet_e3_du = OP_NumComJets("==",3)
@@ -750,7 +751,8 @@ def MakeMCTree(Threshold, Muon = None, Split = None):
     cutTreeMC.TAttach(VertexPtOverHT,DeadEcalCutMC)
     cutTreeMC.TAttach(DeadEcalCutMC,MHT_METCut)
 
-    cutTreeMC.TAttach(MHT_METCut,jet_le3) # jet le3
+    cutTreeMC.TAttach(MHT_METCut,jet_ge2)
+    cutTreeMC.TAttach(jet_ge2, jet_le3) # jet le3
     cutTreeMC.TAttach(MHT_METCut,jet_ge4) # jet ge4
 
     if int(Threshold) is 100 and Split == None :
