@@ -133,7 +133,7 @@ void analysisPlots::StandardPlots() {
    BookHistArray(h_hadronicAlphaTZoom,
       "hadronicAlphaTZoom",
       ";alphaT;# count",
-      100, 0., 1.,
+      150, 0., 1.5,
       6, 0, 1, false);
 
    BookHistArray(h_leadJetdelPhi,
@@ -186,6 +186,12 @@ void analysisPlots::StandardPlots() {
       50, 0, 3.2,
       1, 0, 1, false);
 
+   BookHistArray(h_dPhiStopStop,
+      "dPhiStopStop",
+      ";#delta #phi (stop-stop);# count",
+      50, 0, 3.2,
+      1, 0, 1, false);
+
    BookHistArray(h_susyScanPlane,
     "susyScanPlane",
     ";mSQ (GeV); mLSP (GeV)",
@@ -213,6 +219,12 @@ void analysisPlots::StandardPlots() {
       100, 0., 1000.,
       100, 0., 1000., 
       1, 0, 1, false);   
+
+   BookHistArray(h_evNums,
+      "evNums",
+      ";evNum;",
+      100000, 0., 100000.,
+      1, 0, 1, false); 
 
 }
 
@@ -248,6 +260,8 @@ bool analysisPlots::StandardPlots( Event::Data& ev ) {
    vector<double> v_MHTMET    = getMHTandMET( ev );
    vector<double> v_StopGenPt = getStopGenPt( ev );
    int nbjet = 0, plotIndex = 0;
+
+   h_evNums[0]->Fill( ev.EventNumber() );
 
    //
 //
@@ -295,14 +309,14 @@ bool analysisPlots::StandardPlots( Event::Data& ev ) {
    Event::GenObject gNeut2(0.,0.,0.,0.,0,0,0,0); 
    Event::GenObject gEmpty(0.,0.,0.,0.,0,0,0,0);  
    for( std::vector<Event::GenObject>::const_iterator igen = ev.GenParticles().begin(); igen != ev.GenParticles().end(); ++igen ){
-      if( (*igen).GetID() == 1000005 )    gStop1 = *igen;
-      if( (*igen).GetID() == -1000005 )   gStop2 = *igen;
+      if( (*igen).GetID() == 1000006 )    gStop1 = *igen;
+      if( (*igen).GetID() == -1000006 )   gStop2 = *igen;
 
       if( (*igen).GetStatus() == 3 ){   
-         if( (fabs((*igen).GetID()) == 5) && ((*igen).GetMotherID() == 1000005) )         gCharm1 = *igen;
-         if( (fabs((*igen).GetID()) == 5) && ((*igen).GetMotherID() == -1000005) )        gCharm2 = *igen;
-         if( (fabs((*igen).GetID()) == 1000022) && ((*igen).GetMotherID() == 1000005) )   gNeut1 = *igen;
-         if( (fabs((*igen).GetID()) == 1000022) && ((*igen).GetMotherID() == -1000005) )  gNeut2 = *igen;
+         if( (fabs((*igen).GetID()) == 4) && ((*igen).GetMotherID() == 1000006) )         gCharm1 = *igen;
+         if( (fabs((*igen).GetID()) == 4) && ((*igen).GetMotherID() == -1000006) )        gCharm2 = *igen;
+         if( (fabs((*igen).GetID()) == 1000022) && ((*igen).GetMotherID() == 1000006) )   gNeut1 = *igen;
+         if( (fabs((*igen).GetID()) == 1000022) && ((*igen).GetMotherID() == -1000006) )  gNeut2 = *igen;
       }
 
    }
@@ -335,7 +349,8 @@ bool analysisPlots::StandardPlots( Event::Data& ev ) {
       h_dPhiNeutCharm[0]->Fill( getGenDeltaPhi(gNeut1, gCharm1), evWeight );
       h_dPhiNeutCharm[0]->Fill( getGenDeltaPhi(gNeut2, gCharm2), evWeight );
       h_dPhiStopNeut[0] ->Fill( getGenDeltaPhi(gStop1, gNeut1), evWeight );
-      h_dPhiStopNeut[0] ->Fill( getGenDeltaPhi(gStop2, gNeut2), evWeight );   
+      h_dPhiStopNeut[0] ->Fill( getGenDeltaPhi(gStop2, gNeut2), evWeight );
+      h_dPhiStopStop[0] ->Fill( getGenDeltaPhi(gStop1, gStop2), evWeight );
    }
 
 
@@ -418,7 +433,7 @@ vector<double> analysisPlots::getStopGenPt( Event::Data& ev ){
    double genPtScal = 0;
 
    for( std::vector<Event::GenObject>::const_iterator igen = ev.GenParticles().begin(); igen != ev.GenParticles().end(); ++igen ) {
-      if ( fabs((*igen).GetID())==1000005 ){
+      if ( fabs((*igen).GetID())==1000006 ){
          genPtVect += (*igen);
          genPtScal += (*igen).Pt();
       }
