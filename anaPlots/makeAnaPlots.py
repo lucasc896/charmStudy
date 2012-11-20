@@ -62,8 +62,10 @@ def runAnaPlots():
       oFileName="Stack_%s_%s.png"%(hT, b)
 
       a1 = stackPlots(bgHists, bgTitles, hS)
+      if conf.switches()["PrintLogy"]: a1.PrintLogy = True
       a1.drawStack(hT, rVal, oFileName, sigTitle=sigSamp)
       del a1
+ 
 ###-------------------------------------------------------------------###
 
 def runStandPlots(printPlots=True, comparSamp=None):
@@ -76,6 +78,7 @@ def runStandPlots(printPlots=True, comparSamp=None):
   sinHists    = conf.sinHists()
   sFile       = conf.sigFile()
   sigSamp     = conf.switches()["signalSample"]
+  histRanges  = conf.histRanges()
 
   # override the global signal sample if running comparison plots
   if comparSamp: sigSamp = comparSamp
@@ -99,6 +102,9 @@ def runStandPlots(printPlots=True, comparSamp=None):
         hTot.Draw("colz")
       else:
         hTot.Draw("hist")
+      if hT in histRanges:
+        ranges = histRanges[hT]
+        hTot.GetXaxis().SetRangeUser(ranges[0], ranges[1])
       outHists.append(hTot)  
       if printPlots: c1.Print("%s_%s_%s.png"%(sigSamp, hT, bMulti[0]))    
       del aPlot   
@@ -115,6 +121,9 @@ def runStandPlots(printPlots=True, comparSamp=None):
       hTot.Draw("colz")
     else:
       hTot.Draw("hist")
+    if hT in histRanges:
+      ranges = histRanges[hT]
+      hTot.GetXaxis().SetRangeUser(ranges[0], ranges[1])  
     outHists.append(hTot)  
     if printPlots: c1.Print("%s_%s_%s.png"%(sigSamp, hT, bMulti[0]))
     del aPlot
