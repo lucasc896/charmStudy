@@ -180,16 +180,11 @@ class anaPlot(object):
               else: h1.Add(h)
               ctr1+=1
 
-          #do hist stuff here
           if ctr==0:
             h1.GetXaxis().SetTitle(self.xTitle)
             h1.GetYaxis().SetTitle(self.yTitle)
             h1.SetTitle(self.canvTitle)
 
-            if self.canvTitle in histRanges():
-              ranges = histRanges[self.canvTitle]
-              #fix me
-              print ranges
           h1.SetLineColor(self.listColors[ctr])
           h1.Rebin(rebin)
           h1.SetLineWidth(2)
@@ -217,18 +212,18 @@ class anaPlot(object):
       if i==0: h=self.hists[i].Clone()
       elif i>0: h.Add(self.hists[i])
     
-    if "Charm" in h.GetName():
-      self.canvTitle = self.canvTitle.replace("Charm","Bottom")
-      xTitle = h.GetXaxis().GetTitle()
-      xTitle = xTitle.replace("charm", "bottom")
-      h.SetXTitle(xTitle)
-    if "Stop" in h.GetName():
-      self.canvTitle = self.canvTitle.replace("Stop", "Sbottom")
-      xTitle = h.GetXaxis().GetTitle()
-      xTitle = xTitle.replace("stop", "sbottom")
-      h.SetXTitle(xTitle)      
-    
-    h.SetLineColor(r.kMagenta+2)
+    #if "Charm" in h.GetName():
+    #  self.canvTitle = self.canvTitle.replace("Charm","Bottom")
+    #  xTitle = h.GetXaxis().GetTitle()
+    #  xTitle = xTitle.replace("charm", "bottom")
+    #  h.SetXTitle(xTitle)
+    #if "Stop" in h.GetName():
+    #  self.canvTitle = self.canvTitle.replace("Stop", "Sbottom")
+    #  xTitle = h.GetXaxis().GetTitle()
+    #  xTitle = xTitle.replace("stop", "sbottom")
+    #  h.SetXTitle(xTitle)      
+
+    h.SetLineColor(r.kMagenta+1)
     h.SetLineWidth(2)
 
     if "TH1D" in str( type(h) ):
@@ -244,7 +239,6 @@ class anaPlot(object):
     if norm and "n_Event" not in self.canvTitle: self.normHist(h, norm)
     if "n_Event" in self.canvTitle: r.gStyle.SetOptStat("i")
 
-    #c1.Print("%s.png"%self.canvTitle)
     return h
 
   def SetStyle(self):
@@ -264,6 +258,7 @@ class anaPlot(object):
 
   def normHist(self, h, normVal=1.):
     """docstring for normHist"""
+    if float(h.GetEntries())==0: return 0
     h.Scale( normVal/float(h.GetEntries()) )
 
 
@@ -375,7 +370,7 @@ class stackPlots(object):
     self.bgHists = bgHists
     self.bgTitles = bgTitles
     self.Debug = False
-    self.SetLogy = False
+    self.PrintLogy = False
     self.listColors = [r.kBlue+1, r.kRed-3, r.kYellow+2, r.kGreen+1, r.kViolet]
     if sigHist:
       self.sigHist = sigHist
@@ -390,7 +385,6 @@ class stackPlots(object):
 
     c1=r.TCanvas()
     st1 = r.THStack("hs", canvTitle)
-    if self.SetLogy: c1.SetLogy()
     lg = r.TLegend(0.62, 0.72, 0.82, 0.85)
     lg.SetFillColor(0)
     lg.SetLineColor(0)
@@ -405,11 +399,11 @@ class stackPlots(object):
       lg.AddEntry(h, hT, "L")
       ctr+=1
 
-    # do stacks have a setrangeuser?
+    st1.Draw("hist")
+
     if canvTitle in conf.histRanges():
       ranges = conf.histRanges()[canvTitle]
       st1.GetXaxis().SetRangeUser(ranges[0], ranges[1])
-    st1.Draw("hist")
 
     if self.sigHist: 
       self.sigHist.SetLineStyle(2)
@@ -429,6 +423,11 @@ class stackPlots(object):
 
     c1.Print(oFileName)
 
+    if self.PrintLogy:
+      oFileName = oFileName[:len(oFileName)-4]+"_log.png"
+      c1.SetLogy(1)
+      c1.Print(oFileName)
+
 
   def MakeLegend(self):
     lg = r.TLegend(0.62, 0.72, 0.9, 0.85)
@@ -440,6 +439,8 @@ class stackPlots(object):
 
 def comparPlot(h1=None, h2=None):
   
+  jM = conf.switches()["jetMulti"]
+
   # surpress the drawing of 2D hists
   if "TH2" in str( type(h1) ): return
   if "TH2" in str( type(h2) ): return
@@ -451,17 +452,22 @@ def comparPlot(h1=None, h2=None):
   lg.SetFillColor(0)
   lg.SetLineColor(0)
 
-  h1.Draw("hist")
-  h2.Draw("histsame")
   h1.SetLineColor(r.kBlue)
   h2.SetLineColor(r.kRed)
 
-  lg.AddEntry(h1, "T2cc", "L")
-  lg.AddEntry(h2, "T2bb", "L")
+  if findMaxHist(h1, h2):
+    h1.Draw("hist")
+    h2.Draw("histsame")
+  else:
+    h2.Draw("hist")
+    h1.Draw("histsame")
+
+  lg.AddEntry(h1, "T2cc (160, 110)", "L")
+  lg.AddEntry(h2, "T2cc (300, 250)", "L")
 
   lg.Draw()
 
-  c1.Print("compare_%s_inc.png"%h1.GetName())
+  c1.Print("compare_%s_%s.png"%(h1.GetName(),jM))
 
   pass
 
@@ -477,8 +483,21 @@ def getPlotsFromFile(histName="", dirs=None, bSufs=None, inFile=None, scale=1.):
       else: h1.Add(h)
       ctr+=1
     h1.Scale(scale)
+    
   return h1    
 
+def findMaxHist(h1, h2):
+  max1, max2 = 0, 0
+  for i in range( h1.GetXaxis().GetNbins() ):
+    val = h1.GetBinContent(i)
+    if val>max1: max1=val
+
+  for i in range( h2.GetXaxis().GetNbins() ):
+    val = h2.GetBinContent(i)
+    if val>max2: max2=val
+
+  if max1>max2: return True
+  else: return False
 
 
 
