@@ -19,7 +19,9 @@ def mode():
 def switches():
   switches={
           "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][0],
-          "signalSample"  :"T2cc_225-190"
+          "signalSample"  :"T2cc_225-190",
+          "HTcuts"        :["fullInc","standardHT","highHT","lowHT"][1],
+          "jetMulti"      :["ge4j","ge4j","inc"][2],
           }
 
   return switches
@@ -61,9 +63,20 @@ def comparFiles():
 
 
 def inDirs():
-  #dirs=["noCuts_0_10000"]
-  dirs=["inc_275_325", "inc_325_375", "inc_375_475", "inc_475_575", "inc_575_675", "inc_675_775", "inc_775_875", "inc_875"]
-  #dirs=["inc_375_475", "inc_475_575", "inc_575_675", "inc_675_775", "inc_775_875", "inc_875"]
+
+  if switches()["HTcuts"]=="fullInc": return ["noCuts_0_10000"]
+  if switches()["HTcuts"]=="standardHT":
+    if switches()["jetMulti"]=="inc":
+      dirs=["inc_275_325", "inc_325_375", "inc_375_475", "inc_475_575", "inc_575_675", "inc_675_775", "inc_775_875", "inc_875"]
+    if switches()["jetMulti"]=="le3j":
+      dirs=["le3j_275_325", "le3j_325_375", "le3j_375_475", "le3j_475_575", "le3j_575_675", "le3j_675_775", "le3j_775_875", "le3j_875"]  
+    if switches()["jetMulti"]=="ge4j":
+      dirs=["ge4j_275_325", "ge4j_325_375", "ge4j_375_475", "ge4j_475_575", "ge4j_575_675", "ge4j_675_775", "ge4j_775_875", "ge4j_875"] 
+  if switches()["HTcuts"]=="highHT":
+    dirs = dirs[2:]
+  if switches()["HTcuts"]=="lowHT":
+    dirs = dirs[:2]
+
   return dirs
 
 
