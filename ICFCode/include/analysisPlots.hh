@@ -64,11 +64,13 @@ namespace Operation {
       std::vector<TH2D*>  h_delPhi_vs_vectGenPt;
       std::vector<TH1D*>  h_dPhiStopCharm;
       std::vector<TH1D*>  h_dPhiNeutCharm;
+      std::vector<TH1D*>  h_dPhiStopStop;
       std::vector<TH1D*>  h_dPhiStopNeut;
       std::vector<TH2D*>  h_susyScanPlane;
       std::vector<TH2D*>  h_SMSvectGenPt;
       std::vector<TH2D*>  h_SMSscalGenPt;
       std::vector<TH2D*>  h_SMSdPhiLeadJetsGenPt;
+      std::vector<TH1D*>  h_evNums;
 
   };
 
