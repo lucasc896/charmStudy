@@ -46,6 +46,8 @@ addCutFlowMC(anal_ak5_caloMC)
 outDir = "../results_"+strftime("%d_%b/375_")
 ensure_dir(outDir)
 
-samp = mc_TTbar + mc_WJets + mc_QCD + mc_DiBo + mc_sinT
+samp_mc = mc_TTbar + mc_WJets + mc_QCD + mc_DiBo + mc_sinT
+samp_sig = sig_T2cc_225_190 + sig_T2cc_225_175 + sig_T2cc_225_150
+samp_sig = sig_T2cc_160 + sig_T2cc_300
 
-anal_ak5_caloMC.Run(outDir,conf_ak5_caloMC,samp)
+anal_ak5_caloMC.Run(outDir,conf_ak5_caloMC,samp_sig)
