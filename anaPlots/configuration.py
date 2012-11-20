@@ -11,17 +11,18 @@ from sys import argv, exit
 
 
 def mode():
-  runMode = ["plotting", "yieldTables"][1]
+  runMode = ["plotting", "yieldTables"][0]
 
   return runMode
 
 
 def switches():
   switches={
-          "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][0],
-          "signalSample"  :"T2cc_225-190",
-          "HTcuts"        :["fullInc","standardHT","highHT","lowHT"][1],
-          "jetMulti"      :["le3j","ge4j","inc"][2],
+          "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][1],
+          "signalSample"  :"T2cc_160",
+          "HTcuts"        :["fullInc", "hadrInc", "standardHT","highHT","lowHT"][0],
+          "jetMulti"      :["le3j","ge4j","inc"][0],
+          "PrintLogy"     :[True, False][0],
           }
 
   return switches
@@ -83,10 +84,8 @@ def inDirs():
 def bMulti():
   bMulti=[]
   bMultiAll=["inc", "0b", "1b", "2b", "3b", "4b","ge1b","ge2b","ge3b","ge4b"]
-  
-  #make selection here
-  #include=[0, 1, 2]
-  include=[1]
+
+  include=[0, 1, 2]
 
   for val in include:
     bMulti.append(bMultiAll[val])
@@ -98,24 +97,25 @@ def sinHists():
   singleHists={"stopGenPtScal":10,
         "stopGenPtVect":10,
         "delPhi_vs_scalGenPt":4,
-        "dPhiStopCharm":1,
-        "dPhiNeutCharm":1,
-        "dPhiStopNeut":1,
+        "dPhiStopCharm":2,
+        "dPhiStopStop":2,
+        "dPhiNeutCharm":2,
+        "dPhiStopNeut":2,
         "n_Events_1":1}
   
   return singleHists
 
 
 def anaHists():  
-  hists={#"MET":10,
-    "MHT":10,
+  hists={"MET":20,
+    "MHT":20,
     "commHT":20,
-    "hadronicAlphaTZoom":1,
-    #"leadJetdelPhi":1,
-    #"MHToverMET":1,
-    #"jetPt":10,
-    #"leadJetPt":10,
-    #"subLeadJetPt":10}
+    "hadronicAlphaTZoom":4,
+    "leadJetdelPhi":2,
+    "MHToverMET":5,
+    "jetPt":20,
+    "leadJetPt":20,
+    "subLeadJetPt":20
     }
 
   return hists
@@ -123,22 +123,23 @@ def anaHists():
 
 def histRanges():
   rangeDict={
-         "stopGenPtScal":[0.,1000.],
-         "stopGenPtVect":[0.,1000.],
-         "delPhi_vs_scalGenPt":[0.,1000.],
-         "dPhiStopCharm":[0.,3.2],
-         "dPhiNeutCharm":[0.,3.2],
-         "dPhiStopNeut":[0.,3.2],
-         "n_Events_1":[0.,1.],
-         "MET":[0.,1000.],
-         "MHT":[0.,1000.],
-         "commHT":[0.,1000.],
-         "hadronicAlphaTZoom":[0., 0.9],
-         "leadJetdelPhi":[0.,3.2],
-         "MHToverMET":[0.,10.],
-         "jetPt":[0.,800.],
-         "leadJetPt":[0.,1000.],
-         "subLeadJetPt":[0.,1000.],         
+         "stopGenPtScal"        :[0., 1000.],
+         "stopGenPtVect"        :[0., 1000.],
+         "delPhi_vs_scalGenPt"  :[0., 1000.],
+         "dPhiStopCharm"        :[0., 3.2],
+         "dPhiNeutCharm"        :[0., 3.2],
+         "dPhiStopNeut"         :[0., 3.2],
+         "dPhiStopCharm"        :[0., 3.2],
+         "n_Events_1"           :[0., 1.],
+         "MET"                  :[0., 500.],
+         "MHT"                  :[0., 500.],
+         "commHT"               :[0., 700.],
+         "hadronicAlphaTZoom"   :[0.,  1.5],
+         "leadJetdelPhi"        :[0., 3.2],
+         "MHToverMET"           :[0., 8.],
+         "jetPt"                :[0., 500.],
+         "leadJetPt"            :[0., 500.],
+         "subLeadJetPt"         :[0., 400.],         
   }
 
   return rangeDict
