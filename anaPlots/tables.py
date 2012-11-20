@@ -30,7 +30,7 @@ def getbMultis(bM=""):
   return bMultiHists[bM]
 
 
-def getSMPred():
+def getSMPred(bM="inc", jM="inc"):
 
   zerobtagDict={
           "275-325":[6235., 100., 1010., 34.],
@@ -131,9 +131,21 @@ def getSMPred():
   fourbtagDict  = OrderedDict(sorted(fourbtagDict.items(), key=lambda t: t[0]))
   inclbtagDict  = OrderedDict(sorted(inclbtagDict.items(), key=lambda t: t[0]))
 
-  print inclbtagDict
+  if bM=="0b":
+    smDict = zerobtagDict
+  if bM=="1b":
+    smDict = onebtagDict
+  if bM=="inc":
+    smDict = inclbtagDict
+  
+  for key, val in smDict.iteritems():
+    if jM=="le3j": val = val[:2]
+    if jM=="le3j": val = val[2:]
+    if jM=="inc":
+      val[0]=val[0]+val[2]
+      val[1]=math.sqrt(val[1]*val[1] + val[3]*val[3])
 
-  return {"0b":zerobtagDict, "1b":onebtagDict, "2b":twobtagDict, "3b":threebtagDict, "4b":fourbtagDict, "inc":inclbtagDict}
+  return smDict
 
 
 def getDataYields(bM="inc"):
@@ -187,12 +199,13 @@ def printEnd():
 
 def makeTable(bM="inc"):
   
-  sigSamp     = conf.switches()["signalSample"]
+  sigSamp  = conf.switches()["signalSample"]
+  jM       = conf.switches()["jetMulti"]
 
-  smPred = getSMPred()
+  smPred = getSMPred(bM, jM)
   dYield = getDataYields(bM)
 
-  f = open("yieldTable_%s.tex"%bM, "w")
+  f = open("yieldTable_%s_%s.tex"%(jM, bM), "w")
   outTxt = ""
   outTxt += printHeader()
   outTxt += printCaption(bM)
@@ -205,9 +218,9 @@ def makeTable(bM="inc"):
 
   outTxt += "SM BG Pred "
 
-  for sKey, sVal in smPred[bM].iteritems():
-    print "%s\t%f \\pm %f"%(sKey, sVal[0], sVal[1])
-    outTxt += "& %.1f $^{\pm %.1f }$ "%(sVal[0], sVal[1])
+  for key, val in smPred.iteritems():
+    print "%s\t%f \\pm %f"%(key, val[0], val[1])
+    outTxt += "& %.1f $^{\pm %.1f }$ "%(val[0], val[1])
 
   outTxt += " \\\\"
 
