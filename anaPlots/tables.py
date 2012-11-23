@@ -13,6 +13,7 @@ import configuration as conf
 import math
 from collections import OrderedDict
 
+###-------------------------------------------------------------------###
 
 def getbMultis(bM=""):
   bMultiHists = {
@@ -29,6 +30,7 @@ def getbMultis(bM=""):
 
   return bMultiHists[bM]
 
+###-------------------------------------------------------------------###
 
 def getSMPred(bM="inc", jM="inc"):
 
@@ -147,6 +149,7 @@ def getSMPred(bM="inc", jM="inc"):
 
   return smDict
 
+###-------------------------------------------------------------------###
 
 def getDataYields(bM="inc"):
 
@@ -170,6 +173,7 @@ def getDataYields(bM="inc"):
 
   return OrderedDict(sorted(yieldDict.items(), key=lambda t: t[0]))
 
+###-------------------------------------------------------------------###
 
 def printHeader():
   outTxt=""
@@ -180,6 +184,7 @@ def printHeader():
 
   return outTxt
 
+###-------------------------------------------------------------------###
 
 def printCaption(bM):
   outTxt = "\\caption{Yields for $\alpha_T>$ 0.55 (%s b-jets)}\n"%bM
@@ -187,6 +192,7 @@ def printCaption(bM):
 
   return outTxt
 
+###-------------------------------------------------------------------###
 
 def printEnd():
   outTxt  = "\n\n\\hline\n"
@@ -197,6 +203,7 @@ def printEnd():
 
   return outTxt
 
+###-------------------------------------------------------------------###
 
 def makeTable(bM="inc"):
   
@@ -206,7 +213,7 @@ def makeTable(bM="inc"):
   smPred = getSMPred(bM, jM)
   dYield = getDataYields(bM)
 
-  f = open("yieldTable_%s_%s.tex"%(jM, bM), "w")
+  f = open("tableDump/yieldTable_%s_%s.tex"%(jM, bM), "w")
   outTxt = ""
   outTxt += printHeader()
   outTxt += printCaption(bM)
@@ -237,6 +244,8 @@ def makeTable(bM="inc"):
   outTxt += printEnd()
 
   f.write(outTxt)
+
+###-------------------------------------------------------------------###
 
 def printTable():
 
