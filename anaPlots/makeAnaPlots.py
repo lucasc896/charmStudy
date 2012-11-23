@@ -14,6 +14,7 @@ import tables as tbl
 
 r.TH1.SetDefaultSumw2()
 r.gROOT.SetBatch(True)
+
 ###-------------------------------------------------------------------###
 
 def getbMultis(bM=""):
@@ -30,6 +31,7 @@ def getbMultis(bM=""):
     "inc":["_0", "_1", "_2", "_3", "_4", "_5"],}
 
   return bMultiHists[bM]
+
 ###-------------------------------------------------------------------###
 
 def runAnaPlots():
@@ -59,10 +61,10 @@ def runAnaPlots():
         bgHists.append(h)
         bgTitles.append(sName)
 
-      oFileName="Stack_%s_%s.png"%(hT, b)
+      oFileName="plotDump/Stack_%s_%s.png"%(hT, b)
 
       a1 = stackPlots(bgHists, bgTitles, hS)
-      if conf.switches()["PrintLogy"]: a1.PrintLogy = True
+      if conf.switches()["printLogy"]: a1.PrintLogy = True
       a1.drawStack(hT, rVal, oFileName, sigTitle=sigSamp)
       del a1
  
@@ -79,11 +81,17 @@ def runStandPlots(printPlots=True, comparSamp=None):
   sFile       = conf.sigFile()
   sigSamp     = conf.switches()["signalSample"]
   histRanges  = conf.histRanges()
+  jMulti      = conf.switches()["jetMulti"]
+  debug       = conf.switches()["debug"]
 
   # override the global signal sample if running comparison plots
   if comparSamp: sigSamp = comparSamp
 
+  if debug: print sFile[sigSamp][0]
+
   rFile = r.TFile.Open(sFile[sigSamp][0])
+  if debug: print rFile
+
   c1 = r.TCanvas()
 
   outHists = []
@@ -94,6 +102,7 @@ def runStandPlots(printPlots=True, comparSamp=None):
       histList = []
       for d in dirs:
         for suf in getbMultis(b):
+          if debug: print "%s/%s%s"%(d, hT, suf)
           h = rFile.Get("%s/%s%s"%(d, hT, suf))
           histList.append(h)
       aPlot = anaPlot(histList, "%s_%s"%(hT, b))
@@ -106,16 +115,29 @@ def runStandPlots(printPlots=True, comparSamp=None):
         ranges = histRanges[hT]
         hTot.GetXaxis().SetRangeUser(ranges[0], ranges[1])
       outHists.append(hTot)  
-      if printPlots: c1.Print("%s_%s_%s.png"%(sigSamp, hT, bMulti[0]))    
+      if printPlots:
+        if "noCut" not in conf.switches()["HTcuts"]:
+          c1.Print("plotDump/%s_%s_%s_%s.png"%(sigSamp, hT, b, jMulti))
+        else:
+          c1.Print("plotDump/%s_%s_%s_%s.png"%(sigSamp, hT, b, "noCuts"))
+
       del aPlot   
   
   #plot single plots
   for hT, rVal in sinHists.iteritems():
     histList = []
     for d in dirs:
+      if debug: print "%s/%s"%(d, hT)
       h = rFile.Get("%s/%s"%(d, hT))
       histList.append(h)
     aPlot = anaPlot(histList, hT)
+    #weight=1.
+    #if "T2cc_160" in sigSamp:
+    #  weight = 8
+    #if "T2cc_220" in sigSamp:
+    #  weight =8
+    #if "T2cc_300" in sigSamp:
+    #  weight =10
     hTot = aPlot.makeSinglePlot(rVal, 1.)
     if "TH2D" in str( type(hTot) ):
       hTot.Draw("colz")
@@ -125,10 +147,15 @@ def runStandPlots(printPlots=True, comparSamp=None):
       ranges = histRanges[hT]
       hTot.GetXaxis().SetRangeUser(ranges[0], ranges[1])  
     outHists.append(hTot)  
-    if printPlots: c1.Print("%s_%s_%s.png"%(sigSamp, hT, bMulti[0]))
+    if printPlots:
+        if "noCut" not in conf.switches()["HTcuts"]:
+          c1.Print("plotDump/%s_%s_%s_%s.png"%(sigSamp, hT, b, jMulti))
+        else:
+          c1.Print("plotDump/%s_%s_%s_%s.png"%(sigSamp, hT, b, "noCuts"))
     del aPlot
   
   return outHists
+
 ###-------------------------------------------------------------------###
 
 def runComparPlots():
@@ -143,10 +170,34 @@ def runComparPlots():
   sFile       = conf.sigFile()
   compFiles   = conf.comparFiles()
 
+  if len(bMulti)>1:
+    print "\t*** Only run comparison plots with one bMultiplicity\n"
+    sys.exit()
 
-  ch0 = runStandPlots(printPlots=False, comparSamp=compFiles[0])
-  ch1 = runStandPlots(printPlots=False, comparSamp=compFiles[1])
+  hList=[]
+  for f in compFiles:
+    hList.append( runStandPlots(printPlots=False, comparSamp=f) )
 
-  for h0, h1 in zip(ch0, ch1):
-    comparPlot(h0, h1)
+  if len(hList)==2:
+    for h1, h2 in zip(hList[0], hList[1]):
+      hComp=[]
+      hComp.append(h1)
+      hComp.append(h2)
+      comparPlots(hComp)
 
+  if len(hList)==3:
+    for h1, h2, h3 in zip(hList[0], hList[1], hList[2]):
+      hComp=[]
+      hComp.append(h1)
+      hComp.append(h2)
+      hComp.append(h3)    
+      comparPlots(hComp)
+  if len(hList)==5:
+    for h1, h2, h3, h4, h5 in zip(hList[0], hList[1], hList[2], hList[3], hList[4]):
+      hComp=[]
+      hComp.append(h1)
+      hComp.append(h2)
+      hComp.append(h3)
+      hComp.append(h4)
+      hComp.append(h5)  
+      comparPlots(hComp)
