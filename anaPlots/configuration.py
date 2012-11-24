@@ -23,9 +23,10 @@ def switches():
           "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][2],
           "signalSample"  :"T2cc_220_145_noAlphaInc",
           "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT"][1],
-          "jetMulti"      :["le3j","ge4j","inc"][0],
-          "printLogy"     :[False, True][0],
-          "debug"        :[False,True][0]
+          "jetMulti"      :["le3j","ge4j","inc"][2],
+          "printLogy"     :[False, True][1],
+          "debug"         :[False,True][0],
+          "unitNorm"      :[False,True][1],
           }
 
   return switches
@@ -85,6 +86,8 @@ def sigFile():
 
 def comparFiles():
 
+  comparFiles = ["T2cc_220_195_pt20", "T2cc_220_170_pt20", "T2cc_220_145_pt20"]
+  #comparFiles = ["T2cc_220_170_pt20", "T2cc_160_pt20", "T2cc_300_pt20"]
   comparFiles = ["T2cc_220_195", "T2cc_220_170", "T2cc_220_145"]
 
   return comparFiles
@@ -132,7 +135,7 @@ def sinHists():
         "dPhiStopCharm":2,
         "dPhiStopStop":2,
         "dPhiNeutCharm":2,
-        "dPhiCharmCharm":4,
+        "dPhiCharmCharm":2,
         "dPhiStopNeut":2,
         "n_Events_1":1,
         "n_Jets":1,
@@ -181,6 +184,7 @@ def histRanges():
          "leadJetPt"            :[0., 500.],
          "subLeadJetPt"         :[0., 400.],
          "n_BTagged_Jets_all"   :[0., 5.],
+         "n_Jets"               :[0., 10.],
   }
 
   return rangeDict
