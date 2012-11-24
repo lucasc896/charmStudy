@@ -209,18 +209,7 @@ class anaPlot(object):
 
     for i in range( len(self.hists) ):
       if i==0: h=self.hists[i].Clone()
-      elif i>0: h.Add(self.hists[i])
-    
-    #if "Charm" in h.GetName():
-    #  self.canvTitle = self.canvTitle.replace("Charm","Bottom")
-    #  xTitle = h.GetXaxis().GetTitle()
-    #  xTitle = xTitle.replace("charm", "bottom")
-    #  h.SetXTitle(xTitle)
-    #if "Stop" in h.GetName():
-    #  self.canvTitle = self.canvTitle.replace("Stop", "Sbottom")
-    #  xTitle = h.GetXaxis().GetTitle()
-    #  xTitle = xTitle.replace("stop", "sbottom")
-    #  h.SetXTitle(xTitle)      
+      elif i>0: h.Add(self.hists[i])   
 
     h.SetLineColor(r.kMagenta+1)
     h.SetLineWidth(2)
@@ -476,17 +465,21 @@ def comparPlots(hList=None):
   plots = conf.comparFiles()
   bM = conf.bMulti()
 
+  if conf.switches()["debug"]:
+    print "comparPlots: %s"%hList[0].GetName()
+
   for h in hList:
     if "TH2" in str( type(h) ): return
 
   colors = [r.kRed, r.kBlue, r.kGreen, r.kCyan, r.kMagenta]
+  #colors = [r.kBlue, r.kCyan, r.kMagenta]
 
   c1 = r.TCanvas()
   r.gStyle.SetOptStat(0)
 
 
   if len(hList)==2:
-    lg = r.TLegend(0.38, 0.65, 0.72, 0.85)
+    lg = r.TLegend(0.55, 0.65, 0.82, 0.85)
     if findMaxHist(hList[0], hList[1]):
       hList[0].Draw("hist")
       hList[0].SetLineColor(colors[0])
