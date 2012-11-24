@@ -88,6 +88,10 @@ def runStandPlots(printPlots=True, comparSamp=None):
   if comparSamp: sigSamp = comparSamp
 
   if debug: print sFile[sigSamp][0]
+  
+  normVal = None
+  if conf.switches()["unitNorm"]:
+    normVal = 1.
 
   rFile = r.TFile.Open(sFile[sigSamp][0])
   if debug: print rFile
@@ -106,7 +110,7 @@ def runStandPlots(printPlots=True, comparSamp=None):
           h = rFile.Get("%s/%s%s"%(d, hT, suf))
           histList.append(h)
       aPlot = anaPlot(histList, "%s_%s"%(hT, b))
-      hTot = aPlot.makeSinglePlot(rVal, 1.)
+      hTot = aPlot.makeSinglePlot(rVal, normVal)
       if "TH2D" in str( type(hTot) ):
         hTot.Draw("colz")
       else:
@@ -138,7 +142,7 @@ def runStandPlots(printPlots=True, comparSamp=None):
     #  weight =8
     #if "T2cc_300" in sigSamp:
     #  weight =10
-    hTot = aPlot.makeSinglePlot(rVal, 1.)
+    hTot = aPlot.makeSinglePlot(rVal, normVal)
     if "TH2D" in str( type(hTot) ):
       hTot.Draw("colz")
     else:
