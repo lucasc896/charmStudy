@@ -1,3 +1,6 @@
 - change the way histogram options are handled
     - potentially use a dictionary function at the val for each histogram key
 - add in xSec re-weighting - note: model dependant
+- add in different switches for bTagEff and anaPlots
+- write code for bTagEff
+    - make stand-alone from makeAnaPlots.py
