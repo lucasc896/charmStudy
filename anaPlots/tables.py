@@ -247,8 +247,9 @@ def makeTable(bM="inc"):
 
 ###-------------------------------------------------------------------###
 
-def printTable():
-
+def printTable(debug=False):
+  #sort out debug info!!
+  
   bMulti = conf.bMulti()
 
   for b in bMulti:
