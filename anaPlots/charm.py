@@ -11,39 +11,50 @@ import configuration as conf
 import tables as tabl
 import makeAnaPlots as anaP
 import bTagPlots as bTagP
+from optparse import OptionParser
 
-def printLine():
-   print "========================================="
+parser = OptionParser()
+
+parser.add_option("-d", "--debug",
+                  action="store_true", dest="doDebug", default=False,
+                  help="run code in Debug mode")
+
+(options, args) = parser.parse_args()
+
+def line():
+   return "========================================="
 
 ###-------------------------------------------------------------------###
                         ### Main Program ###
 ###-------------------------------------------------------------------###
 
-#runMode     = conf.mode()
-switches    = conf.switches()
-
 if conf.mode()=="anaPlots":
-   printLine()
+   
+   print "\n%s"%line()
    print "  ***// Running anaPlots Analysis \\***"
-   printLine()
-   if switches["runMode"]=="plotting":
-      if switches["plotMode"]=="anaPlots":
-         anaP.runAnaPlots()
-      if switches["plotMode"]=="standardPlots":
-         anaP.runStandPlots()
-      if switches["plotMode"]=="comparisonPlots":
-         anaP.runComparPlots()
+   print line()
+   
+   if conf.switches()["runMode"]=="plotting":
+      if conf.switches()["plotMode"]=="anaPlots":
+         anaP.runAnaPlots(debug=options.doDebug)
+      if conf.switches()["plotMode"]=="standardPlots":
+         anaP.runStandPlots(debug=options.doDebug)
+      if conf.switches()["plotMode"]=="comparisonPlots":
+         anaP.runComparPlots(debug=options.doDebug)
         
-   elif switches["runMode"]=="yieldTables":
+   elif conf.switches()["runMode"]=="yieldTables":
+      
       print "\n  >>>  Making yield tables\n"
-      tabl.printTable()
+      tabl.printTable(debug=options.doDebug)
 
 
 elif conf.mode()=="bTagEff":
-   printLine()
+   
+   print "\n%s"%line()
    print "  ***// Running anaPlots Analysis \\***"
-   printLine()
-   if switches["runMode"]=="plotting":
-      if switches["plotMode"]=="standardPlots":
-         bTagP.runStandPlots()
+   print line()
+   
+   if conf.switches()["runMode"]=="plotting":
+      if conf.switches()["plotMode"]=="standardPlots":
+         bTagP.runStandPlots(debug=options.doDebug)
 
