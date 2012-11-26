@@ -10,24 +10,40 @@ Copyright (c) 2012 University of Bristol. All rights reserved.
 import configuration as conf
 import tables as tabl
 import makeAnaPlots as anaP
+import bTagPlots as bTagP
+
+def printLine():
+   print "========================================="
 
 ###-------------------------------------------------------------------###
                         ### Main Program ###
 ###-------------------------------------------------------------------###
 
-runMode     = conf.mode()
+#runMode     = conf.mode()
 switches    = conf.switches()
 
-if runMode=="plotting":
-  if switches["plotMode"]=="anaPlots":
-    anaP.runAnaPlots()
-  if switches["plotMode"]=="standardPlots":
-    anaP.runStandPlots()
-  if switches["plotMode"]=="comparisonPlots":
-    anaP.runComparPlots()
-      
-elif runMode=="yieldTables":
-  print "\n  >>>  Making yield tables\n"
+if conf.mode()=="anaPlots":
+   printLine()
+   print "  ***// Running anaPlots Analysis \\***"
+   printLine()
+   if switches["runMode"]=="plotting":
+      if switches["plotMode"]=="anaPlots":
+         anaP.runAnaPlots()
+      if switches["plotMode"]=="standardPlots":
+         anaP.runStandPlots()
+      if switches["plotMode"]=="comparisonPlots":
+         anaP.runComparPlots()
+        
+   elif switches["runMode"]=="yieldTables":
+      print "\n  >>>  Making yield tables\n"
+      tabl.printTable()
 
-  tabl.printTable()
-  
+
+elif conf.mode()=="bTagEff":
+   printLine()
+   print "  ***// Running anaPlots Analysis \\***"
+   printLine()
+   if switches["runMode"]=="plotting":
+      if switches["plotMode"]=="standardPlots":
+         bTagP.runStandPlots()
+
