@@ -106,6 +106,51 @@ def runOldBtagAna():
       c1.close()
 
 
-def runStandPlots():
-    print "\n >>> Making Analysis Plots\n"
-    pass
+def runStandPlots(debug=False):
+   
+   print "\n >>> Making Analysis Plots\n"
+
+   dirs        = conf.inDirs()
+   hists       = conf.anaHists()
+   sinHists    = conf.sinHists()
+   sFile       = conf.sigFile()
+   sigSamp     = conf.switches()["signalSample"]
+   histRanges  = conf.histRanges()
+   jMulti      = conf.switches()["jetMulti"]
+#   debug       = conf.switches()["debug"]
+
+   if debug: print sFile[sigSamp][0]
+  
+   normVal = None
+   if conf.switches()["unitNorm"]:
+      normVal = 1.
+
+   rFile = r.TFile.Open(sFile[sigSamp][0])
+   if debug: print rFile
+
+   c1 = r.TCanvas()
+
+   for hT in sinHists:
+      hList=[]
+      for d in dirs:
+         h = rFile.Get("%s/%s"%(d, hT))
+         if debug: print h
+         hList.append(h)
+      aPlot = anaPlot(hList, hT)
+      if debug: aPlot.Debug=True
+      hTot = aPlot.makeSinglePlot(1, normVal)
+      del aPlot
+      
+      hTot.Draw("hist")
+      if hT in histRanges:
+         ranges = histRanges[hT]
+         hTot.GetXaxis().SetRangeUser(ranges[0], ranges[1]) 
+      
+
+
+      if "noCut" not in conf.switches()["HTcuts"]:
+         c1.Print("plotDump/bTagEff_%s_%s_%s.png"%(sigSamp, hT, hMulti))
+      else:
+         c1.Print("plotDump/bTagEff_%s_%s_noCuts.png"%(sigSamp, hT))
+
+   pass
