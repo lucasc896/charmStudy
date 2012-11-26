@@ -12,21 +12,24 @@ from sys import argv, exit
 ###-------------------------------------------------------------------###
 
 def mode():
-  runMode = ["plotting", "yieldTables"][0]
+  runMode = ["bTagEff", "anaPlots"][0]
+
 
   return runMode
 
 ###-------------------------------------------------------------------###
 
 def switches():
+  #generic switches
   switches={
-          "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][2],
-          "signalSample"  :"T2cc_220_145_noAlphaInc",
-          "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT"][1],
+          "runMode"       :["plotting", "yieldTables"][0],
+          "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][1],
+          "signalSample"  :"T2cc_220_195",
+          "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT"][0],
           "jetMulti"      :["le3j","ge4j","inc"][2],
-          "printLogy"     :[False, True][1],
-          "debug"         :[False,True][0],
-          "unitNorm"      :[False,True][1],
+          "printLogy"     :[False, True][0],
+          "debug"         :[False,True][1],
+          "unitNorm"      :[False,True][0],
           }
 
   return switches
@@ -37,48 +40,63 @@ def inFiles():
   """syntax is "Name":["path", scale]"""
 
   mcScale = 116.9 # corresponding to intL for had sample
-  inDir = "/Users/cl7359/SUSY/charmStudy/ANALYSIS/rootfiles/anaPlots/"
+  inDir = "/Users/cl7359/SUSY/charmStudy/ANALYSIS/rootfiles/"
 
-  files = {
-        "WJets":    ["%soutWJets_anaPlots.root"%inDir, mcScale],
-        #"QCD":      ["%soutQCD_anaPlots.root"%inDir, mcScale],
-        "SingleTop":["%soutSinT_anaPlots.root"%inDir, mcScale],
-        "TTJets":   ["%soutTTbar_anaPlots.root"%inDir, mcScale],
-        "DiBoson":  ["%soutDiBo_anaPlots.root"%inDir, mcScale],
-        }
-
+  if mode()=="anaPlots":
+    files = {
+          "WJets":    ["%sanaPlots/outWJets_anaPlots.root"%inDir, mcScale],
+          #"QCD":      ["%sanaPlots/outQCD_anaPlots.root"%inDir, mcScale],
+          "SingleTop":["%sanaPlots/outSinT_anaPlots.root"%inDir, mcScale],
+          "TTJets":   ["%sanaPlots/outTTbar_anaPlots.root"%inDir, mcScale],
+          "DiBoson":  ["%sanaPlots/outDiBo_anaPlots.root"%inDir, mcScale],
+          }
+  elif mode()=="bTagEff":
+    files = {
+          "file": ["%sbTagEff/some_file.root"%inDir, mcScale]
+    }
   return files
 
 ###-------------------------------------------------------------------###
 
 def sigFile():
-  sigFile = {
-          "T2cc_300"                :["../rootfiles/anaPlots/outT2cc_300_anaPlots.root", 100.],
-          "T2cc_160"                :["../rootfiles/anaPlots/outT2cc_160_anaPlots.root", 100.],
-          "T2bb_300"                :["../rootfiles/anaPlots/outT2bb_300_anaPlots.root", 100.],
-          "T2cc_225-190"            :["../rootfiles/anaPlots/outT2cc_225-190_anaPlots.root", 100.],
-          "T2cc_225-175"            :["../rootfiles/anaPlots/outT2cc_225-175_anaPlots.root", 100.],
-          "T2cc_225-150"            :["../rootfiles/anaPlots/outT2cc_225-150_anaPlots.root", 100.],
-          "T2cc_160_pt10"           :["../rootfiles/anaPlots/outT2cc_160_pt10_anaPlots.root", 100.],
-          "T2cc_300_pt10"           :["../rootfiles/anaPlots/outT2cc_300_pt10_anaPlots.root", 100.],                            
-          "T2cc_160_pt20"           :["../rootfiles/anaPlots/outT2cc_160_pt20_anaPlots.root", 100.],
-          "T2cc_300_pt20"           :["../rootfiles/anaPlots/outT2cc_300_pt20_anaPlots.root", 100.],
-          "T2cc_160_pt20_ISRRW"     :["../rootfiles/anaPlots/outT2cc_160_pt20_ISRRW_anaPlots.root", 100.],
-          "T2cc_160_ISRRW"          :["../rootfiles/anaPlots/outT2cc_160_ISRRW_anaPlots.root", 100.],
-          "T2cc_220_195"            :["../rootfiles/anaPlots/outT2cc_220_195_anaPlots.root", 100.],           
-          "T2cc_220_170"            :["../rootfiles/anaPlots/outT2cc_220_170_anaPlots.root", 100.],           
-          "T2cc_220_145"            :["../rootfiles/anaPlots/outT2cc_220_145_anaPlots.root", 100.],           
-          "T2cc_220_195_pt20"       :["../rootfiles/anaPlots/outT2cc_220_195_pt20_anaPlots.root", 100.],           
-          "T2cc_220_170_pt20"       :["../rootfiles/anaPlots/outT2cc_220_170_pt20_anaPlots.root", 100.],           
-          "T2cc_220_145_pt20"       :["../rootfiles/anaPlots/outT2cc_220_145_pt20_anaPlots.root", 100.],
-          "T2cc_220_195_ISRRW"      :["../rootfiles/anaPlots/outT2cc_220_195_ISRRW_anaPlots.root", 100.],           
-          "T2cc_220_170_ISRRW"      :["../rootfiles/anaPlots/outT2cc_220_170_ISRRW_anaPlots.root", 100.],           
-          "T2cc_220_145_ISRRW"      :["../rootfiles/anaPlots/outT2cc_220_145_ISRRW_anaPlots.root", 100.],
-          "T2cc_220_195_noAlphaInc" :["../rootfiles/anaPlots/outT2cc_220_195_noAlphaInc_anaPlots.root", 100.],           
-          "T2cc_220_170_noAlphaInc" :["../rootfiles/anaPlots/outT2cc_220_170_noAlphaInc_anaPlots.root", 100.],           
-          "T2cc_220_145_noAlphaInc" :["../rootfiles/anaPlots/outT2cc_220_145_noAlphaInc_anaPlots.root", 100.],          
+  inDir = "/Users/cl7359/SUSY/charmStudy/ANALYSIS/rootfiles/"
 
-  }
+  if mode()=="anaPlots":
+    sigFile = {
+            "T2cc_300"                :["%sanaPlots/outT2cc_300_anaPlots.root"%inDir, 100.],
+            "T2cc_160"                :["%sanaPlots/outT2cc_160_anaPlots.root"%inDir, 100.],
+            "T2bb_300"                :["%sanaPlots/outT2bb_300_anaPlots.root"%inDir, 100.],
+            "T2cc_225-190"            :["%sanaPlots/outT2cc_225-190_anaPlots.root"%inDir, 100.],
+            "T2cc_225-175"            :["%sanaPlots/outT2cc_225-175_anaPlots.root"%inDir, 100.],
+            "T2cc_225-150"            :["%sanaPlots/outT2cc_225-150_anaPlots.root"%inDir, 100.],
+            "T2cc_160_pt10"           :["%sanaPlots/outT2cc_160_pt10_anaPlots.root"%inDir, 100.],
+            "T2cc_300_pt10"           :["%sanaPlots/outT2cc_300_pt10_anaPlots.root"%inDir, 100.],                            
+            "T2cc_160_pt20"           :["%sanaPlots/outT2cc_160_pt20_anaPlots.root"%inDir, 100.],
+            "T2cc_300_pt20"           :["%sanaPlots/outT2cc_300_pt20_anaPlots.root"%inDir, 100.],
+            "T2cc_160_pt20_ISRRW"     :["%sanaPlots/outT2cc_160_pt20_ISRRW_anaPlots.root"%inDir, 100.],
+            "T2cc_160_ISRRW"          :["%sanaPlots/outT2cc_160_ISRRW_anaPlots.root"%inDir, 100.],
+            "T2cc_220_195"            :["%sanaPlots/outT2cc_220_195_anaPlots.root"%inDir, 100.],           
+            "T2cc_220_170"            :["%sanaPlots/outT2cc_220_170_anaPlots.root"%inDir, 100.],           
+            "T2cc_220_145"            :["%sanaPlots/outT2cc_220_145_anaPlots.root"%inDir, 100.],           
+            "T2cc_220_195_pt20"       :["%sanaPlots/outT2cc_220_195_pt20_anaPlots.root"%inDir, 100.],           
+            "T2cc_220_170_pt20"       :["%sanaPlots/outT2cc_220_170_pt20_anaPlots.root"%inDir, 100.],           
+            "T2cc_220_145_pt20"       :["%sanaPlots/outT2cc_220_145_pt20_anaPlots.root"%inDir, 100.],
+            "T2cc_220_195_ISRRW"      :["%sanaPlots/outT2cc_220_195_ISRRW_anaPlots.root"%inDir, 100.],           
+            "T2cc_220_170_ISRRW"      :["%sanaPlots/outT2cc_220_170_ISRRW_anaPlots.root"%inDir, 100.],           
+            "T2cc_220_145_ISRRW"      :["%sanaPlots/outT2cc_220_145_ISRRW_anaPlots.root"%inDir, 100.],
+            "T2cc_220_195_noAlphaInc" :["%sanaPlots/outT2cc_220_195_noAlphaInc_anaPlots.root"%inDir, 100.],           
+            "T2cc_220_170_noAlphaInc" :["%sanaPlots/outT2cc_220_170_noAlphaInc_anaPlots.root"%inDir, 100.],           
+            "T2cc_220_145_noAlphaInc" :["%sanaPlots/outT2cc_220_145_noAlphaInc_anaPlots.root"%inDir, 100.],          
+    }
+  elif mode()=="bTagEff":
+    sigFile={
+          "T2cc_160"      :["%sbTagEff_Study/outT2cc_160_bTagEff.root"%inDir],
+          "T2cc_300"      :["%sbTagEff_Study/outT2cc_300_bTagEff.root"%inDir],
+          "T2cc_220_195"  :["%sbTagEff_Study/outT2cc_220_195_bTagEff.root"%inDir],
+          "T2cc_220_170"  :["%sbTagEff_Study/outT2cc_220_170_bTagEff.root"%inDir],
+          "T2cc_220_145"  :["%sbTagEff_Study/outT2cc_220_145_bTagEff.root"%inDir],
+    }
+
 
   return sigFile
 
@@ -128,18 +146,32 @@ def bMulti():
 ###-------------------------------------------------------------------###
 
 def sinHists():
-  singleHists={
-        "stopGenPtScal":40,
-        "stopGenPtVect":20,
-        "delPhi_vs_scalGenPt":4,
-        "dPhiStopCharm":2,
-        "dPhiStopStop":2,
-        "dPhiNeutCharm":2,
-        "dPhiCharmCharm":2,
-        "dPhiStopNeut":2,
-        "n_Events_1":1,
-        "n_Jets":1,
-        "n_BTagged_Jets_all":1,
+  if mode()=="anaPlots":
+    singleHists={
+          "stopGenPtScal":40,
+          "stopGenPtVect":20,
+          "delPhi_vs_scalGenPt":4,
+          "dPhiStopCharm":2,
+          "dPhiStopStop":2,
+          "dPhiNeutCharm":2,
+          "dPhiCharmCharm":2,
+          "dPhiStopNeut":2,
+          "n_Events_1":1,
+          "n_Jets":1,
+          "n_BTagged_Jets_all":1,
+    }
+  elif mode()=="bTagEff":
+    singleHists={
+          "n_Jets":1,
+          "n_JetsMatchB":1,
+          "n_JetsMatchC":1,
+          "n_JetsMatchL":1,
+          "jetFlavour_0":1,
+          "jetFlavour_1":1,
+          "jetFlavour_2":1,
+          "jetFlavour_3":1,
+          "n_Truth_B":1,
+          "n_Truth_C":1,
     }
   
   return singleHists
@@ -147,19 +179,23 @@ def sinHists():
 ###-------------------------------------------------------------------###
 
 def anaHists():  
-  hists={
-    "MET":20,
-    "MHT":20,
-    "commHT":20,
-    "hadronicAlphaTZoom":5,
-    "leadJetdelPhi":2,
-    "MHToverMET":2,
-    "jetPt":20,
-    "leadJetPt":20,
-    "subLeadJetPt":20,
-    #"alphaT_vs_HT":1,
+  
+  if mode()=="anaHist":
+    hists={
+      "MET":20,
+      "MHT":20,
+      "commHT":20,
+      "hadronicAlphaTZoom":5,
+      "leadJetdelPhi":2,
+      "MHToverMET":2,
+      "jetPt":20,
+      "leadJetPt":20,
+      "subLeadJetPt":20,
+      #"alphaT_vs_HT":1,
     }
-
+  elif mode()=="bTagEff":
+    hists={}
+  
   return hists
 
 ###-------------------------------------------------------------------###
