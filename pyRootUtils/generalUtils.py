@@ -424,7 +424,7 @@ class stackPlots(object):
 
 
 
-def comparPlot(h1=None, h2=None):
+def comparPlot(h1=None, h2=None, debug=False):
   
   jM = conf.switches()["jetMulti"]
   plots = conf.comparFiles()
@@ -459,13 +459,13 @@ def comparPlot(h1=None, h2=None):
   c1.Print("plotDump/compare_%s_%s_%s.png"%(h1.GetName(),bM[0], jM))
 
 
-def comparPlots(hList=None):
+def comparPlots(hList=None, debug=None):
 
   jM = conf.switches()["jetMulti"]
   plots = conf.comparFiles()
   bM = conf.bMulti()
 
-  if conf.switches()["debug"]:
+  if debug:
     print "comparPlots: %s"%hList[0].GetName()
 
   for h in hList:
