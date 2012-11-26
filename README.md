@@ -11,4 +11,4 @@ Code related to the study of bTag efficiency of light quarks.
 Code for plotting various analysis distributions and event yields.
 
 ### pyRootUtils
-Semi-generic code from interfacing with pyRoot.
+Semi-generic code for interfacing with pyRoot.
