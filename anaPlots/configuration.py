@@ -9,11 +9,13 @@ Copyright (c) 2012 University of Bristol. All rights reserved.
 
 from sys import argv, exit
 
+#print options
+
 ###-------------------------------------------------------------------###
 
 def mode():
-  runMode = ["bTagEff", "anaPlots"][0]
-
+  
+  runMode = ["bTagEff", "anaPlots"][1]
 
   return runMode
 
@@ -22,13 +24,12 @@ def mode():
 def switches():
   #generic switches
   switches={
-          "runMode"       :["plotting", "yieldTables"][0],
-          "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][1],
+          "runMode"       :["plotting", "yieldTables"][1],
+          "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][2],
           "signalSample"  :"T2cc_220_195",
           "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT"][0],
           "jetMulti"      :["le3j","ge4j","inc"][2],
           "printLogy"     :[False, True][0],
-          "debug"         :[False,True][1],
           "unitNorm"      :[False,True][0],
           }
 
@@ -180,7 +181,7 @@ def sinHists():
 
 def anaHists():  
   
-  if mode()=="anaHist":
+  if mode()=="anaPlots":
     hists={
       "MET":20,
       "MHT":20,
