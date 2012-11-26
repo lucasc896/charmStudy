@@ -192,6 +192,12 @@ void analysisPlots::StandardPlots() {
       50, 0, 3.2,
       1, 0, 1, false);
 
+   BookHistArray(h_dPhiCharmCharm,
+      "dPhiCharmCharm",
+      ";#delta #phi (charm-charm);# count",
+      50, 0, 3.2,
+      1, 0, 1, false);   
+
    BookHistArray(h_susyScanPlane,
     "susyScanPlane",
     ";mSQ (GeV); mLSP (GeV)",
@@ -224,7 +230,20 @@ void analysisPlots::StandardPlots() {
       "evNums",
       ";evNum;",
       100000, 0., 100000.,
-      1, 0, 1, false); 
+      1, 0, 1, false);
+   
+   BookHistArray(h_evLS,
+      "evLS",
+      ";evLS;",
+      100, 0., 100.,
+      1, 0, 1, false);        
+
+   BookHistArray(h_alphaT_vs_HT,
+    "alphaT_vs_HT",
+    ";alphaT;HT (GeV)",
+    200,0., 2.,
+    1000, 0., 1000.,
+    6, 0, 1, false);
 
 }
 
@@ -261,10 +280,12 @@ bool analysisPlots::StandardPlots( Event::Data& ev ) {
    vector<double> v_StopGenPt = getStopGenPt( ev );
    int nbjet = 0, plotIndex = 0;
 
-   h_evNums[0]->Fill( ev.EventNumber() );
 
-   //
-//
+   h_evNums[0] ->Fill( ev.EventNumber() );
+   h_evLS[0]   ->Fill( ev.LumiSection() );
+
+   
+
    for(int i=0; i<nCommJet; i++){
       // count number of btagged jets
       if( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), bTagAlgo_) > bTagAlgoCut_ ) nbjet++;
@@ -287,6 +308,7 @@ bool analysisPlots::StandardPlots( Event::Data& ev ) {
    h_MHToverMET[plotIndex]          ->Fill( v_MHTMET[2], evWeight );
    h_stopGenPtVect[0]               ->Fill( v_StopGenPt.at(0), evWeight );
    h_stopGenPtScal[0]               ->Fill( v_StopGenPt.at(1), evWeight );
+   h_alphaT_vs_HT[plotIndex]        ->Fill( hadronicAlphaT, evHT, evWeight );
 
    for(int i=0; i<nCommJet; i++) h_jetPt[plotIndex]->Fill( ev.JD_CommonJets().accepted.at(i)->Pt(), evWeight );
 
@@ -344,13 +366,14 @@ bool analysisPlots::StandardPlots( Event::Data& ev ) {
    h_SMSdPhiLeadJetsGenPt[0]->Fill( M0, M12, jetDeltaPhi );
 
    if( (gStop1!=gEmpty) && (gStop2 !=gEmpty) && (gCharm1 !=gEmpty) && (gCharm2 !=gEmpty) && (gNeut1 !=gEmpty) && (gNeut2 !=gEmpty) ){
-      h_dPhiStopCharm[0]->Fill( getGenDeltaPhi(gStop1, gCharm1), evWeight );
-      h_dPhiStopCharm[0]->Fill( getGenDeltaPhi(gStop2, gCharm2), evWeight );
-      h_dPhiNeutCharm[0]->Fill( getGenDeltaPhi(gNeut1, gCharm1), evWeight );
-      h_dPhiNeutCharm[0]->Fill( getGenDeltaPhi(gNeut2, gCharm2), evWeight );
-      h_dPhiStopNeut[0] ->Fill( getGenDeltaPhi(gStop1, gNeut1), evWeight );
-      h_dPhiStopNeut[0] ->Fill( getGenDeltaPhi(gStop2, gNeut2), evWeight );
-      h_dPhiStopStop[0] ->Fill( getGenDeltaPhi(gStop1, gStop2), evWeight );
+      h_dPhiStopCharm[0]  ->Fill( getGenDeltaPhi(gStop1, gCharm1), evWeight );
+      h_dPhiStopCharm[0]  ->Fill( getGenDeltaPhi(gStop2, gCharm2), evWeight );
+      h_dPhiNeutCharm[0]  ->Fill( getGenDeltaPhi(gNeut1, gCharm1), evWeight );
+      h_dPhiNeutCharm[0]  ->Fill( getGenDeltaPhi(gNeut2, gCharm2), evWeight );
+      h_dPhiStopNeut[0]   ->Fill( getGenDeltaPhi(gStop1, gNeut1), evWeight );
+      h_dPhiStopNeut[0]   ->Fill( getGenDeltaPhi(gStop2, gNeut2), evWeight );
+      h_dPhiStopStop[0]   ->Fill( getGenDeltaPhi(gStop1, gStop2), evWeight );
+      h_dPhiCharmCharm[0] ->Fill( getGenDeltaPhi(gCharm1, gCharm2), evWeight );
    }
 
 
@@ -446,6 +469,9 @@ vector<double> analysisPlots::getStopGenPt( Event::Data& ev ){
 
 }
 
+
+// -----------------------------------------------------------------------------
+//
 double analysisPlots::getGenDeltaPhi( const Event::GenObject& gOb1, const Event::GenObject& gOb2 ){
 
    double dPhi = ROOT::Math::VectorUtil::DeltaPhi( gOb1, gOb2 );
