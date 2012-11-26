@@ -34,8 +34,9 @@ def getbMultis(bM=""):
 
 ###-------------------------------------------------------------------###
 
-def runAnaPlots():
+def runAnaPlots(debug=False):
   
+  if debug: print "\n\tDEBUG: In runAnaPlots.\n"
   print "\n >>> Making Analysis Plots\n"
 
   files       = conf.inFiles()
@@ -44,12 +45,14 @@ def runAnaPlots():
   hists       = conf.anaHists()
   sigSamp     = conf.switches()["signalSample"]
   sigFile     = conf.sigFile()
-  
+
+
   for hT, rVal in hists.iteritems():
     for b in bMulti:
-
+      if debug: print hT
       if sigSamp:
         sFile=r.TFile().Open(sigFile[sigSamp][0])
+        if debug: print sFile
         hS = getPlotsFromFile(hT, dirs, getbMultis(b), sFile, sigFile[sigSamp][1])
       else: hS=None
 
@@ -64,14 +67,16 @@ def runAnaPlots():
       oFileName="plotDump/Stack_%s_%s.png"%(hT, b)
 
       a1 = stackPlots(bgHists, bgTitles, hS)
+      if debug: a1.Debug=True
       if conf.switches()["printLogy"]: a1.PrintLogy = True
       a1.drawStack(hT, rVal, oFileName, sigTitle=sigSamp)
       del a1
  
 ###-------------------------------------------------------------------###
 
-def runStandPlots(printPlots=True, comparSamp=None):
+def runStandPlots(printPlots=True, comparSamp=None, debug=False):
 
+  if debug: print "\n\tDEBUG: In runStandPlots.\n"
   if printPlots: print "\n >>> Making Standard Plots\n"
 
   dirs        = conf.inDirs()
@@ -82,7 +87,7 @@ def runStandPlots(printPlots=True, comparSamp=None):
   sigSamp     = conf.switches()["signalSample"]
   histRanges  = conf.histRanges()
   jMulti      = conf.switches()["jetMulti"]
-  debug       = conf.switches()["debug"]
+#  debug       = conf.switches()["debug"]
 
   # override the global signal sample if running comparison plots
   if comparSamp: sigSamp = comparSamp
@@ -110,7 +115,9 @@ def runStandPlots(printPlots=True, comparSamp=None):
           h = rFile.Get("%s/%s%s"%(d, hT, suf))
           histList.append(h)
       aPlot = anaPlot(histList, "%s_%s"%(hT, b))
+      if debug: aPlot.Debug=True
       hTot = aPlot.makeSinglePlot(rVal, normVal)
+      del aPlot
       if "TH2D" in str( type(hTot) ):
         hTot.Draw("colz")
       else:
@@ -123,9 +130,7 @@ def runStandPlots(printPlots=True, comparSamp=None):
         if "noCut" not in conf.switches()["HTcuts"]:
           c1.Print("plotDump/%s_%s_%s_%s.png"%(sigSamp, hT, b, jMulti))
         else:
-          c1.Print("plotDump/%s_%s_%s_%s.png"%(sigSamp, hT, b, "noCuts"))
-
-      del aPlot   
+          c1.Print("plotDump/%s_%s_%s_%s.png"%(sigSamp, hT, b, "noCuts"))   
   
   #plot single plots
   for hT, rVal in sinHists.iteritems():
@@ -134,15 +139,12 @@ def runStandPlots(printPlots=True, comparSamp=None):
       if debug: print "%s/%s"%(d, hT)
       h = rFile.Get("%s/%s"%(d, hT))
       histList.append(h)
+    
     aPlot = anaPlot(histList, hT)
-    #weight=1.
-    #if "T2cc_160" in sigSamp:
-    #  weight = 8
-    #if "T2cc_220" in sigSamp:
-    #  weight =8
-    #if "T2cc_300" in sigSamp:
-    #  weight =10
+    if debug: aPlot.Debug=True
     hTot = aPlot.makeSinglePlot(rVal, normVal)
+    del aPlot
+    
     if "TH2D" in str( type(hTot) ):
       hTot.Draw("colz")
     else:
@@ -150,20 +152,22 @@ def runStandPlots(printPlots=True, comparSamp=None):
     if hT in histRanges:
       ranges = histRanges[hT]
       hTot.GetXaxis().SetRangeUser(ranges[0], ranges[1])  
+    
     outHists.append(hTot)  
+    
     if printPlots:
         if "noCut" not in conf.switches()["HTcuts"]:
-          c1.Print("plotDump/%s_%s_%s_%s.png"%(sigSamp, hT, b, jMulti))
+          c1.Print("plotDump/anaPlots_%s_%s_%s_%s.png"%(sigSamp, hT, b, jMulti))
         else:
           c1.Print("plotDump/%s_%s_%s_%s.png"%(sigSamp, hT, b, "noCuts"))
-    del aPlot
   
   return outHists
 
 ###-------------------------------------------------------------------###
 
-def runComparPlots():
+def runComparPlots(debug=False):
 
+  if debug: print "\n\tDEBUG: In runAnaPlots.\n"
   print "\n >>> Making Comparison Plots\n"
 
   files       = conf.inFiles()
@@ -174,20 +178,22 @@ def runComparPlots():
   sFile       = conf.sigFile()
   compFiles   = conf.comparFiles()
 
+  if debug: print compFiles
+
   if len(bMulti)>1:
     print "\t*** Only run comparison plots with one bMultiplicity\n"
     sys.exit()
 
   hList=[]
   for f in compFiles:
-    hList.append( runStandPlots(printPlots=False, comparSamp=f) )
+    hList.append( runStandPlots(printPlots=False, comparSamp=f, debug=debug) )
 
   if len(hList)==2:
     for h1, h2 in zip(hList[0], hList[1]):
       hComp=[]
       hComp.append(h1)
       hComp.append(h2)
-      comparPlots(hComp)
+      comparPlots(hComp, debug=debug)
 
   if len(hList)==3:
     for h1, h2, h3 in zip(hList[0], hList[1], hList[2]):
@@ -195,7 +201,7 @@ def runComparPlots():
       hComp.append(h1)
       hComp.append(h2)
       hComp.append(h3)    
-      comparPlots(hComp)
+      comparPlots(hComp, debug=debug)
   if len(hList)==5:
     for h1, h2, h3, h4, h5 in zip(hList[0], hList[1], hList[2], hList[3], hList[4]):
       hComp=[]
@@ -204,4 +210,4 @@ def runComparPlots():
       hComp.append(h3)
       hComp.append(h4)
       hComp.append(h5)  
-      comparPlots(hComp)
+      comparPlots(hComp, debug=debug)
