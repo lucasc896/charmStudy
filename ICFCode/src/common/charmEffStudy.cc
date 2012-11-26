@@ -66,43 +66,79 @@ void charmEffStudy::StandardPlots() {
    BookHistArray(h_nJets,
      "n_Jets",
      ";nJets;# count",
-     20, 0., 20.,
+     12, 0., 12.,
      1, 0, 1, true);
+
+   BookHistArray(h_nJetsMatchB,
+     "n_JetsMatchB",
+     ";nJets;# count",
+     12, 0., 12.,
+     1, 0, 1, false);
+ 
+   BookHistArray(h_nJetsMatchC,
+     "n_JetsMatchC",
+     ";nJets;# count",
+     12, 0., 12.,
+     1, 0, 1, false);
+
+   BookHistArray(h_nJetsMatchL,
+     "n_JetsMatchL",
+     ";nJets;# count",
+     12, 0., 12.,
+     1, 0, 1, false);
+
+   BookHistArray(h_jetFlavour,
+      "jetFlavour",
+      ";pdgId;# count",
+      200, 0., 200.,
+      4, 0, 1, false);
+
+   BookHistArray(h_charmJetdR1,
+      "charmJetdR1",
+      ";DeltaR;# count",
+      50, 0., 10.,
+      4, 0, 1, false);
+
+   BookHistArray(h_charmJetdR2,
+      "charmJetdR2",
+      ";DeltaR;# count",
+      50, 0., 10.,
+      4, 0, 1, false);
 
    BookHistArray(h_nBTagJets,
       "n_BTagged_Jets",
       ";nBJets;# count",
-      10, 0., 10.,
+      6, 0., 6.,
       3, 0, 1, false);
 
    BookHistArray(h_nBTagJetsMatchB,
      "n_BTagged_JetsMatchB",
      ";nBJets;# count",
-     10, 0., 10.,
+     6, 0., 6.,
      3, 0, 1, false);
  
    BookHistArray(h_nBTagJetsMatchC,
      "n_BTagged_JetsMatchC",
      ";nBJets;# count",
-     10, 0., 10.,
+     6, 0., 6.,
      3, 0, 1, false);
 
    BookHistArray(h_nBTagJetsMatchL,
      "n_BTagged_JetsMatchL",
      ";nBJets;# count",
-     10, 0., 10.,
+     6, 0., 6.,
      3, 0, 1, false);   
 
    BookHistArray(h_nTrueB,
      "n_Truth_B",
      ";nTrueBJets;# count",
-     10, 0., 10.,
+     6, 0., 6.,
      1, 0, 1, true);
  
    BookHistArray(h_nTrueC,
      "n_Truth_C",
      ";nTrueCJets;# count",
-     10, 0., 10.,
+     6, 0., 6.,
      1, 0, 1, true);
    
    BookHistArray(h_noMatch_response,
@@ -129,6 +165,11 @@ void charmEffStudy::StandardPlots() {
       1000, 0., 10.,
       5, 0, 1, false);
 
+   BookHistArray(h_charmEtaSign,
+      "charmEtaSign",
+      ";blah;# count",
+      2, 0., 2.,
+      1, 0, 1, false);
 }
 
 
@@ -147,7 +188,8 @@ bool charmEffStudy::StandardPlots( Event::Data& ev ) {
 // main module
 
    unsigned int nobjkt = ev.CommonObjects().size();
-   int njet=0, nbjet[3], nbjetMatchB[3], nbjetMatchC[3], nbjetMatchL[3];
+   int nbjet[3], nbjetMatchB[3], nbjetMatchC[3], nbjetMatchL[3];
+   int njet=0, nJetMatchB=0, nJetMatchC=0, nJetMatchL=0;
    double bTagAlgoCut[3]={.898,.679,.244};
 
    for(int i=0; i<3; i++){
@@ -159,12 +201,19 @@ bool charmEffStudy::StandardPlots( Event::Data& ev ) {
 
    // a couple event level vetoes
    if (!StandardPlots_) return true;
-   if( nobjkt < nMin_ && nobjkt > nMax_ ) return true;
+   if( nobjkt < nMin_ || nobjkt > nMax_ ) return true;
 
 
    // loop over common jets
    for(unsigned int i=0; i<ev.JD_CommonJets().accepted.size(); i++) {
       njet++;
+      
+      //match generic jets to partons
+      if( matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 5, minDR_) ) nJetMatchB++;
+      if( matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 4, minDR_) ) nJetMatchC++;
+      if( matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 3, minDR_) || matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 2, minDR_) || matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 1, minDR_) ){
+         nJetMatchL++;
+      }
 
       // loop over Tgt/Med/Lse
       for(int j=0; j<3; j++){
@@ -177,6 +226,7 @@ bool charmEffStudy::StandardPlots( Event::Data& ev ) {
             }
          }
       }
+
       //look for b and c quark matching
       if ( matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 5, minDR_) ){
          h_bMatched_response[0]->Fill( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), 5) );
@@ -210,6 +260,10 @@ bool charmEffStudy::StandardPlots( Event::Data& ev ) {
 
    // fill jet multiplicities
    h_nJets[0]->Fill(njet);
+   h_nJetsMatchB[0]->Fill(nJetMatchB);
+   h_nJetsMatchC[0]->Fill(nJetMatchC);
+   h_nJetsMatchL[0]->Fill(nJetMatchL);
+
    
    for(int i=0; i<3; i++){
       h_nBTagJets[i]->Fill(nbjet[i]);
@@ -218,20 +272,47 @@ bool charmEffStudy::StandardPlots( Event::Data& ev ) {
       h_nBTagJetsMatchL[i]->Fill(nbjetMatchL[i]);
    }
 
+   // get the two genCharms
+   Event::GenObject gCharm1(0.,0.,0.,0.,0,0,0,0);
+   Event::GenObject gCharm2(0.,0.,0.,0.,0,0,0,0);
+   for( std::vector<Event::GenObject>::const_iterator igen = ev.GenParticles().begin(); igen != ev.GenParticles().end(); ++igen ){
+      if( (*igen).GetStatus() == 3 ){   
+         if( (fabs((*igen).GetID()) == 4) && ((*igen).GetMotherID() == 1000006) )         gCharm1 = *igen;
+         if( (fabs((*igen).GetID()) == 4) && ((*igen).GetMotherID() == -1000006) )        gCharm2 = *igen;
+      }
+
+   }
+
+   if ((gCharm1.Eta()>0.) && (gCharm2.Eta()<0.)){
+      h_charmEtaSign[0]->Fill(1.5);
+   }
+   else if ((gCharm2.Eta()>0.) && (gCharm1.Eta()<0.)){
+      h_charmEtaSign[0]->Fill(1.5);
+   }
+   else{
+      h_charmEtaSign[0]->Fill(0.5);
+   }
+   
+   for(unsigned int i=0; i<4; i++){
+      if (ev.JD_CommonJets().accepted.size()>i){
+         h_jetFlavour[i]   ->Fill( getJetFlavour(ev, *ev.JD_CommonJets().accepted.at(i), minDR_) );
+         h_charmJetdR1[i]  ->Fill( getDeltaR(gCharm1,*ev.JD_CommonJets().accepted.at(i)) );
+         h_charmJetdR2[i]  ->Fill( getDeltaR(gCharm2,*ev.JD_CommonJets().accepted.at(i)) );
+      }
+   }
+
+
    //check for truth b
    if( hasTrueQuark(ev, 5) ){
       int numTrue   = numTrueQuarks(ev, 5);
-
       h_nTrueB[0] ->Fill( numTrue );
    }
 
    //check for truth c
    if( hasTrueQuark(ev, 4) ){
       int numTrue   = numTrueQuarks(ev, 4);
-
       h_nTrueC[0] ->Fill( numTrue );
    }
-  
 
    return true;
 
@@ -297,4 +378,29 @@ bool charmEffStudy::matchedToGenQuark( const Event::Data& ev, const Event::Jet &
 }
 
 
+// -----------------------------------------------------------------------------
+//
+int charmEffStudy::getJetFlavour( const Event::Data& ev, const Event::Jet &jet, float minDR ){
+
+   float myPdgId=-1;
+
+   for( std::vector<Event::GenObject>::const_iterator igen = ev.GenParticles().begin(); igen != ev.GenParticles().end(); ++igen ) {
+      if( (*igen).GetStatus() == 3 ){
+         if( fabs(ROOT::Math::VectorUtil::DeltaR( (*igen),jet) ) < minDR ){
+            myPdgId=(*igen).GetID();
+         }
+      }
+   }
+
+   return myPdgId;
+}
+
+
+// -----------------------------------------------------------------------------
+//
+float charmEffStudy::getDeltaR( const Event::GenObject gOb, const Event::Jet &jet ){
+
+   return ROOT::Math::VectorUtil::DeltaR(gOb, jet);
+
+}
 
