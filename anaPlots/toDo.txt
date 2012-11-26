@@ -4,3 +4,5 @@
 - add in different switches for bTagEff and anaPlots
 - write code for bTagEff
     - make stand-alone from makeAnaPlots.py
+- put color definitions matched to a signal sample
+- synchronise histNames and root file structure with Z
