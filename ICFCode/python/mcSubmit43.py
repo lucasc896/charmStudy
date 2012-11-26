@@ -15,8 +15,18 @@ from ra1objectid.ra3PhotonId_cff import *
 from ra1objectid.ra3PhotonId2012_cff import *
 from samples import *
 from sys import argv
+from utils import *
+
+ISR_pset = PSet(
+JetPt_Low = EffToPSet(readBtagWeight("./ISR/h_ISRWeight_lastPt_225_200.txt")).GenPt,
+JetPt_High = EffToPSet(readBtagWeight("./ISR/h_ISRWeight_lastPt_225_200.txt")).GenEta,
+Variation  = EffToPSet(readBtagWeight("./ISR/h_ISRWeight_lastPt_225_200.txt")).Pt_Eta_Eff,
+)
+
+ISR_reweight = SMS_ISR_Reweighting(ISR_pset.ps())
 
 default_common.Jets.PtCut              = 50.*(325./375.)
+#default_common.Jets.PtCut              = 20.
 
 cutTreeMC, junkVar,junkVar2            = MakeMCTree(100.*(325./375.),Muon = None)
 vbtfMuonId_cff                         = Muon_IDFilter( vbtfmuonidps.ps()  )
@@ -28,6 +38,8 @@ CustomMuID                             = OL_TightMuID(mu_2012.ps())
 def addCutFlowMC(b) :
   #b.AddWeightFilter("Weight", vertex_reweight)
 #  b.AddWeightFilter("Weight", pileup_reweight)
+  #b.AddWeightFilter("Weight", ISR_reweight)  
+
   b.AddMuonFilter("PreCC",CustomMuID)
   b.AddPhotonFilter("PreCC",ra3PhotonIdFilter)
   b.AddElectronFilter("PreCC",CustomEleID)
@@ -47,7 +59,8 @@ outDir = "../results_"+strftime("%d_%b/325_/")
 ensure_dir(outDir)
 
 samp_mc = mc_TTbar + mc_WJets + mc_QCD + mc_DiBo + mc_sinT
-samp_sig = sig_T2cc_225_190 + sig_T2cc_225_175 + sig_T2cc_225_150
 samp_sig = sig_T2cc_160 + sig_T2cc_300
+samp_sig = sig_T2cc_220_195 + sig_T2cc_220_170 + sig_T2cc_220_145
+
 
 anal_ak5_caloMC.Run(outDir,conf_ak5_caloMC,samp_sig)
