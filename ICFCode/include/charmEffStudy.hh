@@ -41,9 +41,15 @@ namespace Operation {
       bool hasTrueQuark( const Event::Data& ev, int pdgID);
       int numTrueQuarks( const Event::Data& ev, int pdgID);
       bool matchedToGenQuark( const Event::Data& ev, const Event::Jet &jet, int pdgID, float minDR );
+      int getJetFlavour( const Event::Data& ev, const Event::Jet &jet, float minDR );
+      float getDeltaR( const Event::GenObject gOb, const Event::Jet &jet );
   
       //histos
       std::vector<TH1D*>  h_nJets;
+      std::vector<TH1D*>  h_nJetsMatchB;
+      std::vector<TH1D*>  h_nJetsMatchC;
+      std::vector<TH1D*>  h_nJetsMatchL;
+      std::vector<TH1D*>  h_jetFlavour;
       std::vector<TH1D*>  h_nBTagJets;
       std::vector<TH1D*>  h_nBTagJetsMatchB;
       std::vector<TH1D*>  h_nBTagJetsMatchC;
@@ -56,6 +62,9 @@ namespace Operation {
       std::vector<TH1D*>  h_bMatched_response;
       std::vector<TH1D*>  h_cMatched_response;
       std::vector<TH1D*>  h_lMatched_response;
+      std::vector<TH1D*>  h_charmJetdR1;
+      std::vector<TH1D*>  h_charmJetdR2;
+      std::vector<TH1D*>  h_charmEtaSign;
   
       std::vector<TH2D*>  h_Thresh_v_BTagEff;
       std::vector<TH2D*>  h_Thresh_v_CTagEff;
