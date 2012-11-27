@@ -81,7 +81,7 @@ def runAnaPlots(debug=False):
  
 ###-------------------------------------------------------------------###
 
-def runStandPlots(printPlots=True, comparSamp=None, debug=False):
+def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
 
   if debug: print "\n\tDEBUG: In runStandPlots.\n"
   if printPlots: print "\n >>> Making Standard Plots\n"
@@ -101,8 +101,17 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False):
   if debug: print sFile[sigSamp][0]
   
   normVal = None
-  if conf.switches()["unitNorm"]:
+  if conf.switches()["norm"]=="Unitary":
     normVal = 1.
+  elif conf.switches()["norm"]=="xSec":
+    #FIXME
+    normVal = 1.
+    if "T2cc_160" in sigSamp:
+      print "160 found!"
+    if "T2cc_220_" in sigSamp:
+      print "220 found!"
+    if "T2cc_300" in sigSamp:
+      print "300 found!"
 
   rFile = r.TFile.Open(sFile[sigSamp][0])
   if debug: print rFile
@@ -123,6 +132,7 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False):
       
       aPlot = anaPlot(histList, "%s_%s"%(hT, b))
       if debug: aPlot.Debug=True
+      if doLogy: aPlot.SetLogy = True
       hTot = aPlot.makeSinglePlot(rebinX=pDet["rebinX"], rebinY=pDet["rebinY"], norm=normVal)
       del aPlot
       
@@ -158,6 +168,7 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False):
     
     aPlot = anaPlot(histList, hT)
     if debug: aPlot.Debug=True
+    if doLogy: aPlot.SetLogy=True
     hTot = aPlot.makeSinglePlot(rebinX=pDet["rebinX"], rebinY=pDet["rebinY"], norm=normVal)
     del aPlot
     
@@ -190,27 +201,30 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False):
 
 ###-------------------------------------------------------------------###
 
-def runComparPlots(debug=False):
+def runComparPlots(debug=False, doLogy=False):
 
   if debug: print "\n\tDEBUG: In runAnaPlots.\n"
-  print "\n >>> Making Comparison Plots\n"
+  if doLogy:
+    print "\n >>> Making Comparison Plots (SetLogy=True)\n"
+  else:
+    print "\n >>> Making Comparison Plots\n"
 
-  bMulti      = conf.bMulti()
   compFiles   = conf.comparFiles()
 
   if debug: print compFiles
 
-  if len(bMulti)>1:
+  if len( conf.bMulti() )>1:
     print "\t*** Only run comparison plots with one bMultiplicity\n"
     sys.exit()
 
   hList=[]
+
   for f in compFiles:
-    hList.append( runStandPlots(printPlots=False, comparSamp=f, debug=debug) )
+    hList.append( runStandPlots(printPlots=False, comparSamp=f, debug=debug, doLogy=doLogy) )
 
   for i in range( len(hList[0]) ):
     hComp = []
     for k in range( len(hList) ):
       hComp.append(hList[k][i])
-    comparPlots(hComp, debug=debug)
+    comparPlots(hComp, debug=debug, doLogy=doLogy)
 
