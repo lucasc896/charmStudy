@@ -494,8 +494,6 @@ def comparPlots(hList=None, debug=None):
     if "TH2" in str( type(h) ): return
 
   colors = [r.kRed, r.kBlue, r.kGreen, r.kCyan, r.kMagenta]
-  #colors = [r.kRed, r.kGreen-2, 4, r.kOrange-3, 6]
-  #colors = [r.kBlue, r.kCyan, r.kMagenta]
 
   colorDict = {
         "T2cc_160":r.kRed,
@@ -505,9 +503,14 @@ def comparPlots(hList=None, debug=None):
         "T2cc_220_195":6,
   }
 
-  for i in range( len(sSamp) ):
-    if colorDict[sSamp[i]]:
-      colors[i]=colorDict[sSamp[i]]
+  print colors
+
+  for key in colorDict.keys():
+    for i in range( len(sSamp) ):
+      if key in sSamp[i]:
+        colors[i]=colorDict[key]
+
+  print colors
 
   c1 = r.TCanvas()
   r.gStyle.SetOptStat(0)
