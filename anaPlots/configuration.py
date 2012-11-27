@@ -8,6 +8,7 @@ Copyright (c) 2012 University of Bristol. All rights reserved.
 """
 
 from sys import argv, exit
+import ROOT as r
 
 #print options
 
@@ -25,8 +26,8 @@ def switches():
   #generic switches
   switches={
           "runMode"       :["plotting", "yieldTables"][0],
-          "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][2],
-          "signalSample"  :"T2cc_220_195",
+          "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][0],
+          "signalSample"  :"T2cc_160",
           "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT"][0],
           "jetMulti"      :["le3j","ge4j","inc"][2],
           "printLogy"     :[False, True][0],
@@ -51,10 +52,7 @@ def inFiles():
           "TTJets":   ["%sanaPlots/outTTbar_anaPlots.root"%inDir, mcScale],
           "DiBoson":  ["%sanaPlots/outDiBo_anaPlots.root"%inDir, mcScale],
           }
-  elif mode()=="bTagEff":
-    files = {
-          "file": ["%sbTagEff/some_file.root"%inDir, mcScale]
-    }
+
   return files
 
 ###-------------------------------------------------------------------###
@@ -149,17 +147,17 @@ def bMulti():
 def sinHists():
   if mode()=="anaPlots":
     singleHists={
-          "stopGenPtScal":40,
-          "stopGenPtVect":20,
-          "delPhi_vs_scalGenPt":4,
-          "dPhiStopCharm":2,
-          "dPhiStopStop":2,
-          "dPhiNeutCharm":2,
-          "dPhiCharmCharm":2,
-          "dPhiStopNeut":2,
-          "n_Events_1":1,
-          "n_Jets":1,
-          "n_BTagged_Jets_all":1,
+          "stopGenPtScal":plotDetails(xRange=[0.,1000.], rebX=40),
+          "stopGenPtVect":plotDetails(xRange=[0.,500.], rebX=20),
+          "delPhi_vs_scalGenPt":plotDetails(xRange=[0., 900.], yRange=[0., 3.2], rebX=5), 
+          #"dPhiStopCharm":2,
+          #"dPhiStopStop":2,
+          #"dPhiNeutCharm":2,
+          #"dPhiCharmCharm":2,
+          #"dPhiStopNeut":2,
+          #"n_Events_1":1,
+          #"n_Jets":1,
+          "n_BTagged_Jets_all":plotDetails(xRange=[0.,6.]),
     }
   elif mode()=="bTagEff":
     singleHists={
@@ -183,16 +181,16 @@ def anaHists():
   
   if mode()=="anaPlots":
     hists={
-      "MET":20,
-      "MHT":20,
-      "commHT":20,
-      "hadronicAlphaTZoom":5,
-      "leadJetdelPhi":2,
-      "MHToverMET":2,
-      "jetPt":20,
-      "leadJetPt":20,
-      "subLeadJetPt":20,
-      #"alphaT_vs_HT":1,
+      "MET":plotDetails(xRange=[0.,500.], rebX=20),
+      #"MHT":20,
+      "commHT":plotDetails(xRange=[0.,1000.], rebX=20),
+      "hadronicAlphaTZoom":plotDetails(xRange=[0., 1.5], rebX=5),
+      #"leadJetdelPhi":2,
+      #"MHToverMET":2,
+      #"jetPt":20,
+      "leadJetPt":plotDetails(xRange=[0.,500.], rebX=20),
+      #"subLeadJetPt":20,
+      #"alphaT_vs_HT":plotDetails(xRange=[0.,1.6], yRange=[0.,600.], rebX=2, rebY=2),
     }
   elif mode()=="bTagEff":
     hists={}
@@ -225,4 +223,16 @@ def histRanges():
   }
 
   return rangeDict
+
+###-------------------------------------------------------------------###
+
+def plotDetails(xRange=None, yRange=None, rebX=1, rebY=1):
+  """docString for making plotDetails dict"""
+  myDict={}
+  myDict["xRange"]=xRange
+  myDict["yRange"]=yRange
+  myDict["rebinX"] =rebX
+  myDict["rebinY"] =rebY
+
+  return myDict
 
