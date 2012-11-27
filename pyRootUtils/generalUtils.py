@@ -493,6 +493,7 @@ def comparPlots(hList=None, debug=None):
   for h in hList:
     if "TH2" in str( type(h) ): return
 
+  #defult colors
   colors = [r.kRed, r.kBlue, r.kGreen, r.kCyan, r.kMagenta]
 
   colorDict = {
@@ -503,6 +504,7 @@ def comparPlots(hList=None, debug=None):
         "T2cc_220_195":6,
   }
 
+  # swap in sample specific colors
   for key in colorDict.keys():
     for i in range( len(sSamp) ):
       if key in sSamp[i]:
@@ -511,128 +513,69 @@ def comparPlots(hList=None, debug=None):
   c1 = r.TCanvas()
   r.gStyle.SetOptStat(0)
 
-
   if len(hList)==2:
-    lg = r.TLegend(0.55, 0.65, 0.82, 0.85)
-    if findMaxHist(hList[0], hList[1]):
-      hList[0].Draw("hist")
-      hList[0].SetLineColor(colors[0])
-      hList[1].Draw("histsame")
-      hList[1].SetLineColor(colors[1])
-    else:
-      hList[1].Draw("hist")
-      hList[1].SetLineColor(colors[1])
-      hList[0].Draw("histsame")
-      hList[0].SetLineColor(colors[0])
-    lg.SetFillColor(0)
-    lg.SetLineColor(0)
-    lg.AddEntry(hList[0], sSamp[0], "L")
-    lg.AddEntry(hList[1], sSamp[1], "L")     
+    lg = r.TLegend(0.68, 0.73, 0.895, 0.89)
+  elif len(hList)==3:
+    lg = r.TLegend(0.65, 0.73, 0.895, 0.89)
+  elif len(hList)==4:
+    lg = r.TLegend(0.64, 0.64, 0.895, 0.89)
+  elif len(hList)==5:
+    lg = r.TLegend(0.65, 0.61, 0.895, 0.89)
 
-  if len(hList)==3:
-    lg = r.TLegend(0.51, 0.68, 0.82, 0.85)
-    maxHist = findMaxHists(hList)
-    if maxHist==0:
-      hList[0].Draw("hist")
-      hList[0].SetLineColor(colors[0])
-      hList[1].Draw("histsame")
-      hList[1].SetLineColor(colors[1])
-      hList[2].Draw("histsame")
-      hList[2].SetLineColor(colors[2])
-    if maxHist==1:
-      hList[1].Draw("hist")
-      hList[1].SetLineColor(colors[1])
-      hList[0].Draw("histsame")
-      hList[0].SetLineColor(colors[0])
-      hList[2].Draw("histsame")
-      hList[2].SetLineColor(colors[2])
-    if maxHist==2:
-      hList[2].Draw("hist")
-      hList[2].SetLineColor(colors[2])
-      hList[1].Draw("histsame")
-      hList[1].SetLineColor(colors[1])
-      hList[0].Draw("histsame")
-      hList[0].SetLineColor(colors[0])
-    lg.SetFillColor(0)
-    lg.SetLineColor(0) 
-    lg.AddEntry(hList[0], sSamp[0], "L")
-    lg.AddEntry(hList[1], sSamp[1], "L")
-    lg.AddEntry(hList[2], sSamp[2], "L")
+  hOrder = getHistOrder(hList)
 
-  if len(hList)==5:
-    lg = r.TLegend(0.48, 0.65, 0.72, 0.85)
-    hList[0].Draw("hist")
-    hList[0].SetLineColor(colors[0])
-    hList[1].Draw("histsame")
-    hList[1].SetLineColor(colors[1])
-    hList[2].Draw("histsame")
-    hList[2].SetLineColor(colors[2])
-    hList[3].Draw("histsame")
-    hList[3].SetLineColor(colors[3])
-    hList[4].Draw("histsame")
-    hList[4].SetLineColor(colors[4])
-    lg.SetFillColor(0)
-    lg.SetLineColor(0)
-    lg.AddEntry(hList[0], sSamp[0], "L")
-    lg.AddEntry(hList[1], sSamp[1], "L")
-    lg.AddEntry(hList[2], sSamp[2], "L")
-    lg.AddEntry(hList[3], sSamp[3], "L")
-    lg.AddEntry(hList[4], sSamp[4], "L")    
+  ctr=0
+  for i in hOrder:
+    if ctr==0: hList[i].Draw("hist")
+    else: hList[i].Draw("histsame")
+    hList[i].SetLineColor(colors[i])
+    lg.AddEntry(hList[i], sSamp[i], "L")
+    ctr+=1
 
+  lg.SetFillColor(0)
+  lg.SetFillStyle(0)
+  lg.SetLineColor(0)
+  lg.SetLineStyle(0)
   lg.Draw()
 
   c1.Print("plotDump/compare_%s_%s_%s.png"%(hList[0].GetName(),bM[0], jM))
-
+  
   if conf.switches()["printLogy"]:
     c1.SetLogy(1)
     c1.Print("plotDump/compar_%s_%s_%s_log.png"%(hList[0].GetName(),bM[0], jM))
 
 
 
-def getPlotsFromFile(histName="", dirs=None, bSufs=None, inFile=None, scale=1.):
+def getPlotsFromFile(histName="", dirs=None, bSufs=None, inFile=None, scale=None):
 
   ctr=0
-
   for d in dirs:
     for suf in bSufs:
       h = inFile.Get("%s/%s%s"%(d, histName, suf))
       if ctr==0: h1 = h.Clone()
       else: h1.Add(h)
       ctr+=1
-    h1.Scale(scale)
+    if scale: h1.Scale(scale)
     
   return h1    
 
-def findMaxHist(h1, h2):
-  max1, max2 = 0, 0
-  for i in range( h1.GetXaxis().GetNbins() ):
-    val = h1.GetBinContent(i)
-    if val>max1: max1=val
 
-  for i in range( h2.GetXaxis().GetNbins() ):
-    val = h2.GetBinContent(i)
-    if val>max2: max2=val
+def getHistOrder(hList=None):
+  """returns a list of the reverse order of hList"""
 
-  if max1>max2: return True
-  else: return False
+  maxVals = []
+  myOrder = []
 
-def findMaxHists(hList=None):
-  maxVal=[]
-  ctr=0
-  for h in hList:
-    maxVal.append(0)
-    for i in range( h.GetXaxis().GetNbins() ):
-      val=h.GetBinContent(i)
-      if val>maxVal[ctr]: maxVal[ctr]=val
-    ctr+=1
+  for h, i in zip(hList, range( len(hList) )):
+    maxVals.append(h.GetMaximum())
+  tmpMax = sorted(maxVals, reverse=True)
 
-  if maxVal[0]>=maxVal[1] and maxVal[0]>=maxVal[2]: return 0
-  if maxVal[1]>=maxVal[0] and maxVal[1]>=maxVal[2]: return 1
-  if maxVal[2]>=maxVal[0] and maxVal[2]>=maxVal[1]: return 2
+  for i in range(len(tmpMax)):
+    for k in range(len(maxVals)):
+      if tmpMax[i] == maxVals[k]:
+        myOrder.append(k)
 
-
-
-
+  return myOrder
 
 
 
