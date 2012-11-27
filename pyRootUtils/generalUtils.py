@@ -21,7 +21,7 @@ import configuration as conf
 #r.gStyle.SetLabelOffset(0.001)
 #r.gStyle.SetLabelSize(0.003)
 #r.gStyle.SetLabelSize(0.005,"Y")#Y axis
-r.gStyle.SetLabelSize(0.1,"X")#Y axis
+#r.gStyle.SetLabelSize(0.1,"X")#Y axis
 #r.gStyle.SetTitleSize(0.06)
 #r.gStyle.SetTitleW(0.7)
 #r.gStyle.SetTitleH(0.07)
@@ -53,8 +53,12 @@ class multiPlot(object):
     self.SetLogy = False
     self.xRange = []
     self.yRange = []
+    self.xRebin = 1
+    self.yRebin = 1
     self.hTitles = []
+    self.sigTitle = ""
     self.canvTitle = ""
+    self.oFileName = ""
     self.lg = r.TLegend()
     self.ln1 = r.TLine()
     self.ln2 = r.TLine()
@@ -201,7 +205,7 @@ class anaPlot(object):
         c1.Print(oFileName)
 
 
-  def makeSinglePlot(self, rebin=None, norm=None):
+  def makeSinglePlot(self, rebinX=None, rebinY=None, norm=None):
     """docstring for makeSinglePlot"""
     c1 = r.TCanvas()
 
@@ -215,13 +219,13 @@ class anaPlot(object):
     h.SetLineWidth(2)
 
     if "TH1D" in str( type(h) ):
-      if rebin: h.Rebin(rebin)
+      if rebinX: h.Rebin(rebinX)
       if not self.SetLogy:h.SetMinimum(0)
 
     if "TH2D" in str( type(h) ):
       h.SetLabelSize(0.02, "Z")
-
-      if rebin: h.RebinX(rebin)
+      if rebinX: h.RebinX(rebinX)
+      if rebinY: h.RebinY(rebinY)
 
     if norm and "n_Event" not in self.canvTitle: self.normHist(h, norm)
     if "n_Event" in self.canvTitle: r.gStyle.SetOptStat("i")
@@ -358,6 +362,14 @@ class stackPlots(object):
     self.bgTitles = bgTitles
     self.Debug = False
     self.PrintLogy = False
+    self.xRange = []
+    self.yRange = []
+    self.xRebin = 1
+    self.yRebin = 1
+    self.hTitles = []
+    self.sigTitle = ""
+    self.canvTitle = ""
+    self.oFileName = ""
     self.listColors = [r.kBlue+1, r.kRed-3, r.kYellow+2, r.kGreen+1, r.kViolet]
     if sigHist:
       self.sigHist = sigHist
@@ -368,10 +380,11 @@ class stackPlots(object):
     else:
       self.dataHist = None
 
-  def drawStack(self, canvTitle="", rebin=1, oFileName="", sigTitle=""):
+  def drawStack(self):
 
     c1=r.TCanvas()
-    st1 = r.THStack("hs", canvTitle)
+    stTitle = "%s;%s;%s"%(self.canvTitle, self.bgHists[0].GetXaxis().GetTitle(), self.bgHists[0].GetYaxis().GetTitle())
+    st1 = r.THStack("hs", stTitle)
     lg = r.TLegend(0.62, 0.72, 0.82, 0.85)
     lg.SetFillColor(0)
     lg.SetLineColor(0)
@@ -381,37 +394,46 @@ class stackPlots(object):
     for h, hT in zip(self.bgHists, self.bgTitles):
       h.SetLineWidth(2)
       h.SetLineColor(self.listColors[ctr])
-      h.Rebin(rebin)
+      h.Rebin(self.xRebin)
       st1.Add(h)
       lg.AddEntry(h, hT, "L")
       ctr+=1
 
     st1.Draw("hist")
 
-    if canvTitle in conf.histRanges():
-      ranges = conf.histRanges()[canvTitle]
-      st1.GetXaxis().SetRangeUser(ranges[0], ranges[1])
+    if "TH2" in str( type(h) ):
+      if self.xRange:
+        ranges = self.xRange
+        st1.GetXaxis().SetRangeUser(ranges[0], ranges[1])
+      if self.yRange:
+        ranges = self.yRange
+        st1.GetYaxis().SetRangeUser(ranges[0], ranges[1])
+
+    elif "TH1" in str( type(h) ):
+      if self.xRange:
+        ranges = self.xRange
+        st1.GetXaxis().SetRangeUser(ranges[0], ranges[1])
 
     if self.sigHist: 
       self.sigHist.SetLineStyle(2)
       self.sigHist.SetLineWidth(2)
       self.sigHist.SetLineColor(r.kRed)
-      self.sigHist.Rebin(rebin)
-      lg.AddEntry(self.sigHist, sigTitle, "L")
+      self.sigHist.Rebin(self.xRebin)
+      lg.AddEntry(self.sigHist, self.sigTitle, "L")
       self.sigHist.Draw("samehist")
     if self.dataHist: 
       self.dataHist.SetLineStyle(2)
       self.dataHist.SetLineWidth(2)
       self.dataHist.SetLineColor(r.kBlack)
-      self.dataHist.Rebin(rebin)
+      self.dataHist.Rebin(self.xRebin)
       self.dataHist.Draw("same")    
 
     lg.Draw()
 
-    c1.Print(oFileName)
+    c1.Print(self.oFileName)
 
     if self.PrintLogy:
-      oFileName = oFileName[:len(oFileName)-4]+"_log.png"
+      oFileName = self.oFileName[:len(self.oFileName)-4]+"_log.png"
       c1.SetLogy(1)
       c1.Print(oFileName)
 
