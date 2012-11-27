@@ -148,6 +148,7 @@ class anaPlot(object):
     self.Debug = False
     self.DoGrid = False
     self.SetLogy = False
+    self.xSecNorm = False
     self.xRange = []
     self.yRange = []
     self.hTitles = []
@@ -209,7 +210,7 @@ class anaPlot(object):
     """docstring for makeSinglePlot"""
     c1 = r.TCanvas()
 
-    if self.SetLogy: c1.SetLogy()
+    #if self.SetLogy: c1.SetLogy()
 
     for i in range( len(self.hists) ):
       if i==0: h=self.hists[i].Clone()
@@ -220,14 +221,18 @@ class anaPlot(object):
 
     if "TH1D" in str( type(h) ):
       if rebinX: h.Rebin(rebinX)
-      if not self.SetLogy:h.SetMinimum(0)
+      if self.SetLogy:
+        h.SetMinimum(0.01)
+      else:
+        h.SetMinimum(0.)
 
     if "TH2D" in str( type(h) ):
       h.SetLabelSize(0.02, "Z")
       if rebinX: h.RebinX(rebinX)
       if rebinY: h.RebinY(rebinY)
 
-    if norm and "n_Event" not in self.canvTitle: self.normHist(h, norm)
+    if norm and "n_Event" not in self.canvTitle: 
+      self.normHist(h, norm)
     if "n_Event" in self.canvTitle: r.gStyle.SetOptStat("i")
 
     return h
@@ -243,16 +248,20 @@ class anaPlot(object):
     self.lg = r.TLegend(0.6, 0.68, 0.74, 0.87)
 
     self.lg.SetFillColor(0)
-    #self.lg.SetFillStyle(0)
+    self.lg.SetFillStyle(0)
     self.lg.SetLineColor(0)
     self.lg.SetLineStyle(0)
 
   def normHist(self, h, normVal=1.):
     """docstring for normHist"""
     if float(h.GetEntries())==0: return 0
-    h.Scale( normVal/float(h.GetEntries()) )
-
-
+    
+    if self.xSecNorm:
+      scaleF = normVal
+    else:
+      scaleF = normVal/float(h.GetEntries())
+    h.Scale( scaleF )
+    
 
 
 class Print(object):
@@ -481,7 +490,7 @@ def comparPlot(h1=None, h2=None, debug=False):
   c1.Print("plotDump/compare_%s_%s_%s.png"%(h1.GetName(),bM[0], jM))
 
 
-def comparPlots(hList=None, debug=None):
+def comparPlots(hList=None, debug=None, doLogy=False):
 
   jM = conf.switches()["jetMulti"]
   sSamp = conf.comparFiles()
@@ -537,13 +546,12 @@ def comparPlots(hList=None, debug=None):
   lg.SetLineColor(0)
   lg.SetLineStyle(0)
   lg.Draw()
-
-  c1.Print("plotDump/compare_%s_%s_%s.png"%(hList[0].GetName(),bM[0], jM))
   
-  if conf.switches()["printLogy"]:
+  if not doLogy:
+    c1.Print("plotDump/compare_%s_%s_%s.png"%(hList[0].GetName(),bM[0], jM))
+  else:
     c1.SetLogy(1)
     c1.Print("plotDump/compar_%s_%s_%s_log.png"%(hList[0].GetName(),bM[0], jM))
-
 
 
 def getPlotsFromFile(histName="", dirs=None, bSufs=None, inFile=None, scale=None):
