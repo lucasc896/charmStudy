@@ -24,7 +24,7 @@ def mode():
 def switches():
   #generic switches
   switches={
-          "runMode"       :["plotting", "yieldTables"][1],
+          "runMode"       :["plotting", "yieldTables"][0],
           "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][2],
           "signalSample"  :"T2cc_220_195",
           "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT"][0],
@@ -107,8 +107,8 @@ def comparFiles():
 
   comparFiles = ["T2cc_220_195_pt20", "T2cc_220_170_pt20", "T2cc_220_145_pt20"]
   #comparFiles = ["T2cc_220_170_pt20", "T2cc_160_pt20", "T2cc_300_pt20"]
-  comparFiles = ["T2cc_220_195", "T2cc_220_170", "T2cc_220_145"]
-
+  comparFiles = ["T2cc_220_195", "T2cc_220_170", "T2cc_220_145", "T2cc_300", "T2cc_160"]
+  comparFiles = ["T2cc_160", "T2cc_300", "T2cc_220_145", "T2cc_220_170", "T2cc_220_195"]
   return comparFiles
 
 ###-------------------------------------------------------------------###
