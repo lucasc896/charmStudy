@@ -195,12 +195,7 @@ def runComparPlots(debug=False):
   if debug: print "\n\tDEBUG: In runAnaPlots.\n"
   print "\n >>> Making Comparison Plots\n"
 
-  files       = conf.inFiles()
-  dirs        = conf.inDirs()
   bMulti      = conf.bMulti()
-  hists       = conf.anaHists()
-  sinHists    = conf.sinHists()
-  sFile       = conf.sigFile()
   compFiles   = conf.comparFiles()
 
   if debug: print compFiles
@@ -213,26 +208,9 @@ def runComparPlots(debug=False):
   for f in compFiles:
     hList.append( runStandPlots(printPlots=False, comparSamp=f, debug=debug) )
 
-  if len(hList)==2:
-    for h1, h2 in zip(hList[0], hList[1]):
-      hComp=[]
-      hComp.append(h1)
-      hComp.append(h2)
-      comparPlots(hComp, debug=debug)
+  for i in range( len(hList[0]) ):
+    hComp = []
+    for k in range( len(hList) ):
+      hComp.append(hList[k][i])
+    comparPlots(hComp, debug=debug)
 
-  if len(hList)==3:
-    for h1, h2, h3 in zip(hList[0], hList[1], hList[2]):
-      hComp=[]
-      hComp.append(h1)
-      hComp.append(h2)
-      hComp.append(h3)    
-      comparPlots(hComp, debug=debug)
-  if len(hList)==5:
-    for h1, h2, h3, h4, h5 in zip(hList[0], hList[1], hList[2], hList[3], hList[4]):
-      hComp=[]
-      hComp.append(h1)
-      hComp.append(h2)
-      hComp.append(h3)
-      hComp.append(h4)
-      hComp.append(h5)  
-      comparPlots(hComp, debug=debug)
