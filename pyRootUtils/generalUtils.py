@@ -503,14 +503,10 @@ def comparPlots(hList=None, debug=None):
         "T2cc_220_195":6,
   }
 
-  print colors
-
   for key in colorDict.keys():
     for i in range( len(sSamp) ):
       if key in sSamp[i]:
         colors[i]=colorDict[key]
-
-  print colors
 
   c1 = r.TCanvas()
   r.gStyle.SetOptStat(0)
