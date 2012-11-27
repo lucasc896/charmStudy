@@ -1,9 +1,0 @@
-- change the way histogram options are handled
-    - potentially use a dictionary function at the val for each histogram key
-- add in xSec re-weighting - note: model dependant
-- add in different switches for bTagEff and anaPlots
-- write code for bTagEff
-    - make stand-alone from makeAnaPlots.py
-- put color definitions matched to a signal sample
-   - only need to define inside comparPlots - can be a one line thing
-- synchronise histNames and root file structure with Z
