@@ -47,7 +47,7 @@ def runAnaPlots(debug=False):
   sigFile     = conf.sigFile()
 
 
-  for hT, rVal in hists.iteritems():
+  for hT, pDet in hists.iteritems():
     for b in bMulti:
       if debug: print hT
       if sigSamp:
@@ -68,8 +68,15 @@ def runAnaPlots(debug=False):
 
       a1 = stackPlots(bgHists, bgTitles, hS)
       if debug: a1.Debug=True
+      a1.xRange = pDet["xRange"]
+      a1.yRange = pDet["yRange"]
+      a1.xRebin = pDet["rebinX"]
+      a1.yRebin = pDet["rebinY"]
+      a1.canvTitle = hT
+      a1.oFileName = oFileName
+      a1.sigTitle = sigSamp
       if conf.switches()["printLogy"]: a1.PrintLogy = True
-      a1.drawStack(hT, rVal, oFileName, sigTitle=sigSamp)
+      a1.drawStack()
       del a1
  
 ###-------------------------------------------------------------------###
@@ -85,7 +92,6 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False):
   sinHists    = conf.sinHists()
   sFile       = conf.sigFile()
   sigSamp     = conf.switches()["signalSample"]
-  histRanges  = conf.histRanges()
   jMulti      = conf.switches()["jetMulti"]
 #  debug       = conf.switches()["debug"]
 
@@ -106,7 +112,7 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False):
   outHists = []
 
   #plot b-Multi plots
-  for hT, rVal in hists.iteritems():
+  for hT, pDet in hists.iteritems():
     for b in bMulti:
       histList = []
       for d in dirs:
@@ -114,18 +120,28 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False):
           if debug: print "%s/%s%s"%(d, hT, suf)
           h = rFile.Get("%s/%s%s"%(d, hT, suf))
           histList.append(h)
+      
       aPlot = anaPlot(histList, "%s_%s"%(hT, b))
       if debug: aPlot.Debug=True
-      hTot = aPlot.makeSinglePlot(rVal, normVal)
+      hTot = aPlot.makeSinglePlot(rebinX=pDet["rebinX"], rebinY=pDet["rebinY"], norm=normVal)
       del aPlot
+      
       if "TH2D" in str( type(hTot) ):
+        if pDet["xRange"]:
+          ranges=pDet["xRange"]
+          hTot.GetXaxis().SetRangeUser(ranges[0], ranges[1])
+        if pDet["yRange"]:
+          ranges=pDet["yRange"]
+          hTot.GetYaxis().SetRangeUser(ranges[0], ranges[1])
         hTot.Draw("colz")
-      else:
+      elif "TH1D" in str( type(hTot) ):
+        if pDet["xRange"]:
+          ranges=pDet["xRange"]
+          hTot.GetXaxis().SetRangeUser(ranges[0], ranges[1])
         hTot.Draw("hist")
-      if hT in histRanges:
-        ranges = histRanges[hT]
-        hTot.GetXaxis().SetRangeUser(ranges[0], ranges[1])
+
       outHists.append(hTot)  
+
       if printPlots:
         if "noCut" not in conf.switches()["HTcuts"]:
           c1.Print("plotDump/%s_%s_%s_%s.png"%(sigSamp, hT, b, jMulti))
@@ -133,7 +149,7 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False):
           c1.Print("plotDump/%s_%s_%s_%s.png"%(sigSamp, hT, b, "noCuts"))   
   
   #plot single plots
-  for hT, rVal in sinHists.iteritems():
+  for hT, pDet in sinHists.iteritems():
     histList = []
     for d in dirs:
       if debug: print "%s/%s"%(d, hT)
@@ -142,24 +158,33 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False):
     
     aPlot = anaPlot(histList, hT)
     if debug: aPlot.Debug=True
-    hTot = aPlot.makeSinglePlot(rVal, normVal)
+    hTot = aPlot.makeSinglePlot(rebinX=pDet["rebinX"], rebinY=pDet["rebinY"], norm=normVal)
     del aPlot
     
-    if "TH2D" in str( type(hTot) ):
+    if "TH2" in str( type(hTot) ):
+      
+      if pDet["xRange"]:
+        ranges=pDet["xRange"]
+        hTot.GetXaxis().SetRangeUser(ranges[0], ranges[1])
+      if pDet["yRange"]:
+        ranges=pDet["yRange"]
+        hTot.GetYaxis().SetRangeUser(ranges[0], ranges[1])      
       hTot.Draw("colz")
-    else:
-      hTot.Draw("hist")
-    if hT in histRanges:
-      ranges = histRanges[hT]
-      hTot.GetXaxis().SetRangeUser(ranges[0], ranges[1])  
     
+    elif "TH1" in str( type(hTot) ):
+      
+      if pDet["xRange"]:
+        ranges=pDet["xRange"]
+        hTot.GetXaxis().SetRangeUser(ranges[0], ranges[1])
+      hTot.Draw("hist")
+
     outHists.append(hTot)  
     
     if printPlots:
         if "noCut" not in conf.switches()["HTcuts"]:
-          c1.Print("plotDump/anaPlots_%s_%s_%s_%s.png"%(sigSamp, hT, b, jMulti))
+          c1.Print("plotDump/%s_%s_%s.png"%(sigSamp, hT, jMulti))
         else:
-          c1.Print("plotDump/%s_%s_%s_%s.png"%(sigSamp, hT, b, "noCuts"))
+          c1.Print("plotDump/%s_%s_%s.png"%(sigSamp, hT, "noCuts"))
   
   return outHists
 
