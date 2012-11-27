@@ -484,7 +484,7 @@ def comparPlot(h1=None, h2=None, debug=False):
 def comparPlots(hList=None, debug=None):
 
   jM = conf.switches()["jetMulti"]
-  plots = conf.comparFiles()
+  sSamp = conf.comparFiles()
   bM = conf.bMulti()
 
   if debug:
@@ -494,8 +494,20 @@ def comparPlots(hList=None, debug=None):
     if "TH2" in str( type(h) ): return
 
   colors = [r.kRed, r.kBlue, r.kGreen, r.kCyan, r.kMagenta]
-  colors = [r.kRed, r.kGreen-2, 4, r.kOrange-3, 6]
+  #colors = [r.kRed, r.kGreen-2, 4, r.kOrange-3, 6]
   #colors = [r.kBlue, r.kCyan, r.kMagenta]
+
+  colorDict = {
+        "T2cc_160":r.kRed,
+        "T2cc_300":r.kGreen-2,
+        "T2cc_220_145":4,
+        "T2cc_220_170":r.kOrange-3,
+        "T2cc_220_195":6,
+  }
+
+  for i in range( len(sSamp) ):
+    if colorDict[sSamp[i]]:
+      colors[i]=colorDict[sSamp[i]]
 
   c1 = r.TCanvas()
   r.gStyle.SetOptStat(0)
@@ -515,8 +527,8 @@ def comparPlots(hList=None, debug=None):
       hList[0].SetLineColor(colors[0])
     lg.SetFillColor(0)
     lg.SetLineColor(0)
-    lg.AddEntry(hList[0], plots[0], "L")
-    lg.AddEntry(hList[1], plots[1], "L")     
+    lg.AddEntry(hList[0], sSamp[0], "L")
+    lg.AddEntry(hList[1], sSamp[1], "L")     
 
   if len(hList)==3:
     lg = r.TLegend(0.51, 0.68, 0.82, 0.85)
@@ -544,9 +556,9 @@ def comparPlots(hList=None, debug=None):
       hList[0].SetLineColor(colors[0])
     lg.SetFillColor(0)
     lg.SetLineColor(0) 
-    lg.AddEntry(hList[0], plots[0], "L")
-    lg.AddEntry(hList[1], plots[1], "L")
-    lg.AddEntry(hList[2], plots[2], "L")
+    lg.AddEntry(hList[0], sSamp[0], "L")
+    lg.AddEntry(hList[1], sSamp[1], "L")
+    lg.AddEntry(hList[2], sSamp[2], "L")
 
   if len(hList)==5:
     lg = r.TLegend(0.48, 0.65, 0.72, 0.85)
@@ -562,11 +574,11 @@ def comparPlots(hList=None, debug=None):
     hList[4].SetLineColor(colors[4])
     lg.SetFillColor(0)
     lg.SetLineColor(0)
-    lg.AddEntry(hList[0], plots[0], "L")
-    lg.AddEntry(hList[1], plots[1], "L")
-    lg.AddEntry(hList[2], plots[2], "L")
-    lg.AddEntry(hList[3], plots[3], "L")
-    lg.AddEntry(hList[4], plots[4], "L")    
+    lg.AddEntry(hList[0], sSamp[0], "L")
+    lg.AddEntry(hList[1], sSamp[1], "L")
+    lg.AddEntry(hList[2], sSamp[2], "L")
+    lg.AddEntry(hList[3], sSamp[3], "L")
+    lg.AddEntry(hList[4], sSamp[4], "L")    
 
   lg.Draw()
 
