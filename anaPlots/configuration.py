@@ -16,9 +16,9 @@ import ROOT as r
 
 def mode():
   
-  runMode = ["bTagEff", "anaPlots"][1]
+  anaMode = ["bTagEff", "anaPlots", "dev"][1]
 
-  return runMode
+  return anaMode
 
 ###-------------------------------------------------------------------###
 
@@ -26,12 +26,13 @@ def switches():
   #generic switches
   switches={
           "runMode"       :["plotting", "yieldTables"][0],
-          "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][0],
+          "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][2],
           "signalSample"  :"T2cc_160",
           "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT"][0],
           "jetMulti"      :["le3j","ge4j","inc"][2],
           "printLogy"     :[False, True][0],
-          "unitNorm"      :[False,True][0],
+          "norm"          :["None", "Unitary", "xSec", "lumi"][3],
+          "lumiNorm"      :[1, 10, 11.7][2]
           }
 
   return switches
@@ -104,9 +105,8 @@ def sigFile():
 def comparFiles():
 
   comparFiles = ["T2cc_220_195_pt20", "T2cc_220_170_pt20", "T2cc_220_145_pt20"]
-  #comparFiles = ["T2cc_220_170_pt20", "T2cc_160_pt20", "T2cc_300_pt20"]
-  comparFiles = ["T2cc_220_195", "T2cc_220_170", "T2cc_220_145", "T2cc_300", "T2cc_160"]
-  comparFiles = ["T2cc_160", "T2cc_300", "T2cc_220_145", "T2cc_220_170", "T2cc_220_195"]
+  comparFiles = ["T2cc_220_170_pt20", "T2cc_160_pt20", "T2cc_300_pt20"]
+  #comparFiles = ["T2cc_160", "T2cc_300", "T2cc_220_145", "T2cc_220_170", "T2cc_220_195"]
   return comparFiles
 
 ###-------------------------------------------------------------------###
@@ -235,4 +235,36 @@ def plotDetails(xRange=None, yRange=None, rebX=1, rebY=1):
   myDict["rebinY"] =rebY
 
   return myDict
+
+###-------------------------------------------------------------------###
+
+
+def getXSecNorm(mStop=None):
+
+  prodXSec = {
+        160:58.01,
+        220:11.18,
+        300:1.996,
+        600:0.02480,
+  }
+
+  stopXSec = prodXSec[mStop]
+
+  if switches()["norm"]=="xSec":
+    #normFact=prodXSec[mStop]*switches()["xSecNorm"]*1000.
+    normFact=1.
+    print "\nERROR: Normalisation by xSec feature not yet enabled/written at all. My bad.\n"
+    exit()
+  elif switches()["norm"]=="lumi":
+    targLumi = switches()["lumiNorm"]
+    normFact=targLumi/(100000./stopXSec)
+    print normFact
+
+  return normFact
+
+
+
+
+
+
 
