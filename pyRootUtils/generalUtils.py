@@ -472,6 +472,7 @@ def comparPlots(hList=None, debug=None):
     if "TH2" in str( type(h) ): return
 
   colors = [r.kRed, r.kBlue, r.kGreen, r.kCyan, r.kMagenta]
+  colors = [r.kRed, r.kGreen-2, 4, r.kOrange-3, 6]
   #colors = [r.kBlue, r.kCyan, r.kMagenta]
 
   c1 = r.TCanvas()
