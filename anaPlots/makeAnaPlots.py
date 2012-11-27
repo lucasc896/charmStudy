@@ -103,15 +103,14 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
   normVal = None
   if conf.switches()["norm"]=="Unitary":
     normVal = 1.
-  elif conf.switches()["norm"]=="xSec":
+  elif conf.switches()["norm"]=="xSec" or conf.switches()["norm"]=="lumi":
     #FIXME
-    normVal = 1.
     if "T2cc_160" in sigSamp:
-      print "160 found!"
+      normVal = conf.getXSecNorm(160)
     if "T2cc_220_" in sigSamp:
-      print "220 found!"
+      normVal = conf.getXSecNorm(220)
     if "T2cc_300" in sigSamp:
-      print "300 found!"
+      normVal = conf.getXSecNorm(300)
 
   rFile = r.TFile.Open(sFile[sigSamp][0])
   if debug: print rFile
@@ -133,6 +132,7 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
       aPlot = anaPlot(histList, "%s_%s"%(hT, b))
       if debug: aPlot.Debug=True
       if doLogy: aPlot.SetLogy = True
+      if conf.switches()["norm"]=="lumi": aPlot.xSecNorm=True
       hTot = aPlot.makeSinglePlot(rebinX=pDet["rebinX"], rebinY=pDet["rebinY"], norm=normVal)
       del aPlot
       
