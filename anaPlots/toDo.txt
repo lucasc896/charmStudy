@@ -5,4 +5,5 @@
 - write code for bTagEff
     - make stand-alone from makeAnaPlots.py
 - put color definitions matched to a signal sample
+   - only need to define inside comparPlots - can be a one line thing
 - synchronise histNames and root file structure with Z
