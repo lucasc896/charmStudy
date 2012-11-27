@@ -60,3 +60,9 @@ elif conf.mode()=="bTagEff":
       if conf.switches()["plotMode"]=="standardPlots":
          bTagP.runStandPlots(debug=options.doDebug)
 
+elif conf.mode()=="dev":
+   print ""
+   conf.getXSecNorm(300)
+
+   pass
+
