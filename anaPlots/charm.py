@@ -22,7 +22,7 @@ parser.add_option("-d", "--debug",
 (options, args) = parser.parse_args()
 
 def line():
-   return "========================================="
+   return "="*40
 
 ###-------------------------------------------------------------------###
                         ### Main Program ###
@@ -58,11 +58,10 @@ elif conf.mode()=="bTagEff":
    
    if conf.switches()["runMode"]=="plotting":
       if conf.switches()["plotMode"]=="standardPlots":
-         bTagP.runStandPlots(debug=options.doDebug)
+         #bTagP.runStandPlots(debug=options.doDebug)
+         bTagP.jetFlavourQuick(debug=options.doDebug)
+
 
 elif conf.mode()=="dev":
-   print ""
-   conf.getXSecNorm(300)
-
    pass
 
