@@ -16,7 +16,7 @@ import ROOT as r
 
 def mode():
   
-  anaMode = ["bTagEff", "anaPlots", "dev"][1]
+  anaMode = ["bTagEff", "anaPlots", "dev"][0]
 
   return anaMode
 
@@ -26,12 +26,12 @@ def switches():
   #generic switches
   switches={
           "runMode"       :["plotting", "yieldTables"][0],
-          "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][2],
-          "signalSample"  :"T2cc_160",
-          "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT"][0],
+          "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][1],
+          "signalSample"  :"T2cc_220_145",
+          "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT"][1],
           "jetMulti"      :["le3j","ge4j","inc"][2],
           "printLogy"     :[False, True][0],
-          "norm"          :["None", "Unitary", "xSec", "lumi"][3],
+          "norm"          :["None", "Unitary", "xSec", "lumi"][1],
           "lumiNorm"      :[1, 10, 11.7][2]
           }
 
@@ -90,12 +90,17 @@ def sigFile():
     }
   elif mode()=="bTagEff":
     sigFile={
-          "T2cc_160"      :["%sbTagEff_Study/outT2cc_160_bTagEff.root"%inDir],
-          "T2cc_300"      :["%sbTagEff_Study/outT2cc_300_bTagEff.root"%inDir],
-          "T2cc_220_195"  :["%sbTagEff_Study/outT2cc_220_195_bTagEff.root"%inDir],
-          "T2cc_220_170"  :["%sbTagEff_Study/outT2cc_220_170_bTagEff.root"%inDir],
-          "T2cc_220_145"  :["%sbTagEff_Study/outT2cc_220_145_bTagEff.root"%inDir],
+          "T2cc_160"          :["%sbTagEff_Study/outT2cc_160_bTagEff.root"%inDir],
+          "T2cc_300"          :["%sbTagEff_Study/outT2cc_300_bTagEff.root"%inDir],
+          "T2cc_220_195"      :["%sbTagEff_Study/outT2cc_220_195_bTagEff.root"%inDir],
+          "T2cc_220_170"      :["%sbTagEff_Study/outT2cc_220_170_bTagEff.root"%inDir],
+          "T2cc_220_145"      :["%sbTagEff_Study/outT2cc_220_145_bTagEff.root"%inDir],
+          "T2cc_220_195_pt50" :["%sbTagEff_Study/outT2cc_220_195_pt50_bTagEff.root"%inDir],
+          "T2cc_220_170_pt50" :["%sbTagEff_Study/outT2cc_220_170_pt50_bTagEff.root"%inDir],
+          "T2cc_220_145_pt50" :["%sbTagEff_Study/outT2cc_220_145_pt50_bTagEff.root"%inDir],    
     }
+  else:
+    sigFile={}
 
 
   return sigFile
@@ -124,6 +129,10 @@ def inDirs():
   if switches()["HTcuts"]=="highHT":
     if switches()["jetMulti"]=="le3j":
       dirs=["le3j_375_475", "le3j_475_575", "le3j_575_675", "le3j_675_775", "le3j_775_875", "le3j_875"]
+    if switches()["jetMulti"]=="ge4j":
+      dirs=["ge4j_375_475", "ge4j_475_575", "ge4j_575_675", "ge4j_675_775", "ge4j_775_875", "ge4j_875"]
+    if switches()["jetMulti"]=="inc":
+      dirs=["inc_375_475", "inc_475_575", "inc_575_675", "inc_675_775", "inc_775_875", "inc_875"]        
   if switches()["HTcuts"]=="lowHT":
     dirs = dirs[:2]
 
@@ -172,6 +181,8 @@ def sinHists():
           "n_Truth_B":1,
           "n_Truth_C":1,
     }
+  else:
+    singleHists={}
   
   return singleHists
 
@@ -193,6 +204,8 @@ def anaHists():
       #"alphaT_vs_HT":plotDetails(xRange=[0.,1.6], yRange=[0.,600.], rebX=2, rebY=2),
     }
   elif mode()=="bTagEff":
+    hists={}
+  else:
     hists={}
   
   return hists
