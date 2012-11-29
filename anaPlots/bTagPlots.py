@@ -117,12 +117,12 @@ def runStandPlots(debug=False):
    sigSamp     = conf.switches()["signalSample"]
    histRanges  = conf.histRanges()
    jMulti      = conf.switches()["jetMulti"]
-#   debug       = conf.switches()["debug"]
+   bMulti      = conf.bMulti()
 
    if debug: print sFile[sigSamp][0]
   
    normVal = None
-   if conf.switches()["unitNorm"]:
+   if conf.switches()["norm"]:
       normVal = 1.
 
    rFile = r.TFile.Open(sFile[sigSamp][0])
@@ -149,8 +149,113 @@ def runStandPlots(debug=False):
 
 
       if "noCut" not in conf.switches()["HTcuts"]:
-         c1.Print("plotDump/bTagEff_%s_%s_%s.png"%(sigSamp, hT, hMulti))
+         c1.Print("plotDump/bTagEff_%s_%s_%s.png"%(sigSamp, hT, bMulti[0]))
       else:
          c1.Print("plotDump/bTagEff_%s_%s_noCuts.png"%(sigSamp, hT))
 
    pass
+
+
+def jetFlavourQuick(debug=False):
+
+   dirs        = conf.inDirs()
+   hists       = conf.anaHists()
+   sinHists    = conf.sinHists()
+   sFile       = conf.sigFile()
+   sigSamp     = conf.switches()["signalSample"]
+   histRanges  = conf.histRanges()
+
+   if debug: print sFile[sigSamp][0]
+  
+   normVal = None
+   if conf.switches()["norm"]:
+      normVal = 1.
+
+   c1 = r.TCanvas()
+
+   
+   inFiles=["T2cc_220_195","T2cc_220_170","T2cc_220_145"]
+   inFiles=["T2cc_220_195_pt50","T2cc_220_170_pt50","T2cc_220_145_pt50"]
+   inFiles=["T2cc_220_145", "T2cc_220_145_pt50"]
+
+   mg = r.TMultiGraph()
+
+   lg = r.TLegend(0.6, 0.17, 0.85, 0.42)
+
+   for iF in inFiles:
+      hList=[]
+      rFile = r.TFile().Open(sFile[iF][0])
+      print "\n>> %s"%iF
+      for i in range(4):
+         ctr=0
+         for d in dirs:
+            if debug: print "%s/jetFlavourICF_%d"%(d,i)
+            h = rFile.Get("%s/jetFlavourICF_%d"%(d,i))
+            if ctr==0: hT = h.Clone()
+            else: hT.Add(h)
+            ctr+=1
+         hList.append(hT)
+   
+      g = r.TGraph(4)
+
+      ctr1=0
+      for hT in hList:   
+         charmFrac = hT.GetBinContent(5)/hT.GetEntries()
+         g.SetPoint(ctr1, ctr1, charmFrac)
+
+         myDict = {
+               0:"first",
+               1:"second",
+               2:"third",
+               3:"fourth",
+               }
+         
+         print "Frac of gen charm %s jets: %f.2"%(myDict[ctr1], charmFrac) 
+         ctr1+=1
+   
+      g.Draw("P")
+      #g.SetTitle("Charm Fraction - %s; Jet Rank (pT ordered); genCharm Frac."%iF)
+      #g.GetXaxis().SetRangeUser(0.,.4)
+      #g.GetXaxis().SetRangeUser(-1, 5)
+      #g.GetXaxis().SetTitleOffset(1.4)
+      g.SetMarkerStyle(29)
+      g.SetMarkerSize(4)
+
+      if "195" in iF: g.SetMarkerColor(r.kRed)
+      if "195_pt50" in iF: g.SetMarkerColor(r.kRed-2)
+      if "170" in iF: g.SetMarkerColor(r.kBlue)
+      if "170_pt50" in iF: g.SetMarkerColor(r.kBlue-2)
+      if "145" in iF: g.SetMarkerColor(r.kViolet)
+      if "145_pt50" in iF: g.SetMarkerColor(r.kViolet+2)
+      if "300" in iF: g.SetMarkerColor(r.kGreen-2)
+      if "160" in iF: g.SetMarkerColor(r.kOrange)
+
+      #for i in range(len(hList)):
+      #   bin = g.GetXaxis().FindBin(i)
+      #   g.GetXaxis().SetBinLabel(bin, myDict[i])
+
+      #g.GetXaxis().LabelsOption("d")
+      #g.GetXaxis().SetLabelSize(0.05)
+
+      lg.AddEntry(g, iF, "P")
+
+      #c1.Print("plotDump/%s_charmFrac_%d.png"%(iF,ctr))
+
+      mg.Add(g)
+
+   mg.SetTitle("Charm Fraction; Jet Rank (pT ordered); genCharm Frac.")
+   mg.Draw("AP")
+
+   for i in range(len(hList)):
+      bin = mg.GetXaxis().FindBin(i)
+      mg.GetXaxis().SetBinLabel(bin, myDict[i])
+   mg.GetXaxis().LabelsOption("d")
+   mg.GetXaxis().SetLabelSize(0.05)
+   mg.GetXaxis().SetTitleOffset(1.35)
+   mg.GetYaxis().SetRangeUser(0., 0.35)
+
+   lg.SetFillColor(0)
+   #lg.SetLineColor(0)
+   lg.Draw()
+   c1.Print("plotDump/total_charmFrac.png")
+
