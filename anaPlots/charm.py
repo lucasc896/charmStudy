@@ -56,10 +56,8 @@ elif conf.mode()=="bTagEff":
    print "  ***// Running anaPlots Analysis \\***"
    print line()
    
-   if conf.switches()["runMode"]=="plotting":
-      if conf.switches()["plotMode"]=="standardPlots":
-         #bTagP.runStandPlots(debug=options.doDebug)
-         bTagP.jetFlavourQuick(debug=options.doDebug)
+   if conf.switches()["runModeBTag"]=="charmFrac":
+      bTagP.jetCharmFrac(debug=options.doDebug)
 
 
 elif conf.mode()=="dev":
