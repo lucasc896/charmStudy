@@ -10,13 +10,11 @@ Copyright (c) 2012 University of Bristol. All rights reserved.
 from sys import argv, exit
 import ROOT as r
 
-#print options
-
 ###-------------------------------------------------------------------###
 
 def mode():
   
-  anaMode = ["bTagEff", "anaPlots", "dev"][0]
+  anaMode = ["bTagEff", "anaPlots", "dev"][1]
 
   return anaMode
 
@@ -28,7 +26,7 @@ def switches():
           "runMode"       :["plotting", "yieldTables"][0],
           "runModeBTag"   :["charmFrac", "standardPlots"][1],
           "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][1],
-          "signalSample"  :"T2cc_220_145",
+          "signalSample"  :"T2cc_160",
           "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT"][1],
           "jetMulti"      :["le3j","ge4j","inc"][2],
           "printLogy"     :[False, True][0],
@@ -87,7 +85,7 @@ def sigFile():
             "T2cc_220_145_ISRRW"      :["%sanaPlots/outT2cc_220_145_ISRRW_anaPlots.root"%inDir, 100.],
             "T2cc_220_195_noAlphaInc" :["%sanaPlots/outT2cc_220_195_noAlphaInc_anaPlots.root"%inDir, 100.],           
             "T2cc_220_170_noAlphaInc" :["%sanaPlots/outT2cc_220_170_noAlphaInc_anaPlots.root"%inDir, 100.],           
-            "T2cc_220_145_noAlphaInc" :["%sanaPlots/outT2cc_220_145_noAlphaInc_anaPlots.root"%inDir, 100.],          
+            "T2cc_220_145_noAlphaInc" :["%sanaPlots/outT2cc_220_145_noAlphaInc_anaPlots.root"%inDir, 100.],
     }
   elif mode()=="bTagEff":
     sigFile={
@@ -118,23 +116,27 @@ def comparFiles():
 
 def inDirs():
 
-  if switches()["HTcuts"]=="noCutInc": return ["noCuts_0_10000"]
-  if switches()["HTcuts"]=="standardHT":
-    if switches()["jetMulti"]=="inc":
-      dirs=["inc_275_325", "inc_325_375", "inc_375_475", "inc_475_575", "inc_575_675", "inc_675_775", "inc_775_875", "inc_875"]
-    if switches()["jetMulti"]=="le3j":
-      dirs=["le3j_275_325", "le3j_325_375", "le3j_375_475", "le3j_475_575", "le3j_575_675", "le3j_675_775", "le3j_775_875", "le3j_875"]  
-    if switches()["jetMulti"]=="ge4j":
-      dirs=["ge4j_275_325", "ge4j_325_375", "ge4j_375_475", "ge4j_475_575", "ge4j_575_675", "ge4j_675_775", "ge4j_775_875", "ge4j_875"] 
-  if switches()["HTcuts"]=="highHT":
-    if switches()["jetMulti"]=="le3j":
-      dirs=["le3j_375_475", "le3j_475_575", "le3j_575_675", "le3j_675_775", "le3j_775_875", "le3j_875"]
-    if switches()["jetMulti"]=="ge4j":
-      dirs=["ge4j_375_475", "ge4j_475_575", "ge4j_575_675", "ge4j_675_775", "ge4j_775_875", "ge4j_875"]
-    if switches()["jetMulti"]=="inc":
-      dirs=["inc_375_475", "inc_475_575", "inc_575_675", "inc_675_775", "inc_775_875", "inc_875"]        
-  if switches()["HTcuts"]=="lowHT":
-    dirs = dirs[:2]
+  HTdirs = ["275_325", "325_375", "375_475", "475_575", "575_675", "675_775", "775_875", "875"]
+  dirs=[]
+
+  if switches()["HTcuts"]=="noCutInc": dirs = ["noCuts_0_10000"]
+  elif switches()["HTcuts"]=="standardHT":
+    for d in HTdirs:
+      if switches()["jetMulti"]=="le3j": dirs.append("le3j_"+d)
+      if switches()["jetMulti"]=="ge4j": dirs.append("ge4j_"+d)
+      if switches()["jetMulti"]=="inc":  dirs.append("inc_"+d)
+  
+  elif switches()["HTcuts"]=="highHT":
+    for d in HTdirs[2:]:
+      if switches()["jetMulti"]=="le3j": dirs.append("le3j_"+d)
+      if switches()["jetMulti"]=="ge4j": dirs.append("ge4j_"+d)
+      if switches()["jetMulti"]=="inc":  dirs.append("inc_"+d)
+  
+  elif switches()["HTcuts"]=="lowHT":
+    for d in HTdirs[:2]:
+      if switches()["jetMulti"]=="le3j": dirs.append("le3j_"+d)
+      if switches()["jetMulti"]=="ge4j": dirs.append("ge4j_"+d)
+      if switches()["jetMulti"]=="inc":  dirs.append("inc_"+d)
 
   return dirs
 
@@ -156,30 +158,30 @@ def bMulti():
 def sinHists():
   if mode()=="anaPlots":
     singleHists={
-          "stopGenPtScal":plotDetails(xRange=[0.,1000.], rebX=40),
-          "stopGenPtVect":plotDetails(xRange=[0.,500.], rebX=20),
+          "stopGenPtScal":      plotDetails(xRange=[0.,1000.], rebX=40),
+          "stopGenPtVect":      plotDetails(xRange=[0.,500.], rebX=20),
           "delPhi_vs_scalGenPt":plotDetails(xRange=[0., 900.], yRange=[0., 3.2], rebX=5), 
-          #"dPhiStopCharm":2,
-          #"dPhiStopStop":2,
-          #"dPhiNeutCharm":2,
-          #"dPhiCharmCharm":2,
-          #"dPhiStopNeut":2,
-          #"n_Events_1":1,
-          #"n_Jets":1,
-          "n_BTagged_Jets_all":plotDetails(xRange=[0.,6.]),
+          "dPhiStopCharm":      plotDetails(xRange=[0.,3.2], rebX=2),
+          "dPhiStopStop":       plotDetails(xRange=[0.,3.2], rebX=2),
+          "dPhiNeutCharm":      plotDetails(xRange=[0.,3.2], rebX=2),
+          "dPhiCharmCharm":     plotDetails(xRange=[0.,3.2], rebX=2),
+          "dPhiStopNeut":       plotDetails(xRange=[0.,3.2], rebX=2),
+          "n_Events_1":         plotDetails(),
+          "n_Jets":             plotDetails(),
+          "n_BTagged_Jets_all": plotDetails(xRange=[0.,6.]),
     }
   elif mode()=="bTagEff":
     singleHists={
-          "n_Jets":plotDetails(),
-          "n_JetsMatchB":plotDetails(),
-          "n_JetsMatchC":plotDetails(),
-          "n_JetsMatchL":plotDetails(),
-          "jetFlavour_0":plotDetails(),
-          "jetFlavour_1":plotDetails(),
-          "jetFlavour_2":plotDetails(),
-          "jetFlavour_3":plotDetails(),
-          "n_Truth_B":plotDetails(),
-          "n_Truth_C":plotDetails(),
+          "n_Jets":       plotDetails(),
+          "n_JetsMatchB": plotDetails(),
+          "n_JetsMatchC": plotDetails(),
+          "n_JetsMatchL": plotDetails(),
+          "jetFlavour_0": plotDetails(),
+          "jetFlavour_1": plotDetails(),
+          "jetFlavour_2": plotDetails(),
+          "jetFlavour_3": plotDetails(),
+          "n_Truth_B":    plotDetails(),
+          "n_Truth_C":    plotDetails(),
     }
   else:
     singleHists={}
@@ -192,15 +194,15 @@ def anaHists():
   
   if mode()=="anaPlots":
     hists={
-      "MET":plotDetails(xRange=[0.,500.], rebX=20),
-      #"MHT":20,
-      "commHT":plotDetails(xRange=[0.,1000.], rebX=20),
-      "hadronicAlphaTZoom":plotDetails(xRange=[0., 1.5], rebX=5),
-      #"leadJetdelPhi":2,
-      #"MHToverMET":2,
-      #"jetPt":20,
-      "leadJetPt":plotDetails(xRange=[0.,500.], rebX=20),
-      #"subLeadJetPt":20,
+      "MET":                plotDetails(xRange=[0.,500.], rebX=20),
+      "MHT":                plotDetails(xRange=[0.,800.],rebX=20),
+      "commHT":             plotDetails(xRange=[200.,1000.], rebX=20),
+      "hadronicAlphaTZoom": plotDetails(xRange=[0., 1.5], rebX=5),
+      "leadJetdelPhi":      plotDetails(xRange=[0.,3.2], rebX=2),
+      "MHToverMET":         plotDetails(xRange=[0.,8.], rebX=2),
+      "jetPt":              plotDetails(xRange=[0.,500.], rebX=20),
+      "leadJetPt":          plotDetails(xRange=[0.,500.], rebX=20),
+      "subLeadJetPt":       plotDetails(xRange=[0.,400.], rebX=20),
       #"alphaT_vs_HT":plotDetails(xRange=[0.,1.6], yRange=[0.,600.], rebX=2, rebY=2),
     }
   elif mode()=="bTagEff":
@@ -209,33 +211,6 @@ def anaHists():
     hists={}
   
   return hists
-
-###-------------------------------------------------------------------###
-
-def histRanges():
-  rangeDict={
-         "stopGenPtScal"        :[0., 1000.],
-         "stopGenPtVect"        :[0., 500.],
-         "delPhi_vs_scalGenPt"  :[0., 1000.],
-         "dPhiStopCharm"        :[0., 3.2],
-         "dPhiNeutCharm"        :[0., 3.2],
-         "dPhiStopNeut"         :[0., 3.2],
-         "dPhiStopCharm"        :[0., 3.2],
-         "n_Events_1"           :[0., 1.],
-         "MET"                  :[0., 500.],
-         "MHT"                  :[0., 500.],
-         "commHT"               :[0., 700.],
-         "hadronicAlphaTZoom"   :[0.,  1.5],
-         "leadJetdelPhi"        :[0., 3.2],
-         "MHToverMET"           :[0., 8.],
-         "jetPt"                :[0., 500.],
-         "leadJetPt"            :[0., 500.],
-         "subLeadJetPt"         :[0., 400.],
-         "n_BTagged_Jets_all"   :[0., 5.],
-         "n_Jets"               :[0., 10.],
-  }
-
-  return rangeDict
 
 ###-------------------------------------------------------------------###
 
@@ -250,7 +225,6 @@ def plotDetails(xRange=None, yRange=None, rebX=1, rebY=1):
   return myDict
 
 ###-------------------------------------------------------------------###
-
 
 def getXSecNorm(mStop=None):
 
@@ -274,6 +248,36 @@ def getXSecNorm(mStop=None):
     print normFact
 
   return normFact
+
+###-------------------------------------------------------------------###
+
+def getXSec():
+
+  sigSamp = switches()["signalSample"]
+
+  prodXSec = {
+        160:58.01,
+        220:11.18,
+        300:1.996,
+        600:0.02480,
+  }
+
+  if "T2cc_160" in sigSamp:
+    sigXSec = prodXSec[160]
+  elif "T2cc_220_" in sigSamp:
+    sigXSec = prodXSec[220]
+  elif "T2cc_300" in sigSamp:
+    sigXSec = prodXSec[300]
+  elif "T2cc_600" in sigSamp:
+    sigXSec = prodXSec[600]
+  else:
+    print "> ERROR: Could not get signal xSec value."
+    print ">>> This could be a sample naming issue."
+    sys.exit()
+
+  print "> Setting signal xSec to %.2fpb\n"%sigXSec
+
+  return sigXSec
 
 
 
