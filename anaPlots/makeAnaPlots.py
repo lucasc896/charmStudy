@@ -46,6 +46,11 @@ def runAnaPlots(debug=False):
   sigSamp     = conf.switches()["signalSample"]
   sigFile     = conf.sigFile()
 
+  c1 = r.TCanvas()
+
+  sigXSec = conf.getXSec()
+
+  sigNorm = 0.01*conf.switches()["lumiNorm"]*sigXSec
 
   for hT, pDet in hists.iteritems():
     for b in bMulti:
@@ -53,7 +58,7 @@ def runAnaPlots(debug=False):
       if sigSamp:
         sFile=r.TFile().Open(sigFile[sigSamp][0])
         if debug: print sFile
-        hS = getPlotsFromFile(hT, dirs, getbMultis(b), sFile, sigFile[sigSamp][1])
+        hS = getPlotsFromFile(hT, dirs, getbMultis(b), sFile, sigNorm)
       else: hS=None
 
       bgHists=[]
@@ -93,7 +98,6 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
   sFile       = conf.sigFile()
   sigSamp     = conf.switches()["signalSample"]
   jMulti      = conf.switches()["jetMulti"]
-#  debug       = conf.switches()["debug"]
 
   # override the global signal sample if running comparison plots
   if comparSamp: sigSamp = comparSamp
@@ -136,18 +140,11 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
       hTot = aPlot.makeSinglePlot(rebinX=pDet["rebinX"], rebinY=pDet["rebinY"], norm=normVal)
       del aPlot
       
+      doRanges(hTot, pDet)
+
       if "TH2D" in str( type(hTot) ):
-        if pDet["xRange"]:
-          ranges=pDet["xRange"]
-          hTot.GetXaxis().SetRangeUser(ranges[0], ranges[1])
-        if pDet["yRange"]:
-          ranges=pDet["yRange"]
-          hTot.GetYaxis().SetRangeUser(ranges[0], ranges[1])
         hTot.Draw("colz")
       elif "TH1D" in str( type(hTot) ):
-        if pDet["xRange"]:
-          ranges=pDet["xRange"]
-          hTot.GetXaxis().SetRangeUser(ranges[0], ranges[1])
         hTot.Draw("hist")
 
       outHists.append(hTot)  
@@ -172,21 +169,11 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
     hTot = aPlot.makeSinglePlot(rebinX=pDet["rebinX"], rebinY=pDet["rebinY"], norm=normVal)
     del aPlot
     
-    if "TH2" in str( type(hTot) ):
-      
-      if pDet["xRange"]:
-        ranges=pDet["xRange"]
-        hTot.GetXaxis().SetRangeUser(ranges[0], ranges[1])
-      if pDet["yRange"]:
-        ranges=pDet["yRange"]
-        hTot.GetYaxis().SetRangeUser(ranges[0], ranges[1])      
+    doRanges(hTot, pDet)
+
+    if "TH2" in str( type(hTot) ): 
       hTot.Draw("colz")
-    
     elif "TH1" in str( type(hTot) ):
-      
-      if pDet["xRange"]:
-        ranges=pDet["xRange"]
-        hTot.GetXaxis().SetRangeUser(ranges[0], ranges[1])
       hTot.Draw("hist")
 
     outHists.append(hTot)  
@@ -210,7 +197,6 @@ def runComparPlots(debug=False, doLogy=False):
     print "\n >>> Making Comparison Plots\n"
 
   compFiles   = conf.comparFiles()
-
   if debug: print compFiles
 
   if len( conf.bMulti() )>1:
@@ -218,7 +204,6 @@ def runComparPlots(debug=False, doLogy=False):
     sys.exit()
 
   hList=[]
-
   for f in compFiles:
     hList.append( runStandPlots(printPlots=False, comparSamp=f, debug=debug, doLogy=doLogy) )
 
