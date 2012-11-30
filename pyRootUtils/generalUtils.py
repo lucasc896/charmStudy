@@ -40,7 +40,9 @@ import configuration as conf
 #r.gStyle.SetLabelSize(0.05, "XYZ");
 #r.gStyle.SetHatchesLineWidth(2)
 #r.gStyle.SetPalette(1)
-#
+
+###-------------------------------------------------------------------###
+###-------------------------------------------------------------------###
 
 class multiPlot(object):
   """Rate plot producer"""
@@ -136,8 +138,8 @@ class multiPlot(object):
       self.ln3.SetLineColor(16)
       self.ln3.SetLineStyle(2)
 
-
-
+###-------------------------------------------------------------------###
+###-------------------------------------------------------------------###
 
 class anaPlot(object):
   """making specific analysis plots"""
@@ -262,7 +264,8 @@ class anaPlot(object):
       scaleF = normVal/float(h.GetEntries())
     h.Scale( scaleF )
     
-
+###-------------------------------------------------------------------###
+###-------------------------------------------------------------------###
 
 class Print(object):
   """docstring for printPDF"""
@@ -362,6 +365,8 @@ class Print(object):
     self.pageCounter += 1
     pass
 
+###-------------------------------------------------------------------###
+###-------------------------------------------------------------------###
 
 class stackPlots(object):
   """docstring for stackPlots"""
@@ -453,7 +458,7 @@ class stackPlots(object):
     lg.SetLineColor(0)
 
 
-
+###-------------------------------------------------------------------###
 
 def comparPlot(h1=None, h2=None, debug=False):
   
@@ -489,6 +494,7 @@ def comparPlot(h1=None, h2=None, debug=False):
 
   c1.Print("plotDump/compare_%s_%s_%s.png"%(h1.GetName(),bM[0], jM))
 
+###-------------------------------------------------------------------###
 
 def comparPlots(hList=None, debug=None, doLogy=False):
 
@@ -553,6 +559,7 @@ def comparPlots(hList=None, debug=None, doLogy=False):
     c1.SetLogy(1)
     c1.Print("plotDump/compar_%s_%s_%s_log.png"%(hList[0].GetName(),bM[0], jM))
 
+###-------------------------------------------------------------------###
 
 def getPlotsFromFile(histName="", dirs=None, bSufs=None, inFile=None, scale=None):
 
@@ -563,10 +570,11 @@ def getPlotsFromFile(histName="", dirs=None, bSufs=None, inFile=None, scale=None
       if ctr==0: h1 = h.Clone()
       else: h1.Add(h)
       ctr+=1
-    if scale: h1.Scale(scale)
+  if scale: h1.Scale(scale)
     
   return h1    
 
+###-------------------------------------------------------------------###
 
 def getHistOrder(hList=None):
   """returns a list of the reverse order of hList"""
@@ -585,8 +593,23 @@ def getHistOrder(hList=None):
 
   return myOrder
 
+###-------------------------------------------------------------------###
 
+def doRanges(h=None, hD=None):
 
+  if "TH1" in str( type(h) ):
+    if hD["xRange"]:
+      ranges=hD["xRange"]
+      h.GetXaxis().SetRangeUser(ranges[0], ranges[1])
+  elif "TH2" in str( type(h) ):
+    if hD["xRange"]:
+      ranges=hD["xRange"]
+      h.GetXaxis().SetRangeUser(ranges[0], ranges[1])
+    if hD["yRange"]:
+      ranges=hD["yRange"]
+      h.GetYaxis().SetRangeUser(ranges[0], ranges[1])      
+
+  pass
 
 
 
