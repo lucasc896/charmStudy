@@ -26,6 +26,7 @@ def switches():
   #generic switches
   switches={
           "runMode"       :["plotting", "yieldTables"][0],
+          "runModeBTag"   :["charmFrac"][0],
           "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][1],
           "signalSample"  :"T2cc_220_145",
           "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT"][1],
@@ -110,8 +111,7 @@ def sigFile():
 def comparFiles():
 
   comparFiles = ["T2cc_220_195_pt20", "T2cc_220_170_pt20", "T2cc_220_145_pt20"]
-  comparFiles = ["T2cc_220_170_pt20", "T2cc_160_pt20", "T2cc_300_pt20"]
-  #comparFiles = ["T2cc_160", "T2cc_300", "T2cc_220_145", "T2cc_220_170", "T2cc_220_195"]
+  comparFiles = ["T2cc_220_145", "T2cc_220_170", "T2cc_220_195"]
   return comparFiles
 
 ###-------------------------------------------------------------------###
