@@ -26,7 +26,7 @@ def switches():
   #generic switches
   switches={
           "runMode"       :["plotting", "yieldTables"][0],
-          "runModeBTag"   :["charmFrac"][0],
+          "runModeBTag"   :["charmFrac", "standardPlots"][1],
           "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][1],
           "signalSample"  :"T2cc_220_145",
           "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT"][1],
@@ -170,16 +170,16 @@ def sinHists():
     }
   elif mode()=="bTagEff":
     singleHists={
-          "n_Jets":1,
-          "n_JetsMatchB":1,
-          "n_JetsMatchC":1,
-          "n_JetsMatchL":1,
-          "jetFlavour_0":1,
-          "jetFlavour_1":1,
-          "jetFlavour_2":1,
-          "jetFlavour_3":1,
-          "n_Truth_B":1,
-          "n_Truth_C":1,
+          "n_Jets":plotDetails(),
+          "n_JetsMatchB":plotDetails(),
+          "n_JetsMatchC":plotDetails(),
+          "n_JetsMatchL":plotDetails(),
+          "jetFlavour_0":plotDetails(),
+          "jetFlavour_1":plotDetails(),
+          "jetFlavour_2":plotDetails(),
+          "jetFlavour_3":plotDetails(),
+          "n_Truth_B":plotDetails(),
+          "n_Truth_C":plotDetails(),
     }
   else:
     singleHists={}
