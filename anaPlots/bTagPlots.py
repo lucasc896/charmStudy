@@ -156,36 +156,24 @@ def runStandPlots(debug=False):
    pass
 
 
-def jetFlavourQuick(debug=False):
+def jetCharmFrac(debug=False):
 
-   dirs        = conf.inDirs()
-   hists       = conf.anaHists()
-   sinHists    = conf.sinHists()
-   sFile       = conf.sigFile()
-   sigSamp     = conf.switches()["signalSample"]
-   histRanges  = conf.histRanges()
+   dirs    = conf.inDirs()
+   inFiles = conf.comparFiles()
+   sFile = conf.sigFile()
 
-   if debug: print sFile[sigSamp][0]
-  
-   normVal = None
-   if conf.switches()["norm"]:
-      normVal = 1.
+   if debug: print sFile
 
    c1 = r.TCanvas()
-
-   
-   inFiles=["T2cc_220_195","T2cc_220_170","T2cc_220_145"]
-   inFiles=["T2cc_220_195_pt50","T2cc_220_170_pt50","T2cc_220_145_pt50"]
-   inFiles=["T2cc_220_145", "T2cc_220_145_pt50"]
-
    mg = r.TMultiGraph()
-
    lg = r.TLegend(0.6, 0.17, 0.85, 0.42)
 
    for iF in inFiles:
       hList=[]
+      g = r.TGraph(4)
       rFile = r.TFile().Open(sFile[iF][0])
       print "\n>> %s"%iF
+
       for i in range(4):
          ctr=0
          for d in dirs:
@@ -195,8 +183,6 @@ def jetFlavourQuick(debug=False):
             else: hT.Add(h)
             ctr+=1
          hList.append(hT)
-   
-      g = r.TGraph(4)
 
       ctr1=0
       for hT in hList:   
@@ -214,10 +200,6 @@ def jetFlavourQuick(debug=False):
          ctr1+=1
    
       g.Draw("P")
-      #g.SetTitle("Charm Fraction - %s; Jet Rank (pT ordered); genCharm Frac."%iF)
-      #g.GetXaxis().SetRangeUser(0.,.4)
-      #g.GetXaxis().SetRangeUser(-1, 5)
-      #g.GetXaxis().SetTitleOffset(1.4)
       g.SetMarkerStyle(29)
       g.SetMarkerSize(4)
 
@@ -230,17 +212,7 @@ def jetFlavourQuick(debug=False):
       if "300" in iF: g.SetMarkerColor(r.kGreen-2)
       if "160" in iF: g.SetMarkerColor(r.kOrange)
 
-      #for i in range(len(hList)):
-      #   bin = g.GetXaxis().FindBin(i)
-      #   g.GetXaxis().SetBinLabel(bin, myDict[i])
-
-      #g.GetXaxis().LabelsOption("d")
-      #g.GetXaxis().SetLabelSize(0.05)
-
       lg.AddEntry(g, iF, "P")
-
-      #c1.Print("plotDump/%s_charmFrac_%d.png"%(iF,ctr))
-
       mg.Add(g)
 
    mg.SetTitle("Charm Fraction; Jet Rank (pT ordered); genCharm Frac.")
@@ -249,13 +221,13 @@ def jetFlavourQuick(debug=False):
    for i in range(len(hList)):
       bin = mg.GetXaxis().FindBin(i)
       mg.GetXaxis().SetBinLabel(bin, myDict[i])
+   
    mg.GetXaxis().LabelsOption("d")
    mg.GetXaxis().SetLabelSize(0.05)
    mg.GetXaxis().SetTitleOffset(1.35)
    mg.GetYaxis().SetRangeUser(0., 0.35)
 
    lg.SetFillColor(0)
-   #lg.SetLineColor(0)
    lg.Draw()
    c1.Print("plotDump/total_charmFrac.png")
 
