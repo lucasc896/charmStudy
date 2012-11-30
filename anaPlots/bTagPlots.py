@@ -21,15 +21,15 @@ def runOldBtagAna():
 
    inList = {
       "TTbar_CSVM":("_375_",
-        ["jet_response_0",
-        "bMatched_response_0",
-        "cMatched_response_0",
-        "lMatched_response_0"],
-        "../rootfiles/bTagEff_Study/outTTbar_bTagEff.root",
-        [0., .07], [0.001, .2]),
+            ["jet_response_0",
+            "bMatched_response_0",
+            "cMatched_response_0",
+            "lMatched_response_0"],
+            "../rootfiles/bTagEff_Study/outTTbar_bTagEff.root",
+            [0., .07], [0.001, .2]),
 
       "TTbar_CSVMVA":("_375_",
-        ["jet_response_1",
+            ["jet_response_1",
             "bMatched_response_1",
             "cMatched_response_1",
             "lMatched_response_1"],
@@ -105,6 +105,7 @@ def runOldBtagAna():
       del multi
       c1.close()
 
+###-------------------------------------------------------------------###
 
 def runStandPlots(debug=False):
    
@@ -139,21 +140,12 @@ def runStandPlots(debug=False):
       hTot = aPlot.makeSinglePlot(1, normVal)
       del aPlot
       
-      hTot.Draw("hist")
+      doRanges(hTot, pDet)
+
       if "TH2D" in str( type(hTot) ):
-         if pDet["xRange"]:
-            ranges=pDet["xRange"]
-            hTot.GetXaxis().SetRangeUser(ranges[0], ranges[1])
-         if pDet["yRange"]:
-            ranges=pDet["yRange"]
-            hTot.GetYaxis().SetRangeUser(ranges[0], ranges[1])
          hTot.Draw("colz")
       elif "TH1D" in str( type(hTot) ):
-         if pDet["xRange"]:
-            ranges=pDet["xRange"]
-            hTot.GetXaxis().SetRangeUser(ranges[0], ranges[1])
          hTot.Draw("hist")
-      
 
 
       if "noCut" not in conf.switches()["HTcuts"]:
@@ -163,6 +155,7 @@ def runStandPlots(debug=False):
 
    pass
 
+###-------------------------------------------------------------------###
 
 def jetCharmFrac(debug=False):
 
@@ -240,3 +233,7 @@ def jetCharmFrac(debug=False):
    lg.Draw()
    c1.Print("plotDump/total_charmFrac.png")
 
+###-------------------------------------------------------------------###
+
+def doCharmPhiStudy():
+   pass
