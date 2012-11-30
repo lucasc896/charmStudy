@@ -111,11 +111,9 @@ def runStandPlots(debug=False):
    print "\n >>> Making Analysis Plots\n"
 
    dirs        = conf.inDirs()
-   hists       = conf.anaHists()
    sinHists    = conf.sinHists()
    sFile       = conf.sigFile()
    sigSamp     = conf.switches()["signalSample"]
-   histRanges  = conf.histRanges()
    jMulti      = conf.switches()["jetMulti"]
    bMulti      = conf.bMulti()
 
@@ -130,7 +128,7 @@ def runStandPlots(debug=False):
 
    c1 = r.TCanvas()
 
-   for hT in sinHists:
+   for hT, pDet in sinHists.iteritems():
       hList=[]
       for d in dirs:
          h = rFile.Get("%s/%s"%(d, hT))
@@ -142,9 +140,19 @@ def runStandPlots(debug=False):
       del aPlot
       
       hTot.Draw("hist")
-      if hT in histRanges:
-         ranges = histRanges[hT]
-         hTot.GetXaxis().SetRangeUser(ranges[0], ranges[1]) 
+      if "TH2D" in str( type(hTot) ):
+         if pDet["xRange"]:
+            ranges=pDet["xRange"]
+            hTot.GetXaxis().SetRangeUser(ranges[0], ranges[1])
+         if pDet["yRange"]:
+            ranges=pDet["yRange"]
+            hTot.GetYaxis().SetRangeUser(ranges[0], ranges[1])
+         hTot.Draw("colz")
+      elif "TH1D" in str( type(hTot) ):
+         if pDet["xRange"]:
+            ranges=pDet["xRange"]
+            hTot.GetXaxis().SetRangeUser(ranges[0], ranges[1])
+         hTot.Draw("hist")
       
 
 
@@ -203,6 +211,7 @@ def jetCharmFrac(debug=False):
       g.SetMarkerStyle(29)
       g.SetMarkerSize(4)
 
+      # work out a better way of doing this
       if "195" in iF: g.SetMarkerColor(r.kRed)
       if "195_pt50" in iF: g.SetMarkerColor(r.kRed-2)
       if "170" in iF: g.SetMarkerColor(r.kBlue)
