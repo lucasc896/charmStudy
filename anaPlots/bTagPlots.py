@@ -267,22 +267,25 @@ def doCharmPhiStudy(debug=False):
                   hT.Add(h)
                ctr+=1
 
+            normalise(hT)
             # why do i need this?!
             hList.append(hT)
 
+         hOrder = getHistOrder(hList)
+
          ctr1=0
-         for h1 in hList:
+         for k in hOrder:
             if ctr1==0:
-               h1.Draw("hist")
+               hList[k].Draw("hist")
             else:
-               h1.Draw("histsame")
-            h1.SetLineColor(colors[ctr1])
-            h1.SetLineWidth(2)
-            h1.Rebin(2)
+               hList[k].Draw("histsame")
+            hList[k].SetLineColor(colors[ctr1])
+            hList[k].SetLineWidth(2)
+            hList[k].Rebin(2)
+            # temp
             if "dPhi" in iH:
-               print iH
-               h1.GetXaxis().SetTitle("DeltaPhi")
-            lg.AddEntry(h1, "Jet %d"%ctr1, "L")
+               hList[k].GetXaxis().SetTitle("DeltaPhi")
+            lg.AddEntry(hList[k], "Jet %d"%ctr1, "L")
             ctr1+=1
 
          c1.Print("plotDump/%s_%s.png"%(iF, iH))     
