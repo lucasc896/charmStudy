@@ -159,9 +159,9 @@ def runStandPlots(debug=False):
 
 def jetCharmFrac(debug=False):
 
-   dirs    = conf.inDirs()
-   inFiles = conf.comparFiles()
-   sFile = conf.sigFile()
+   dirs     = conf.inDirs()
+   inFiles  = conf.comparFiles()
+   sFile    = conf.sigFile()
 
    if debug: print sFile
 
@@ -235,5 +235,61 @@ def jetCharmFrac(debug=False):
 
 ###-------------------------------------------------------------------###
 
-def doCharmPhiStudy():
-   pass
+def doCharmPhiStudy(debug=False):
+
+   dirs        = conf.inDirs()
+   sFile       = conf.sigFile()
+   sigSamp     = conf.switches()["signalSample"]
+   jMulti      = conf.switches()["jetMulti"]
+   inFiles     = conf.comparFiles()
+
+   if debug: print inFiles
+
+   iHists = ["noCLeadJetdR", "noCLeadJetdPhi"]
+   #iHists = ["noCLeadJetdPhi"]
+   colors = [r.kRed, r.kBlue, r.kViolet-1]
+
+   c1 = r.TCanvas()
+   lg = r.TLegend(.6,.7,.9,.9)
+
+   for iF in inFiles:
+      rFile = r.TFile().Open(sFile[iF][0])
+
+      for iH in iHists:
+         hList=[]
+         for i in range(3):
+            ctr=0
+            for d in dirs:
+               h = rFile.Get("%s/%s_%d"%(d,iH,i))
+               if ctr==0:
+                  hT = h.Clone()
+               else:
+                  hT.Add(h)
+               ctr+=1
+
+            # why do i need this?!
+            hList.append(hT)
+
+         ctr1=0
+         for h1 in hList:
+            if ctr1==0:
+               h1.Draw("hist")
+            else:
+               h1.Draw("histsame")
+            h1.SetLineColor(colors[ctr1])
+            h1.SetLineWidth(2)
+            h1.Rebin(2)
+            if "dPhi" in iH:
+               print iH
+               h1.GetXaxis().SetTitle("DeltaPhi")
+            lg.AddEntry(h1, "Jet %d"%ctr1, "L")
+            ctr1+=1
+
+         c1.Print("plotDump/%s_%s.png"%(iF, iH))     
+
+
+
+
+
+
+
