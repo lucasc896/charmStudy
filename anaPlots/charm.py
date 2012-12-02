@@ -60,6 +60,8 @@ elif conf.mode()=="bTagEff":
       bTagP.jetCharmFrac(debug=options.doDebug)
    elif conf.switches()["runModeBTag"]=="standardPlots":
       bTagP.runStandPlots(debug=options.doDebug)
+   elif conf.switches()["runModeBTag"]=="charmPhi":
+      bTagP.doCharmPhiStudy(debug=options.doDebug)
 
 
 elif conf.mode()=="dev":
