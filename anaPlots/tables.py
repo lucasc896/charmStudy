@@ -167,9 +167,12 @@ def getDataYields(bM="inc"):
     dirTitle = d[4:].replace("_","-")
     if d=="inc_875": dirTitle="875-inf"
     for suf in getbMultis(bM):
+      #print d, suf
       h = sFile.Get("%s/commHT%s"%(d, suf))
       ent += h.GetEntries()
-    yieldDict[dirTitle]=[ent, math.sqrt(ent)]
+      #print ent
+    yieldDict[dirTitle[1:]]=[ent, math.sqrt(ent)]
+    #print yieldDict
 
   return OrderedDict(sorted(yieldDict.items(), key=lambda t: t[0]))
 
@@ -178,7 +181,7 @@ def getDataYields(bM="inc"):
 def printHeader():
   outTxt=""
   outTxt += "\\documentclass[a4paper,12pt]{article}\n"
-  outTxt += "\\usepackage[margin=0.3in]{geometry}\n"
+  outTxt += "\\usepackage[margin=0.3in, landscape]{geometry}\n"
   outTxt += "\\begin{document}\n\n"
   outTxt += "\\begin{table}[lp{5cm}l]\n"
 
@@ -187,7 +190,7 @@ def printHeader():
 ###-------------------------------------------------------------------###
 
 def printCaption(bM):
-  outTxt = "\\caption{Yields for $\alpha_T>$ 0.55 (%s b-jets)}\n"%bM
+  outTxt = "\\caption{Yields for $\\alpha_T>$ 0.55 (%s b-jets)}\n"%bM
   #add a bit more eventually
 
   return outTxt
@@ -195,13 +198,19 @@ def printCaption(bM):
 ###-------------------------------------------------------------------###
 
 def printEnd():
-  outTxt  = "\n\n\\hline\n"
+  outTxt  = "\n\n\n"
   outTxt += "\\end{tabular}\n"
-  outTxt += "\\end{flushleft}\n"
+  outTxt += "\\end{center}\n"
   outTxt += "\\end{table}\n"
   outTxt += "\\end{document}"
 
   return outTxt
+
+###-------------------------------------------------------------------###
+
+def printHT():
+
+  return " HT Bins (GeV) & 275-325 & 325-375 & 375-475 & 475-575 & 575-675 & 675-775 & 775-875 & 875-$\\inf$ \\\\ \n"
 
 ###-------------------------------------------------------------------###
 
@@ -213,18 +222,21 @@ def makeTable(bM="inc"):
   smPred = getSMPred(bM, jM)
   dYield = getDataYields(bM)
 
-  f = open("tableDump/yieldTable_%s_%s.tex"%(jM, bM), "w")
+  f = open("tableDump/yieldTable_%s_%s_%s.tex"%(sigSamp, jM, bM), "w")
   outTxt = ""
   outTxt += printHeader()
   outTxt += printCaption(bM)
 
-  outTxt += "\\begin{flushleft}\n"
+  outTxt += "\\begin{center}\n"
   outTxt += "\\begin{tabular}{ c|cccccccc }\n"
-  outTxt += "\\hline"
+
+  outTxt += printHT()
+
+  outTxt +="\\hline"
 
   print "\n*** SM BG Pred ***"
 
-  outTxt += "SM BG Pred "
+  outTxt += " SM BG Pred "
 
   for key, val in smPred.iteritems():
     print "%s\t%f \\pm %f"%(key, val[0], val[1])
@@ -235,9 +247,13 @@ def makeTable(bM="inc"):
   print "\n*** %s Yields"%(sigSamp)
   outTxt += "\n\n%s "%sigSamp.replace("_"," ")
 
+  totYield = 0
   for key, val in dYield.iteritems():
     print "%s\t%f \\pm %f"%(key, val[0], val[1])
     outTxt += "& %.1f $^{\pm %.1f }$ "%(val[0], val[1])
+    totYield += val[0]
+
+  print "\n*** Total Yield for %s: %d ***\n"%(sigSamp, totYield)
 
   outTxt += " \\\\"
 
