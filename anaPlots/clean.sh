@@ -1,2 +1,2 @@
 rm plotDump/*png
-rm tableDump/*tex
+rm tableDump/*
