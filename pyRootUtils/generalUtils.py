@@ -544,6 +544,7 @@ def comparPlots(hList=None, debug=None, doLogy=False):
     if ctr==0: hList[i].Draw("hist")
     else: hList[i].Draw("histsame")
     hList[i].SetLineColor(colors[i])
+    if "ISRRW" in sSamp[i]: hList[i].SetLineColor(r.kBlue)
     lg.AddEntry(hList[i], sSamp[i], "L")
     ctr+=1
 
@@ -554,7 +555,7 @@ def comparPlots(hList=None, debug=None, doLogy=False):
   lg.Draw()
   
   if not doLogy:
-    c1.Print("plotDump/compare_%s_%s_%s.png"%(hList[0].GetName(),bM[0], jM))
+    c1.Print("plotDump/compare_%s_%s_%s_%s.png"%(hList[0].GetName(),bM[0], jM, sSamp[0]))
   else:
     c1.SetLogy(1)
     c1.Print("plotDump/compar_%s_%s_%s_log.png"%(hList[0].GetName(),bM[0], jM))
@@ -611,7 +612,25 @@ def doRanges(h=None, hD=None):
 
   pass
 
+###-------------------------------------------------------------------###
 
+def normalise(h=None, normVal=1.):
+
+  h = h.Scale(normVal/h.GetEntries())
+
+  return h
+
+###-------------------------------------------------------------------###
+
+def setChrisStyle(generic=True, multiPlot=False, anaPlot=False):
+
+  if generic:
+    pass
+  elif multiPlot:
+    pass
+  elif anaPlot:
+    pass
+  pass
 
 
 
