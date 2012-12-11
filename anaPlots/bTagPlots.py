@@ -121,7 +121,7 @@ def runStandPlots(debug=False):
    if debug: print sFile[sigSamp][0]
   
    normVal = None
-   if conf.switches()["norm"]:
+   if conf.switches()["norm"]=="Unitary":
       normVal = 1.
 
    rFile = r.TFile.Open(sFile[sigSamp][0])
@@ -137,7 +137,7 @@ def runStandPlots(debug=False):
          hList.append(h)
       aPlot = anaPlot(hList, hT)
       if debug: aPlot.Debug=True
-      hTot = aPlot.makeSinglePlot(1, normVal)
+      hTot = aPlot.makeSinglePlot(rebinX=1, norm=normVal)
       del aPlot
       
       doRanges(hTot, pDet)
@@ -245,17 +245,18 @@ def doCharmPhiStudy(debug=False):
 
    if debug: print inFiles
 
+   r.gStyle.SetOptStat(0)
+
    iHists = ["noCLeadJetdR", "noCLeadJetdPhi"]
-   #iHists = ["noCLeadJetdPhi"]
    colors = [r.kRed, r.kBlue, r.kViolet-1]
 
    c1 = r.TCanvas()
-   lg = r.TLegend(.6,.7,.9,.9)
 
    for iF in inFiles:
       rFile = r.TFile().Open(sFile[iF][0])
 
       for iH in iHists:
+         lg = r.TLegend(.75,.68,.89,.89)
          hList=[]
          for i in range(3):
             ctr=0
@@ -268,6 +269,7 @@ def doCharmPhiStudy(debug=False):
                ctr+=1
 
             normalise(hT)
+            hT.Rebin(5)
             # why do i need this?!
             hList.append(hT)
 
@@ -281,13 +283,16 @@ def doCharmPhiStudy(debug=False):
                hList[k].Draw("histsame")
             hList[k].SetLineColor(colors[ctr1])
             hList[k].SetLineWidth(2)
-            hList[k].Rebin(2)
+            #hList[k].Rebin(5)
             # temp
             if "dPhi" in iH:
                hList[k].GetXaxis().SetTitle("DeltaPhi")
             lg.AddEntry(hList[k], "Jet %d"%ctr1, "L")
             ctr1+=1
 
+         lg.SetFillColor(0)
+         lg.SetLineColor(0)
+         lg.Draw()
          c1.Print("plotDump/%s_%s.png"%(iF, iH))     
 
 
