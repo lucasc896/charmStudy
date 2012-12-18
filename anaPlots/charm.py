@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 """
-tables.py
+charm.py
 
 Created by Chris Lucas on 2012-11-14.
 Copyright (c) 2012 University of Bristol. All rights reserved.
