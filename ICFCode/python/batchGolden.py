@@ -31,7 +31,7 @@ def ensure_dir(path):
       else: raise
 
 def runMode():
-  return ["OP_analysisPlots", "OP_charmEffStudy"][1]
+  return ["OP_analysisPlots", "OP_charmEffStudy"][0]
 
 
 # -----------------------------------------------------------------------------
@@ -711,6 +711,9 @@ def MakeMCTree(Threshold, Muon = None, Split = None):
   ### override the above for thresh=100, split==None
   if int(Threshold) is 100 and Split == None : HTBins_inc = [0.,10000.]
 
+  ### override the threshold arguement
+  Threshold=Threshold*0.95
+
   if Muon!=None:
       secondJetET = OP_SecondJetOrMuEtCut(Threshold)
   else:
@@ -761,10 +764,10 @@ def MakeMCTree(Threshold, Muon = None, Split = None):
     cutTreeMC.TAttach(MHT_METCut,jet_ge4) # jet ge4
 
     if int(Threshold) is 100 and Split == None :
-
-      out.append(AddBinedHist(cutTree = cutTreeMC,
-      OP = (runModeName,genericPSet_mc), cut = jet_ge2,
-      htBins = HTBins_inc, TriggerDict = None, lab ="noCuts_", Muon=False, alphaTCut=False))
+      pass
+      #out.append(AddBinedHist(cutTree = cutTreeMC,
+      #OP = (runModeName,genericPSet_mc), cut = jet_ge2,
+      #htBins = HTBins_inc, TriggerDict = None, lab ="noCuts_", Muon=False, alphaTCut=False))
 
     out.append(AddBinedHist(cutTree = cutTreeMC,
     OP = (runModeName,genericPSet_mc), cut = MHT_METCut,
