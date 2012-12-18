@@ -160,7 +160,6 @@ def getDataYields(bM="inc"):
   sFile = r.TFile.Open(sigFile[sigSamp][0])
 
   yieldDict = {}
-  ent = 0
 
   for d in dirs:
     ent=0
