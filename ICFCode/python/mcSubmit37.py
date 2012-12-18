@@ -25,8 +25,8 @@ Variation  = EffToPSet(readBtagWeight("./ISR/h_ISRWeight_lastPt_225_200.txt")).P
 
 ISR_reweight = SMS_ISR_Reweighting(ISR_pset.ps())
 
-default_common.Jets.PtCut              = 50.*(275./375.)
-#default_common.Jets.PtCut              = 20.
+default_common.Jets.PtCut              = 50.*(275./375.)*0.95
+#default_common.Jets.PtCut              = 50.
 
 cutTreeMC, junkVar,junkVar2            = MakeMCTree(100.*(275./375.), Muon=None)
 vbtfMuonId_cff                         = Muon_IDFilter( vbtfmuonidps.ps()  )
@@ -59,7 +59,7 @@ ensure_dir(outDir)
 
 samp_mc = mc_TTbar + mc_WJets + mc_QCD + mc_DiBo + mc_sinT
 samp_sig = sig_T2cc_160 + sig_T2cc_300
-samp_sig = sig_T2cc_220_195 + sig_T2cc_220_170 + sig_T2cc_220_145
+samp_sig = sig_T2cc_220_195 + sig_T2cc_220_170 + sig_T2cc_220_145 + sig_T2cc_160 + sig_T2cc_300
 
 
 anal_ak5_caloMC.Run(outDir,conf_ak5_caloMC,samp_sig)
