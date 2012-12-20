@@ -175,7 +175,7 @@ def jetCharmFrac(debug=False):
       rFile = r.TFile().Open(sFile[iF][0])
       print "\n>> %s"%iF
 
-      for i in range(4):
+      for i in range(3):
          ctr=0
          for d in dirs:
             if debug: print "%s/jetFlavourICF_%d"%(d,i)
@@ -197,7 +197,7 @@ def jetCharmFrac(debug=False):
                3:"fourth",
                }
          
-         print "Frac of gen charm %s jets: %f.2"%(myDict[ctr1], charmFrac) 
+         print "Frac of gen charm %s jets: %f.2 (from %d charmJets)"%(myDict[ctr1], charmFrac, hT.GetBinContent(5))
          ctr1+=1
    
       g.Draw("P")
