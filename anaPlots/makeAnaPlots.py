@@ -7,7 +7,8 @@ Created by Chris Lucas on 2012-11-13.
 Copyright (c) 2012 University of Bristol. All rights reserved.
 """
 
-from sys import argv, exit
+import sys
+from Log import *
 from generalUtils import *
 import configuration as conf
 import tables as tbl
@@ -36,8 +37,7 @@ def getbMultis(bM=""):
 
 def runAnaPlots(debug=False):
   
-  if debug: print "\n\tDEBUG: In runAnaPlots.\n"
-  print "\n >>> Making Analysis Plots\n"
+  Log.info("\n >>> Making Analysis Plots\n")
 
   files       = conf.inFiles()
   dirs        = conf.inDirs()
@@ -54,10 +54,10 @@ def runAnaPlots(debug=False):
 
   for hT, pDet in hists.iteritems():
     for b in bMulti:
-      if debug: print hT
+      if debug: Log.debug(hT)
       if sigSamp:
         sFile=r.TFile().Open(sigFile[sigSamp][0])
-        if debug: print sFile
+        if debug: Log.debug(sFile)
         hS = getPlotsFromFile(hT, dirs, getbMultis(b), sFile, sigNorm)
       else: hS=None
 
@@ -88,8 +88,7 @@ def runAnaPlots(debug=False):
 
 def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
 
-  if debug: print "\n\tDEBUG: In runStandPlots.\n"
-  if printPlots: print "\n >>> Making Standard Plots\n"
+  if printPlots: Log.info("\n >>> Making Standard Plots\n")
 
   dirs        = conf.inDirs()
   bMulti      = conf.bMulti()
@@ -102,7 +101,7 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
   # override the global signal sample if running comparison plots
   if comparSamp: sigSamp = comparSamp
 
-  if debug: print sFile[sigSamp][0]
+  if debug: Log.debug(sFile[sigSamp][0])
   
   normVal = None
   if conf.switches()["norm"]=="Unitary":
@@ -117,7 +116,7 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
       normVal = conf.getXSecNorm(300)
 
   rFile = r.TFile.Open(sFile[sigSamp][0])
-  if debug: print rFile
+  if debug: Log.debug(str(rFile))
 
   c1 = r.TCanvas()
 
@@ -129,7 +128,7 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
       histList = []
       for d in dirs:
         for suf in getbMultis(b):
-          if debug: print "%s/%s%s"%(d, hT, suf)
+          if debug: Log.debug("%s/%s%s"%(d, hT, suf))
           h = rFile.Get("%s/%s%s"%(d, hT, suf))
           histList.append(h)
       
@@ -159,7 +158,7 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
   for hT, pDet in sinHists.iteritems():
     histList = []
     for d in dirs:
-      if debug: print "%s/%s"%(d, hT)
+      if debug: Log.debug("%s/%s"%(d, hT))
       h = rFile.Get("%s/%s"%(d, hT))
       histList.append(h)
     
@@ -190,17 +189,16 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
 
 def runComparPlots(debug=False, doLogy=False):
 
-  if debug: print "\n\tDEBUG: In runAnaPlots.\n"
   if doLogy:
-    print "\n >>> Making Comparison Plots (SetLogy=True)\n"
+    Log.info("Making Comparison Plots (SetLogy=True)")
   else:
-    print "\n >>> Making Comparison Plots\n"
+    Log.info("Making Comparison Plots")
 
   compFiles   = conf.comparFiles()
-  if debug: print compFiles
+  if debug: Log.debug(str(compFiles))
 
   if len( conf.bMulti() )>1:
-    print "\t*** Only run comparison plots with one bMultiplicity\n"
+    Log.error("Only run comparison plots with one bMultiplicity")
     sys.exit()
 
   hList=[]
