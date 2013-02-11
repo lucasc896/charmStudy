@@ -169,13 +169,15 @@ def jetCharmFrac(debug=False):
    mg = r.TMultiGraph()
    lg = r.TLegend(0.6, 0.17, 0.85, 0.42)
 
+   c1.SetCanvasSize(1400, 1000)
+
    for iF in inFiles:
       hList=[]
       g = r.TGraph(4)
       rFile = r.TFile().Open(sFile[iF][0])
-      print "\n>> %s"%iF
+      if debug: print "\n>> %s"%iF
 
-      for i in range(3):
+      for i in range(4):
          ctr=0
          for d in dirs:
             if debug: print "%s/jetFlavourICF_%d"%(d,i)
@@ -197,12 +199,12 @@ def jetCharmFrac(debug=False):
                3:"fourth",
                }
          
-         print "Frac of gen charm %s jets: %f.2 (from %d charmJets)"%(myDict[ctr1], charmFrac, hT.GetBinContent(5))
+         print "Frac of gen charm %s jets: %.2f (from %d charmJets)"%(myDict[ctr1], charmFrac, hT.GetBinContent(5))
          ctr1+=1
    
       g.Draw("P")
       g.SetMarkerStyle(29)
-      g.SetMarkerSize(4)
+      g.SetMarkerSize(8)
 
       # work out a better way of doing this
       if "195" in iF: g.SetMarkerColor(r.kRed)
@@ -227,10 +229,11 @@ def jetCharmFrac(debug=False):
    mg.GetXaxis().LabelsOption("d")
    mg.GetXaxis().SetLabelSize(0.05)
    mg.GetXaxis().SetTitleOffset(1.35)
-   mg.GetYaxis().SetRangeUser(0., 0.35)
+   mg.GetYaxis().SetRangeUser(0., 0.4)
 
    lg.SetFillColor(0)
    lg.Draw()
+   c1.SetGrid(1)
    c1.Print("plotDump/total_charmFrac.png")
 
 ###-------------------------------------------------------------------###
