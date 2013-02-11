@@ -12,6 +12,8 @@ import os
 import ROOT as r
 import math
 import configuration as conf
+from Log import *
+from sys import exit
 
 ## r.gROOT.SetStyle("Plain") #To set plain bkgds for slides
 #r.gStyle.SetTitleBorderSize(0)
@@ -195,6 +197,7 @@ class anaPlot(object):
           h1.SetLineColor(self.listColors[ctr])
           h1.Rebin(rebin)
           h1.SetLineWidth(2)
+          h1.GetYaxis().SetTitleOffset(1.4)
     
           self.lg.AddEntry(h1, samp, "L")
     
@@ -220,6 +223,7 @@ class anaPlot(object):
 
     h.SetLineColor(r.kMagenta+1)
     h.SetLineWidth(2)
+    h.GetYaxis().SetTitleOffset(1.4)
 
     if "TH1D" in str( type(h) ):
       if rebinX: h.Rebin(rebinX)
@@ -462,6 +466,8 @@ class stackPlots(object):
 
 def comparPlot(h1=None, h2=None, debug=False):
   
+  Log.error(">>> Shouldn't be running in here!!")
+
   jM = conf.switches()["jetMulti"]
   plots = conf.comparFiles()
   bM = conf.bMulti()
@@ -503,7 +509,7 @@ def comparPlots(hList=None, debug=None, doLogy=False):
   bM = conf.bMulti()
 
   if debug:
-    print "comparPlots: %s"%hList[0].GetName()
+    Log.debug("comparPlots: %s"%hList[0].GetName())
 
   for h in hList:
     if "TH2" in str( type(h) ): return
@@ -520,7 +526,7 @@ def comparPlots(hList=None, debug=None, doLogy=False):
   }
 
   # swap in sample specific colors
-  for key in colorDict.keys():
+  for key, val in colorDict.iteritems():
     for i in range( len(sSamp) ):
       if key in sSamp[i]:
         colors[i]=colorDict[key]
@@ -529,9 +535,9 @@ def comparPlots(hList=None, debug=None, doLogy=False):
   r.gStyle.SetOptStat(0)
 
   if len(hList)==2:
-    lg = r.TLegend(0.68, 0.73, 0.895, 0.89)
+    lg = r.TLegend(0.6, 0.73, 0.895, 0.89)
   elif len(hList)==3:
-    lg = r.TLegend(0.65, 0.73, 0.895, 0.89)
+    lg = r.TLegend(0.52, 0.72, 0.895, 0.89)
   elif len(hList)==4:
     lg = r.TLegend(0.64, 0.64, 0.895, 0.89)
   elif len(hList)==5:
@@ -539,26 +545,72 @@ def comparPlots(hList=None, debug=None, doLogy=False):
 
   hOrder = getHistOrder(hList)
 
+  pd1 = r.TPad("pd1", "pd1", 0., 0.3, 1., 1.)
+  pd1.SetBottomMargin(0.005)
+  pd1.Draw()
+
+  pd2 = r.TPad("pd2", "pd2", 0., 0.02, 1., 0.3)
+  pd2.SetTopMargin(0.05)
+  pd2.SetBottomMargin(0.22)
+  pd2.SetGridx(1)
+  pd2.SetGridy(1)
+  pd2.Draw()
+
+  pd1.cd()
+
   ctr=0
   for i in hOrder:
-    if ctr==0: hList[i].Draw("hist")
-    else: hList[i].Draw("histsame")
+    #if ctr==0: hList[i].Draw("hist")
+    #else: hList[i].Draw("histsame")
     hList[i].SetLineColor(colors[i])
-    if "ISRRW" in sSamp[i]: hList[i].SetLineColor(r.kBlue)
-    lg.AddEntry(hList[i], sSamp[i], "L")
+    entTitle = sSamp[i]
+
+    if entTitle == "T2cc_200": entTitle="Pythia"
+    elif entTitle == "T2cc_NF_200_120_cut": entTitle="Madgraph"
+
+    lg.AddEntry(hList[i], entTitle, "L")
+
+    if ctr==0:
+      hList[i].Draw("hist e")
+    else: hList[i].Draw("histsame e")
+
     ctr+=1
+
+  hList[hOrder[0]].SetLabelSize(0.04,"Y")
+  hList[hOrder[0]].SetTitleOffset(0.7, "Y")
+  hList[hOrder[0]].SetTitleSize(0.05, "Y")
 
   lg.SetFillColor(0)
   lg.SetFillStyle(0)
   lg.SetLineColor(0)
   lg.SetLineStyle(0)
   lg.Draw()
+
+  pd2.cd()
   
+#  hRatio = hList[hOrder[0]].Clone()
+#  hRatio.Divide( hList[hOrder[1]] )
+  hRatio = hList[0].Clone()
+  hRatio.Divide( hList[1] )
+  hRatio.SetMarkerStyle(4)
+  hRatio.SetMarkerSize(.7)
+  hRatio.SetLineWidth(1)
+  hRatio.SetLineColor(r.kBlack)
+  hRatio.GetYaxis().SetTitle("Ratio")
+  hRatio.GetYaxis().SetRangeUser(0.,2.)
+  hRatio.SetLabelSize(0.12, "X")
+  hRatio.SetLabelSize(0.07, "Y")
+  hRatio.SetTitleSize(0.13, "X")
+  hRatio.SetTitleSize(0.11, "Y")
+  hRatio.SetTitleOffset(0.25, "Y")
+  hRatio.SetTitleOffset(.9, "X")
+  hRatio.Draw("pe1")
+
   if not doLogy:
     c1.Print("plotDump/compare_%s_%s_%s_%s.png"%(hList[0].GetName(),bM[0], jM, sSamp[0]))
   else:
     c1.SetLogy(1)
-    c1.Print("plotDump/compar_%s_%s_%s_log.png"%(hList[0].GetName(),bM[0], jM))
+    c1.Print("plotDump/compar_%s_%s_%s_%s_log.png"%(hList[0].GetName(),bM[0], jM, sSamp[0]))
 
 ###-------------------------------------------------------------------###
 
@@ -617,12 +669,12 @@ def doRanges(h=None, hD=None):
 def normalise(h=None, normVal=1.):
 
   h = h.Scale(normVal/h.GetEntries())
-
+  print "SCALE: ", normVal
   return h
 
 ###-------------------------------------------------------------------###
 
-def setChrisStyle(generic=True, multiPlot=False, anaPlot=False):
+def setChrisStyle(generic=False, multiPlot=False, anaPlot=False):
 
   if generic:
     pass
