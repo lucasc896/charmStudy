@@ -9,6 +9,7 @@ Copyright (c) 2012 University of Bristol. All rights reserved.
 
 from sys import argv, exit
 from generalUtils import *
+from Log import *
 import configuration as conf
 import math
 from collections import OrderedDict
@@ -35,6 +36,7 @@ def getbMultis(bM=""):
 def getSMPred(bM="inc", jM="inc"):
 
   zerobtagDict={
+          "225-275":[0., 0., 0., 0.],
           "275-325":[6235., 100., 1010., 34.],
           "325-375":[2900., 60., 447., 19.],
           "375-475":[1955., 34., 390., 19.],
@@ -46,6 +48,7 @@ def getSMPred(bM="inc", jM="inc"):
   }
 
   onebtagDict={
+          "225-275":[0., 0., 0., 0.],
           "275-325":[1162, 37., 521., 25.],
           "325-375":[481., 18., 232., 15.],
           "375-475":[341., 15., 188., 12.],
@@ -56,6 +59,7 @@ def getSMPred(bM="inc", jM="inc"):
           "875-inf":[2.1, 0.5, 6.8, 1.2],
   }
   twobtagDict={
+          "225-275":[0., 0., 0., 0.],
           "275-325":[224., 15., 208., 17.],
           "325-375":[98.2, 8.4, 103., 9.],
           "375-475":[59., 5.2, 85.9, 7.2],
@@ -66,6 +70,7 @@ def getSMPred(bM="inc", jM="inc"):
           "875-inf":[0.1, 0., 1.3, 0.4],
   }
   threebtagDict={
+          "225-275":[0., 0., 0., 0.],
           "275-325":[0., 0., 25.3, 5.],
           "325-375":[0., 0., 11.7, 1.7],
           "375-475":[0., 0., 6.7, 1.4],
@@ -76,6 +81,7 @@ def getSMPred(bM="inc", jM="inc"):
           "875-inf":[0., 0., 0.1, 0.1],
   }
   fourbtagDict={
+          "225-275":[0., 0., 0., 0.],
           "275-325":[0., 0., 0.9, 0.4],
           "325-375":[0., 0., 0.3, 0.2],
           "375-475":[0., 0., 0.6, 0.3],
@@ -86,6 +92,7 @@ def getSMPred(bM="inc", jM="inc"):
           "875-inf":[0., 0., 0., 0.],
   }
   inclbtagDict={
+          "225-275":[0., 0., 0., 0.],
           "275-325":[0., 0., 0., 0.],
           "325-375":[0., 0., 0., 0.],
           "375-475":[0., 0., 0., 0.],
@@ -97,6 +104,7 @@ def getSMPred(bM="inc", jM="inc"):
   }
 
   HTbins = [
+          "225-275",
           "275-325",
           "325-375",
           "375-475",
@@ -151,27 +159,38 @@ def getSMPred(bM="inc", jM="inc"):
 
 ###-------------------------------------------------------------------###
 
-def getDataYields(bM="inc"):
+def getDataYields(bM="inc", debug=False):
 
   dirs        = conf.inDirs()
   sigSamp     = conf.switches()["signalSample"]
   sigFile     = conf.sigFile()
 
+  if debug: Log.debug(sigFile[sigSamp][0])
+
   sFile = r.TFile.Open(sigFile[sigSamp][0])
 
   yieldDict = {}
+
+  scale=1.
+
+#  if "200_190" in sigSamp:
+#    scale=494749.
+#  elif "200_120" in sigSamp:
+#    scale=601852.
+
+#  scale=float(601852./90000.)
 
   for d in dirs:
     ent=0
     dirTitle = d[4:].replace("_","-")
     if d=="inc_875": dirTitle="875-inf"
     for suf in getbMultis(bM):
-      #print d, suf
+      if debug: Log.debug("Getting %s/commHT%s"%(d, suf))
       h = sFile.Get("%s/commHT%s"%(d, suf))
       ent += h.GetEntries()
-      #print ent
+      if debug: Log.debug(str(ent))
+    ent /= scale  
     yieldDict[dirTitle[1:]]=[ent, math.sqrt(ent)]
-    #print yieldDict
 
   return OrderedDict(sorted(yieldDict.items(), key=lambda t: t[0]))
 
@@ -188,8 +207,16 @@ def printHeader():
 
 ###-------------------------------------------------------------------###
 
-def printCaption(bM):
-  outTxt = "\\caption{Yields for $\\alpha_T>$ 0.55 (%s b-jets)}\n"%bM
+def printCaption(bM, jM):
+
+  if jM=="le3j":
+    label = "$N_{jet} \\leq 3$"
+  elif jM=="ge4j":
+    label = "$N_{jet} \\leq 3$"
+  else:
+    label = "all jets"
+
+  outTxt = "\\caption{Yields for $\\alpha_T>$ 0.55 (%s b-jets, %s)}\n"%(bM, label)
   #add a bit more eventually
 
   return outTxt
@@ -209,25 +236,29 @@ def printEnd():
 
 def printHT():
 
-  return " HT Bins (GeV) & 275-325 & 325-375 & 375-475 & 475-575 & 575-675 & 675-775 & 775-875 & 875-$\\inf$ \\\\ \n"
+  return " HT Bins (GeV) & 225-275 & 275-325 & 325-375 & 375-475 & 475-575 & 575-675 & 675-775 & 775-875 & 875-$\\inf$ \\\\ \n"
 
 ###-------------------------------------------------------------------###
 
-def makeTable(bM="inc"):
+def makeTable(bM="inc", debug=False):
   
   sigSamp  = conf.switches()["signalSample"]
   jM       = conf.switches()["jetMulti"]
 
+  if debug: Log.debug("Making table for %s %s"%(bM, jM))
+
   smPred = getSMPred(bM, jM)
-  dYield = getDataYields(bM)
+  dYield = getDataYields(bM, debug=debug)
+
+  if debug: Log.debug("Opening: tableDump/yieldTable_%s_%s_%s.tex"%(sigSamp, jM, bM))
 
   f = open("tableDump/yieldTable_%s_%s_%s.tex"%(sigSamp, jM, bM), "w")
   outTxt = ""
   outTxt += printHeader()
-  outTxt += printCaption(bM)
+  outTxt += printCaption(bM, jM)
 
   outTxt += "\\begin{center}\n"
-  outTxt += "\\begin{tabular}{ c|cccccccc }\n"
+  outTxt += "\\begin{tabular}{ c|ccccccccc }\n"
 
   outTxt += printHT()
 
@@ -253,7 +284,7 @@ def makeTable(bM="inc"):
     totYield += val[0]
 
   print "\n*** Total Yield for %s: %d ***\n"%(sigSamp, totYield)
-
+  outTxt += "\ntotal: %f"%totYield
   outTxt += " \\\\"
 
   outTxt += printEnd()
@@ -263,9 +294,8 @@ def makeTable(bM="inc"):
 ###-------------------------------------------------------------------###
 
 def printTable(debug=False):
-  #sort out debug info!!
   
   bMulti = conf.bMulti()
 
   for b in bMulti:
-    makeTable(b)
+    makeTable(b, debug=debug)
