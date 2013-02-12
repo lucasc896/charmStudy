@@ -59,7 +59,7 @@ if conf.mode()=="anaPlots":
          Log.error("\tChange 'bMulti()' in configurtion.py\n")
          sys.exit()
       
-      print "\n  >>>  Making yield tables\n"
+      Log.info(">>> Running yield tables\n")
       tabl.printTable(debug=options.doDebug)
 
 
