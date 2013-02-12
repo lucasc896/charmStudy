@@ -71,12 +71,12 @@ namespace Operation {
       std::vector<TH2D*>  h_SMSvectGenPt;
       std::vector<TH2D*>  h_SMSscalGenPt;
       std::vector<TH2D*>  h_SMSdPhiLeadJetsGenPt;
-      std::vector<TH1D*>  h_evNums;
-      std::vector<TH1D*>  h_evLS;
       std::vector<TH2D*>  h_alphaT_vs_HT;
-
+      std::vector<TH2D*>  h_leadJetPt_vs_HT;
+      std::vector<TH2D*>  h_leadminsubJetPt_vs_HT;   
+      std::vector<TH1D*>  h_leadTwoJetsPt;   
   };
 
 }
 
-#endif // hadronic_include_WeeklyUpdatePlots_hh
+#endif // hadronic_include_analysisPlots_hh
