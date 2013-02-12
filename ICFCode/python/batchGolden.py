@@ -226,6 +226,7 @@ def AddBinedHist(cutTree = None, OP = (), cut = None, htBins = [],TriggerDict = 
   if TriggerDict is not None:
     ## DATA
       for lower,upper in zip(htBins,htBins[1:]+[None]):
+        if int(lower) == 275 and upper is None: continue
         if int(lower) == 325 and upper is None: continue
         if int(lower) == 375 and upper is None : continue
         if int(lower) == 675 and upper is None : continue
@@ -273,6 +274,7 @@ def AddBinedHist(cutTree = None, OP = (), cut = None, htBins = [],TriggerDict = 
   else:
     ## MC
       for lower,upper in zip(htBins,htBins[1:]+[None]):
+        if int(lower) == 275 and upper is None: continue
         if int(lower) == 325 and upper is None: continue
         if int(lower) == 375 and upper is None: continue
         if int(lower) == 675 and upper is None : continue
@@ -324,9 +326,16 @@ badMuonInJet = OP_BadMuonInJet()
 numComElectrons = OP_NumComElectrons("<=",0)
 numComPhotons = OP_NumComPhotons("<=",0)
 
+ht200trigger = 200.
+ht200_Trigger = RECO_CommonHTCut(ht200trigger)
+htTakeMu200_Trigger = RECO_CommonHTTakeMuCut(ht200trigger)
+
 ht250trigger = 250.
 ht250_Trigger = RECO_CommonHTCut(ht250trigger)
 htTakeMu250_Trigger = RECO_CommonHTTakeMuCut(ht250trigger)
+
+htCut225 = RECO_CommonHTCut(225.)
+htTakeMuCut225 = RECO_CommonHTTakeMuCut(225.)
 
 htCut275 = RECO_CommonHTCut(275.)
 htTakeMuCut275 = RECO_CommonHTTakeMuCut(275.)
@@ -440,10 +449,15 @@ secondJetET = OP_SecondJetEtCut(0)
 Tot_VertexCut = OP_TotVertexCut(0,100)
 
 SMSMassCut_300 = OP_SSMmasscut(299., 301., 249., 251.)
+SMSMassCut_200 = OP_SSMmasscut(199., 201., 119., 121.)
 
 
 def MakeDataTree(Threshold,Muon = None,Split = None):
   out = []
+
+  runModeName = runMode()
+
+
   if re.match("Muon_Add", str(Split)):
       secondJetET = OP_SecondJetOrMuEtCut(Threshold) 
   else:
@@ -534,149 +548,150 @@ def MakeDataTree(Threshold,Muon = None,Split = None):
       else:
           genericPSet_data.mode="None"
           out.append(AddBinedHist(cutTree = cutTreeData,
-          OP = ("TauFakeB",genericPSet_data), cut = MHT_METCut,
-          htBins = HTBins,TriggerDict = triggers,lab ="", split = None) )
+          OP = (runModeName,genericPSet_data), cut = MHT_METCut,
+          htBins = HTBins,TriggerDict = triggers,lab ="", Muon = None) )
 
           out.append(AddBinedHist(cutTree = cutTreeData,
-          OP = ("TauFakeB",genericPSet_data), cut = jet_e2,
-          htBins = HTBins,TriggerDict = ht_triggers,lab ="TwoJet_", split = Split) )
+          OP = (runModeName,genericPSet_data), cut = jet_e2,
+          htBins = HTBins,TriggerDict = ht_triggers,lab ="TwoJet_", Muon = None) )
 
           out.append(AddBinedHist(cutTree = cutTreeData,
-          OP = ("TauFakeB",genericPSet_data), cut = jet_e3,
-          htBins = HTBins,TriggerDict = ht_triggers,lab ="ThreeJet", split = Split) )
+          OP = (runModeName,genericPSet_data), cut = jet_e3,
+          htBins = HTBins,TriggerDict = ht_triggers,lab ="ThreeJet", Muon = None) )
 
           out.append(AddBinedHist(cutTree = cutTreeData,
-          OP = ("TauFakeB",genericPSet_data), cut = jet_e4,
-          htBins = HTBins,TriggerDict = ht_triggers,lab ="FourJet", split = Split) )
+          OP = (runModeName,genericPSet_data), cut = jet_e4,
+          htBins = HTBins,TriggerDict = ht_triggers,lab ="FourJet", Muon = None) )
 
           out.append(AddBinedHist(cutTree = cutTreeData,
-          OP = ("TauFakeB",genericPSet_data), cut = jet_g3,
-          htBins = HTBins,TriggerDict = ht_triggers,lab ="MoreThreeJet", split = Split) )
+          OP = (runModeName,genericPSet_data), cut = jet_g3,
+          htBins = HTBins,TriggerDict = ht_triggers,lab ="MoreThreeJet", Muon = None) )
 
           out.append(AddBinedHist(cutTree = cutTreeData,
-          OP = ("TauFakeB",genericPSet_data), cut = jet_g4,
-          htBins = HTBins,TriggerDict = ht_triggers,lab ="MoreFourJet", split = Split) )
+          OP = (runModeName,genericPSet_data), cut = jet_g4,
+          htBins = HTBins,TriggerDict = ht_triggers,lab ="MoreFourJet", Muon = None) )
 
-      print "genericPSet_data.mode := "+str(genericPSet_data.mode)
-      print "genericPSet_data.doZinvFromDY: "+str(genericPSet_data.doZinvFromDY)
+      #print "genericPSet_data.mode := "+str(genericPSet_data.mode)
+      #print "genericPSet_data.doZinvFromDY: "+str(genericPSet_data.doZinvFromDY)
   else:
-      if Split is None:
-          genericPSet_data.mode="None"
-      elif re.match("Muon_Add", str(Split)):
-          genericPSet_data.mode="Muon_Add"
-      else:
-          genericPSet_data.mode=Split
-
-      if Split == "Muon_SingleMuTrig":
-          cutTreeData.TAttach(Tot_VertexCut,htCut275)
-          cutTreeData.TAttach(htCut275,Mu45PtCut)
-          cutTreeData.TAttach(Mu45PtCut,minDRMuonJetCut)
-          cutTreeData.TAttach(minDRMuonJetCut,recHitCut)
-          cutTreeData.TAttach(recHitCut,VertexPtOverHT)
-          cutTreeData.TAttach(VertexPtOverHT,DeadEcalCutData)
-          cutTreeData.TAttach(DeadEcalCutData,MHT_METCut)
-
-          cutTreeData.TAttach(MHT_METCut,OneMuon)
-          cutTreeData.TAttach(OneMuon,PFMTCut30)
-          cutTreeData.TAttach(PFMTCut30,ZMassCut)
-          cutTreeData.TAttach(ZMassCut,jet_e2) # jet n=2
-          cutTreeData.TAttach(ZMassCut,jet_e3) # jet n=3
-          cutTreeData.TAttach(ZMassCut,jet_e4) # jet n=2
-          cutTreeData.TAttach(ZMassCut,jet_g3) # jet n>3
-          cutTreeData.TAttach(ZMassCut,jet_g4) # jet n>4
+    pass
+      #if Split is None:
+      #    genericPSet_data.mode="None"
+      #elif re.match("Muon_Add", str(Split)):
+      #    genericPSet_data.mode="Muon_Add"
+      #else:
+      #    genericPSet_data.mode=Split
+#
+      #if Split == "Muon_SingleMuTrig":
+      #    cutTreeData.TAttach(Tot_VertexCut,htCut275)
+      #    cutTreeData.TAttach(htCut275,Mu45PtCut)
+      #    cutTreeData.TAttach(Mu45PtCut,minDRMuonJetCut)
+      #    cutTreeData.TAttach(minDRMuonJetCut,recHitCut)
+      #    cutTreeData.TAttach(recHitCut,VertexPtOverHT)
+      #    cutTreeData.TAttach(VertexPtOverHT,DeadEcalCutData)
+      #    cutTreeData.TAttach(DeadEcalCutData,MHT_METCut)
+#
+      #    cutTreeData.TAttach(MHT_METCut,OneMuon)
+      #    cutTreeData.TAttach(OneMuon,PFMTCut30)
+      #    cutTreeData.TAttach(PFMTCut30,ZMassCut)
+      #    cutTreeData.TAttach(ZMassCut,jet_e2) # jet n=2
+      #    cutTreeData.TAttach(ZMassCut,jet_e3) # jet n=3
+      #    cutTreeData.TAttach(ZMassCut,jet_e4) # jet n=2
+      #    cutTreeData.TAttach(ZMassCut,jet_g3) # jet n>3
+      #    cutTreeData.TAttach(ZMassCut,jet_g4) # jet n>4
+      #
+      #    cutTreeData.TAttach(MHT_METCut,DiMuon)
+      #    cutTreeData.TAttach(DiMuon,ZMass_2Muons)
+      #    cutTreeData.TAttach(ZMass_2Muons,jet_e2_du) # jet n=2
+      #    cutTreeData.TAttach(ZMass_2Muons,jet_e3_du) # jet n=3
+      #    cutTreeData.TAttach(ZMass_2Muons,jet_e4_du) # jet n=4
+      #    cutTreeData.TAttach(ZMass_2Muons,jet_g3_du) # jet n>3
+      #    cutTreeData.TAttach(ZMass_2Muons,jet_g4_du) # jet n>4
       
-          cutTreeData.TAttach(MHT_METCut,DiMuon)
-          cutTreeData.TAttach(DiMuon,ZMass_2Muons)
-          cutTreeData.TAttach(ZMass_2Muons,jet_e2_du) # jet n=2
-          cutTreeData.TAttach(ZMass_2Muons,jet_e3_du) # jet n=3
-          cutTreeData.TAttach(ZMass_2Muons,jet_e4_du) # jet n=4
-          cutTreeData.TAttach(ZMass_2Muons,jet_g3_du) # jet n>3
-          cutTreeData.TAttach(ZMass_2Muons,jet_g4_du) # jet n>4
+	  #out.append(AddBinedHist(cutTree = cutTreeData,
+    #      OP = ("TauFakeB",genericPSet_data), cut = ZMassCut,
+    #      htBins = HTBins,TriggerDict = single_mu_triggers,lab = "OneMuon_", split = genericPSet_data.mode ) )
+#
+	  #out.append(AddBinedHist(cutTree = cutTreeData,
+    #      OP = ("TauFakeB",genericPSet_data), cut = jet_e2,
+    #      htBins = HTBins,TriggerDict = single_mu_triggers,lab = "TwoJet_OneMuon_", split = genericPSet_data.mode ) )
+#
+	  #out.append(AddBinedHist(cutTree = cutTreeData,
+    #      OP = ("TauFakeB",genericPSet_data), cut = jet_e3,
+    #      htBins = HTBins,TriggerDict = single_mu_triggers,lab = "ThreeJet_OneMuon_", split = genericPSet_data.mode ) )
+#
+	  #out.append(AddBinedHist(cutTree = cutTreeData,
+    #      OP = ("TauFakeB",genericPSet_data), cut = jet_e4,
+    #      htBins = HTBins,TriggerDict = single_mu_triggers,lab = "FourJet_OneMuon_", split = genericPSet_data.mode ) )
+#
+	  #out.append(AddBinedHist(cutTree = cutTreeData,
+    #      OP = ("TauFakeB",genericPSet_data), cut = jet_g3,
+    #      htBins = HTBins,TriggerDict = single_mu_triggers,lab = "MoreThreeJet_OneMuon_", split = genericPSet_data.mode ) )
+#
+	  #out.append(AddBinedHist(cutTree = cutTreeData,
+    #      OP = ("TauFakeB",genericPSet_data), cut = jet_g4,
+    #      htBins = HTBins,TriggerDict = single_mu_triggers,lab = "MoreFourJet_OneMuon_", split = genericPSet_data.mode ) )
+
+
+    #      out.append(AddBinedHist(cutTree = cutTreeData,
+    #      OP = ("TauFakeB",genericPSet_data), cut = ZMass_2Muons,
+    #      htBins = HTBins,TriggerDict = single_mu_triggers,lab = "DiMuon_", split = genericPSet_data.mode ) )
+#
+    #      out.append(AddBinedHist(cutTree = cutTreeData,
+    #      OP = ("TauFakeB",genericPSet_data), cut = jet_e2_du,
+    #      htBins = HTBins,TriggerDict = single_mu_triggers,lab = "TwoJet_DiMuon_", split = genericPSet_data.mode ) )
+#
+    #      out.append(AddBinedHist(cutTree = cutTreeData,
+    #      OP = ("TauFakeB",genericPSet_data), cut = jet_e3_du,
+    #      htBins = HTBins,TriggerDict = single_mu_triggers,lab = "ThreeJet_DiMuon_", split = genericPSet_data.mode ) )
+#
+    #      out.append(AddBinedHist(cutTree = cutTreeData,
+    #      OP = ("TauFakeB",genericPSet_data), cut = jet_e4_du,
+    #      htBins = HTBins,TriggerDict = single_mu_triggers,lab = "FourJet_DiMuon_", split = genericPSet_data.mode ) )
+#
+    #      out.append(AddBinedHist(cutTree = cutTreeData,
+    #      OP = ("TauFakeB",genericPSet_data), cut = jet_g3_du,
+    #      htBins = HTBins,TriggerDict = single_mu_triggers,lab = "MoreThreeJet_DiMuon_", split = genericPSet_data.mode ) )
+#
+    #      out.append(AddBinedHist(cutTree = cutTreeData,
+    #      OP = ("TauFakeB",genericPSet_data), cut = jet_g4_du,
+    #      htBins = HTBins,TriggerDict = single_mu_triggers,lab = "MoreFourJet_DiMuon_", split = genericPSet_data.mode ) )
+##
+     #     print "mode  data="+str(genericPSet_data.mode)+" "+str(Split)
+     # elif Split == "Muon_Add_SingleMuTrigPlateau":
+     #     cutTreeData.TAttach(Tot_VertexCut,htTakeMuCut275)
+     #     if int(Threshold) is 73:
+     #         cutTreeData.TAttach(htTakeMuCut275,Mu50PtCut_LowHT275_MuTrigPlateau)
+     #         cutTreeData.TAttach(Mu50PtCut_LowHT275_MuTrigPlateau,minDRMuonJetCut)
+     #     elif int(Threshold) is 86:
+     #         cutTreeData.TAttach(htTakeMuCut275,Mu50PtCut_LowHT325_MuTrigPlateau)
+     #         cutTreeData.TAttach(Mu50PtCut_LowHT325_MuTrigPlateau,minDRMuonJetCut)
+     #     elif int(Threshold) is 100:
+     #         cutTreeData.TAttach(htTakeMuCut275,Mu50PtCut_HigHT_MuTrigPlateau)
+     #         cutTreeData.TAttach(Mu50PtCut_HigHT_MuTrigPlateau,minDRMuonJetCut)
+     #     cutTreeData.TAttach(minDRMuonJetCut,recHitCut)
+     #     cutTreeData.TAttach(recHitCut,VertexPtOverHT)
+     #     cutTreeData.TAttach(VertexPtOverHT,DeadEcalCutData)
+     #     cutTreeData.TAttach(DeadEcalCutData,MHTTakeMu_METTakeMuCut)
+#
+     #     cutTreeData.TAttach(MHTTakeMu_METTakeMuCut,OneMuon)
+     #     cutTreeData.TAttach(OneMuon,PFMTCut30)
+     #     cutTreeData.TAttach(PFMTCut30,ZMassCut)
+#
+     #     cutTreeData.TAttach(MHT_METCut,DiMuon)
+     #     cutTreeData.TAttach(DiMuon,ZMass_2Muons)
       
-	  out.append(AddBinedHist(cutTree = cutTreeData,
-          OP = ("TauFakeB",genericPSet_data), cut = ZMassCut,
-          htBins = HTBins,TriggerDict = single_mu_triggers,lab = "OneMuon_", split = genericPSet_data.mode ) )
-
-	  out.append(AddBinedHist(cutTree = cutTreeData,
-          OP = ("TauFakeB",genericPSet_data), cut = jet_e2,
-          htBins = HTBins,TriggerDict = single_mu_triggers,lab = "TwoJet_OneMuon_", split = genericPSet_data.mode ) )
-
-	  out.append(AddBinedHist(cutTree = cutTreeData,
-          OP = ("TauFakeB",genericPSet_data), cut = jet_e3,
-          htBins = HTBins,TriggerDict = single_mu_triggers,lab = "ThreeJet_OneMuon_", split = genericPSet_data.mode ) )
-
-	  out.append(AddBinedHist(cutTree = cutTreeData,
-          OP = ("TauFakeB",genericPSet_data), cut = jet_e4,
-          htBins = HTBins,TriggerDict = single_mu_triggers,lab = "FourJet_OneMuon_", split = genericPSet_data.mode ) )
-
-	  out.append(AddBinedHist(cutTree = cutTreeData,
-          OP = ("TauFakeB",genericPSet_data), cut = jet_g3,
-          htBins = HTBins,TriggerDict = single_mu_triggers,lab = "MoreThreeJet_OneMuon_", split = genericPSet_data.mode ) )
-
-	  out.append(AddBinedHist(cutTree = cutTreeData,
-          OP = ("TauFakeB",genericPSet_data), cut = jet_g4,
-          htBins = HTBins,TriggerDict = single_mu_triggers,lab = "MoreFourJet_OneMuon_", split = genericPSet_data.mode ) )
-
-
-          out.append(AddBinedHist(cutTree = cutTreeData,
-          OP = ("TauFakeB",genericPSet_data), cut = ZMass_2Muons,
-          htBins = HTBins,TriggerDict = single_mu_triggers,lab = "DiMuon_", split = genericPSet_data.mode ) )
-
-          out.append(AddBinedHist(cutTree = cutTreeData,
-          OP = ("TauFakeB",genericPSet_data), cut = jet_e2_du,
-          htBins = HTBins,TriggerDict = single_mu_triggers,lab = "TwoJet_DiMuon_", split = genericPSet_data.mode ) )
-
-          out.append(AddBinedHist(cutTree = cutTreeData,
-          OP = ("TauFakeB",genericPSet_data), cut = jet_e3_du,
-          htBins = HTBins,TriggerDict = single_mu_triggers,lab = "ThreeJet_DiMuon_", split = genericPSet_data.mode ) )
-
-          out.append(AddBinedHist(cutTree = cutTreeData,
-          OP = ("TauFakeB",genericPSet_data), cut = jet_e4_du,
-          htBins = HTBins,TriggerDict = single_mu_triggers,lab = "FourJet_DiMuon_", split = genericPSet_data.mode ) )
-
-          out.append(AddBinedHist(cutTree = cutTreeData,
-          OP = ("TauFakeB",genericPSet_data), cut = jet_g3_du,
-          htBins = HTBins,TriggerDict = single_mu_triggers,lab = "MoreThreeJet_DiMuon_", split = genericPSet_data.mode ) )
-
-          out.append(AddBinedHist(cutTree = cutTreeData,
-          OP = ("TauFakeB",genericPSet_data), cut = jet_g4_du,
-          htBins = HTBins,TriggerDict = single_mu_triggers,lab = "MoreFourJet_DiMuon_", split = genericPSet_data.mode ) )
-
-          print "mode  data="+str(genericPSet_data.mode)+" "+str(Split)
-      elif Split == "Muon_Add_SingleMuTrigPlateau":
-          cutTreeData.TAttach(Tot_VertexCut,htTakeMuCut275)
-          if int(Threshold) is 73:
-              cutTreeData.TAttach(htTakeMuCut275,Mu50PtCut_LowHT275_MuTrigPlateau)
-              cutTreeData.TAttach(Mu50PtCut_LowHT275_MuTrigPlateau,minDRMuonJetCut)
-          elif int(Threshold) is 86:
-              cutTreeData.TAttach(htTakeMuCut275,Mu50PtCut_LowHT325_MuTrigPlateau)
-              cutTreeData.TAttach(Mu50PtCut_LowHT325_MuTrigPlateau,minDRMuonJetCut)
-          elif int(Threshold) is 100:
-              cutTreeData.TAttach(htTakeMuCut275,Mu50PtCut_HigHT_MuTrigPlateau)
-              cutTreeData.TAttach(Mu50PtCut_HigHT_MuTrigPlateau,minDRMuonJetCut)
-          cutTreeData.TAttach(minDRMuonJetCut,recHitCut)
-          cutTreeData.TAttach(recHitCut,VertexPtOverHT)
-          cutTreeData.TAttach(VertexPtOverHT,DeadEcalCutData)
-          cutTreeData.TAttach(DeadEcalCutData,MHTTakeMu_METTakeMuCut)
-
-          cutTreeData.TAttach(MHTTakeMu_METTakeMuCut,OneMuon)
-          cutTreeData.TAttach(OneMuon,PFMTCut30)
-          cutTreeData.TAttach(PFMTCut30,ZMassCut)
-
-          cutTreeData.TAttach(MHT_METCut,DiMuon)
-          cutTreeData.TAttach(DiMuon,ZMass_2Muons)
-      
-	  out.append(AddBinedHist(cutTree = cutTreeData,
-          OP = ("TauFakeB",genericPSet_data), cut = ZMassCut,
-          htBins = HTBins,TriggerDict = single_mu_triggers,lab = "OneMuon_", split = genericPSet_data.mode ) )
-
-          out.append(AddBinedHist(cutTree = cutTreeData,
-          OP = ("TauFakeB",genericPSet_data), cut = ZMass_2Muons,
-          htBins = HTBins,TriggerDict = single_mu_triggers,lab = "DiMuon_", split = genericPSet_data.mode ) )
-          print "mode  data="+str(genericPSet_data.mode)+" "+str(Split)
-          print "genericPSet_data.doZinvFromDY: "+str(genericPSet_data.doZinvFromDY)
-      else:
-          print "do nothing: here data, single/di muon selection"
+	  #out.append(AddBinedHist(cutTree = cutTreeData,
+    #      OP = ("TauFakeB",genericPSet_data), cut = ZMassCut,
+    #      htBins = HTBins,TriggerDict = single_mu_triggers,lab = "OneMuon_", split = genericPSet_data.mode ) )
+#
+    #      out.append(AddBinedHist(cutTree = cutTreeData,
+    #      OP = ("TauFakeB",genericPSet_data), cut = ZMass_2Muons,
+    #      htBins = HTBins,TriggerDict = single_mu_triggers,lab = "DiMuon_", split = genericPSet_data.mode ) )
+    #      print "mode  data="+str(genericPSet_data.mode)+" "+str(Split)
+    #      print "genericPSet_data.doZinvFromDY: "+str(genericPSet_data.doZinvFromDY)
+    #  else:
+    #      print "do nothing: here data, single/di muon selection"
 
 
 #      cutTreeData.TAttach(minDRMuonJetCut,DiMuon)
@@ -707,12 +722,15 @@ def MakeMCTree(Threshold, Muon = None, Split = None):
   if int(Threshold) is 100 and Split == "Muon_Three" : HTBins = [675,775,875]
   if int(Threshold) is 73 : HTBins = [275.,325.]
   if int(Threshold) is 86 : HTBins = [325.,375.]
-  
-  ### override the above for thresh=100, split==None
-  if int(Threshold) is 100 and Split == None : HTBins_inc = [0.,10000.]
+  if int(Threshold) is 60 : HTBins = [225.,275.]
+
+ 
+  ### add incl binning for thresh=100, split==None
+  if int(Threshold) is 10 and Split == None : HTBins_inc = [0.,10000.]
 
   ### override the threshold arguement
-  Threshold=Threshold*0.95
+  #Threshold=Threshold*1.1
+  #Threshold=40.
 
   if Muon!=None:
       secondJetET = OP_SecondJetOrMuEtCut(Threshold)
@@ -725,19 +743,25 @@ def MakeMCTree(Threshold, Muon = None, Split = None):
 
 
   if Muon!=None:
-      cutTreeMC.Attach(htTakeMu250_Trigger)
-      cutTreeMC.TAttach(htTakeMu250_Trigger,NoiseFilt)
+      cutTreeMC.Attach(htTakeMu200_Trigger)
+      cutTreeMC.TAttach(htTakeMu200_Trigger,NoiseFilt)
+#      cutTreeMC.Attach(htTakeMu250_Trigger)
+#      cutTreeMC.TAttach(htTakeMu250_Trigger,NoiseFilt)
       cutTreeMC.TAttach(NoiseFilt,GoodVertexMonster)
       cutTreeMC.TAttach(GoodVertexMonster,LeadingJetOrMuEta)
       cutTreeMC.TAttach(LeadingJetOrMuEta,secondJetET)
       cutTreeMC.TAttach(secondJetET,oddJet)
   else:
       cutTreeMC.Attach(nullCut)
+      #cutTreeMC.TAttach(nullCut, SMSMassCut_200)
+      #cutTreeMC.TAttach(SMSMassCut_200, jet_ge2)
       cutTreeMC.TAttach(nullCut, jet_ge2)
       #cutTreeMC.TAttach(nullCut,SMSMassCut_300)
       #cutTreeMC.TAttach(SMSMassCut_300, jet_ge2)
-      cutTreeMC.TAttach(jet_ge2, ht250_Trigger)
-      cutTreeMC.TAttach(ht250_Trigger,NoiseFilt)
+#      cutTreeMC.TAttach(jet_ge2, ht250_Trigger)
+#      cutTreeMC.TAttach(ht250_Trigger,NoiseFilt)
+      cutTreeMC.TAttach(jet_ge2, ht200_Trigger)
+      cutTreeMC.TAttach(ht200_Trigger,NoiseFilt)
       cutTreeMC.TAttach(NoiseFilt,GoodVertexMonster)
       cutTreeMC.TAttach(GoodVertexMonster,LeadingJetEta)
       cutTreeMC.TAttach(LeadingJetEta,secondJetET)
@@ -753,8 +777,10 @@ def MakeMCTree(Threshold, Muon = None, Split = None):
   cutTreeMC.TAttach(MET_Filter,Tot_VertexCut)
  
   if Muon == None:
-    cutTreeMC.TAttach(Tot_VertexCut,htCut275)
-    cutTreeMC.TAttach(htCut275,ZeroMuon)
+#    cutTreeMC.TAttach(Tot_VertexCut,htCut275)
+#    cutTreeMC.TAttach(htCut275,ZeroMuon)
+    cutTreeMC.TAttach(Tot_VertexCut,htCut225)
+    cutTreeMC.TAttach(htCut225,ZeroMuon)
     cutTreeMC.TAttach(ZeroMuon,recHitCut)
     cutTreeMC.TAttach(recHitCut,VertexPtOverHT)
     cutTreeMC.TAttach(VertexPtOverHT,DeadEcalCutMC)
@@ -763,23 +789,23 @@ def MakeMCTree(Threshold, Muon = None, Split = None):
     cutTreeMC.TAttach(MHT_METCut,jet_le3)
     cutTreeMC.TAttach(MHT_METCut,jet_ge4) # jet ge4
 
-    if int(Threshold) is 100 and Split == None :
-      pass
-      #out.append(AddBinedHist(cutTree = cutTreeMC,
-      #OP = (runModeName,genericPSet_mc), cut = jet_ge2,
-      #htBins = HTBins_inc, TriggerDict = None, lab ="noCuts_", Muon=False, alphaTCut=False))
-
-    out.append(AddBinedHist(cutTree = cutTreeMC,
-    OP = (runModeName,genericPSet_mc), cut = MHT_METCut,
-    htBins = HTBins, TriggerDict = None, lab ="inc_", Muon=False, alphaTCut=True))
-
-    out.append(AddBinedHist(cutTree = cutTreeMC,
-    OP = (runModeName,genericPSet_mc), cut = jet_le3,
-    htBins = HTBins, TriggerDict = None, lab ="le3j_", Muon=False, alphaTCut=True ))
-
-    out.append(AddBinedHist(cutTree = cutTreeMC,
-    OP = (runModeName,genericPSet_mc), cut = jet_ge4,
-    htBins = HTBins, TriggerDict = None, lab ="ge4j_", Muon=False, alphaTCut=True))
+    if int(Threshold) is 10 and Split == None :
+      #pass
+      out.append(AddBinedHist(cutTree = cutTreeMC,
+      OP = (runModeName,genericPSet_mc), cut = jet_ge2,
+      htBins = HTBins_inc, TriggerDict = None, lab ="noCuts_", Muon=False, alphaTCut=False))
+    else:
+      out.append(AddBinedHist(cutTree = cutTreeMC,
+      OP = (runModeName,genericPSet_mc), cut = MHT_METCut,
+      htBins = HTBins, TriggerDict = None, lab ="inc_", Muon=False, alphaTCut=True))
+      
+      out.append(AddBinedHist(cutTree = cutTreeMC,
+      OP = (runModeName,genericPSet_mc), cut = jet_le3,
+      htBins = HTBins, TriggerDict = None, lab ="le3j_", Muon=False, alphaTCut=True ))
+      
+      out.append(AddBinedHist(cutTree = cutTreeMC,
+      OP = (runModeName,genericPSet_mc), cut = jet_ge4,
+      htBins = HTBins, TriggerDict = None, lab ="ge4j_", Muon=False, alphaTCut=True))
 
   else:
     cutTreeMC.TAttach(Tot_VertexCut,htCut275)
@@ -842,6 +868,19 @@ mu_2012_veto = PSet(
         NumPixelHits = 1,
         MaxInrTrkDz = 0.5
               )
+
+mu_2012_had = PSet(
+    MuID = "Tight",
+    MinPt = 10.,
+    MaxEta = 2.5,
+    MaxIsolation = 0.12,
+    GlobalChi2 = 10,
+    MaxGlbTrkDxy = 0.2,
+    MinNumTrkLayers = 6,
+    Match2GlbMu = 1,
+    NumPixelHits = 1,
+    MaxInrTrkDz = 0.5
+        )
 
 
 
