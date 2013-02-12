@@ -299,5 +299,12 @@ def printTable(debug=False):
   
   bMulti = conf.bMulti()
 
+  if len( bMulti )>1:
+     print "\n"
+     Log.error("*** ERROR: Too many b-tag multiplicities for yield mode. ***")
+     Log.error("\tChange 'bMulti()' in configurtion.py\n")
+     sys.exit()
+      
+
   for b in bMulti:
     makeTable(b, debug=debug)
