@@ -17,16 +17,25 @@ from samples import *
 from sys import argv
 from utils import *
 
+myDict = {
+   "ISR/h_ISRWeight_lastPt_150_100.txt":sig_T2cc_160,
+   "ISR/h_ISRWeight_lastPt_300_250.txt":sig_T2cc_300,
+   "ISR/h_ISRWeight_lastPt_225_200.txt":sig_T2cc_220_195,
+   "ISR/h_ISRWeight_lastPt_225_175.txt":sig_T2cc_220_170,
+   "ISR/h_ISRWeight_lastPt_225_150.txt":sig_T2cc_220_145,
+}
+
+#for key, val in myDict.iteritems():
+
 ISR_pset = PSet(
-JetPt_Low = EffToPSet(readBtagWeight("./ISR/h_ISRWeight_lastPt_225_200.txt")).GenPt,
-JetPt_High = EffToPSet(readBtagWeight("./ISR/h_ISRWeight_lastPt_225_200.txt")).GenEta,
-Variation  = EffToPSet(readBtagWeight("./ISR/h_ISRWeight_lastPt_225_200.txt")).Pt_Eta_Eff,
+JetPt_Low = EffToPSet(readBtagWeight("ISR/h_ISRWeight_lastPt_225_150.txt")).GenPt,
+JetPt_High = EffToPSet(readBtagWeight("ISR/h_ISRWeight_lastPt_225_150.txt")).GenEta,
+Variation  = EffToPSet(readBtagWeight("ISR/h_ISRWeight_lastPt_225_150.txt")).Pt_Eta_Eff,
 )
 
 ISR_reweight = SMS_ISR_Reweighting(ISR_pset.ps())
 
 default_common.Jets.PtCut              = 50.*(325./375.)
-#default_common.Jets.PtCut              = 20.
 
 cutTreeMC, junkVar,junkVar2            = MakeMCTree(100.*(325./375.),Muon = None)
 vbtfMuonId_cff                         = Muon_IDFilter( vbtfmuonidps.ps()  )
@@ -60,7 +69,6 @@ ensure_dir(outDir)
 
 samp_mc = mc_TTbar + mc_WJets + mc_QCD + mc_DiBo + mc_sinT
 samp_sig = sig_T2cc_160 + sig_T2cc_300
-samp_sig = sig_T2cc_220_195 + sig_T2cc_220_170 + sig_T2cc_220_145
+samp_sig = sig_T2cc_220_195 + sig_T2cc_220_170 + sig_T2cc_220_145 + sig_T2cc_300 + sig_T2cc_160
 
-
-anal_ak5_caloMC.Run(outDir,conf_ak5_caloMC,samp_sig)
+anal_ak5_caloMC.Run(outDir,conf_ak5_caloMC,sig_T2cc_noFilter)
