@@ -44,21 +44,14 @@ if conf.mode()=="anaPlots":
    if conf.switches()["runMode"]=="plotting":
       if conf.switches()["plotMode"]=="anaPlots":
          anaP.runAnaPlots(debug=options.doDebug)
-      if conf.switches()["plotMode"]=="standardPlots":
+      elif conf.switches()["plotMode"]=="standardPlots":
          anaP.runStandPlots(debug=options.doDebug)
-      if conf.switches()["plotMode"]=="comparisonPlots":
+      elif conf.switches()["plotMode"]=="comparisonPlots":
          anaP.runComparPlots(debug=options.doDebug, doLogy=False)
          if conf.switches()["printLogy"]:
             anaP.runComparPlots(debug=options.doDebug, doLogy=True)         
         
    elif conf.switches()["runMode"]=="yieldTables":
-
-      if len( conf.bMulti() )>1:
-         print "\n"
-         Log.error("*** ERROR: Too many b-tag multiplicities for yield mode. ***")
-         Log.error("\tChange 'bMulti()' in configurtion.py\n")
-         sys.exit()
-      
       Log.info(">>> Running yield tables\n")
       tabl.printTable(debug=options.doDebug)
 
@@ -66,7 +59,7 @@ if conf.mode()=="anaPlots":
 elif conf.mode()=="bTagEff":
    
    print "\n%s"%line()
-   print "  ***// Running anaPlots Analysis \\***"
+   print "  ***// Running bTagEff Analysis \\***"
    print line()+"\n"
    
    if conf.switches()["runModeBTag"]=="charmFrac":
@@ -76,6 +69,19 @@ elif conf.mode()=="bTagEff":
    elif conf.switches()["runModeBTag"]=="charmPhi":
       bTagP.doCharmPhiStudy(debug=options.doDebug)
 
+elif conf.mode()=="ISRSystem":
+
+   print "\n%s"%line()
+   print "   ***// Running ISR Systematics \\***"
+   print line()+"\n"
+
+   if conf.switches()["runMode"]=="plotting":
+      if conf.switches()["plotMode"]=="standardPlots":
+         anaP.runStandPlots(debug=options.doDebug)
+   
+   elif conf.switches()["runMode"]=="yieldTables":
+      Log.info(">>> Running yield tables\n")
+      tabl.printTable(debug=options.doDebug)
 
 elif conf.mode()=="dev":
    pass
