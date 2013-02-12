@@ -14,19 +14,19 @@ import ROOT as r
 
 def mode():
   
-  anaMode = ["bTagEff", "anaPlots", "dev"][1]
+  anaMode = ["bTagEff", "anaPlots", "ISRSystem","dev"][2]
 
   return anaMode
 
 ###-------------------------------------------------------------------###
 
 def switches():
-   
+
   switches={
-          "runMode"       :["plotting", "yieldTables"][0],
+          "runMode"       :["plotting", "yieldTables"][1],
           "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][2],
           "runModeBTag"   :["charmFrac", "standardPlots", "charmPhi"][0],
-          "signalSample"  :"T2cc_Scan_NoFilter",
+          "signalSample"  :"MuEG_2012",
           "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT","parkedHT"][1],
           "jetMulti"      :["le3j","ge4j","inc"][0],
           "printLogy"     :[False, True][0],
@@ -153,6 +153,11 @@ def sigFile():
           "T2cc_220_170_noCuts"     :["%sbTagEff_Study/outT2cc_220_170_noCuts_bTagEff.root"%inDir],
           "T2cc_220_145_noCuts"     :["%sbTagEff_Study/outT2cc_220_145_noCuts_bTagEff.root"%inDir],          
     }
+  elif mode()=="ISRSystem":
+    sigFile={
+          "MuEG_2012" :["%sISRSystem/outMuEG_2012_ISRSystem.root"%inDir],
+    }
+
   else:
     sigFile={}
 
@@ -174,7 +179,7 @@ def comparFiles():
 
 def inDirs():
 
-  HTdirs = ["225_275", "275_325", "325_375", "375_475", "475_575", "575_675", "675_775", "775_875", "875"]
+  HTdirs = ["275_325", "325_375", "375_475", "475_575", "575_675", "675_775", "775_875", "875"]
 
   if switches()["HTcuts"]=="parkedHT":
     HTdirs.insert(0, "225_275")
