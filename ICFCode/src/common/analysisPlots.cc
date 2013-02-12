@@ -71,10 +71,10 @@ void analysisPlots::StandardPlots() {
       2, 0, 1, false);
 
    BookHistArray(h_nJets,
-     "n_Jets",
-     ";nJets;# count",
-     20, 0., 20.,
-     1, 0, 1, true);
+      "n_Jets",
+      ";nJets;# count",
+      20, 0., 20.,
+      1, 0, 1, true);
 
    BookHistArray(h_nBTagJets,
       "n_BTagged_Jets",
@@ -85,37 +85,37 @@ void analysisPlots::StandardPlots() {
    BookHistArray(h_jetPt,
       "jetPt",
       ";p_T (GeV);# count",
-      1000, 0., 1000.,
+      100, 0., 1000.,
       6, 0, 1, false);   
 
    BookHistArray(h_leadJetPt,
       "leadJetPt",
       ";p_T (GeV);# count",
-      1000, 0., 1000.,
+      100, 0., 800.,
       6, 0, 1, false);
 
    BookHistArray(h_subLeadJetPt,
       "subLeadJetPt",
       ";p_T (GeV);# count",
-      1000, 0., 1000.,
+      100, 0., 1000.,
       6, 0, 1, false);   
 
    BookHistArray(h_commHT,
       "commHT",
       ";HT_(GeV);# count",
-      1000, 0., 1000.,
+      100, 0., 1000.,
       6, 0, 1, false);
 
    BookHistArray(h_MET,
       "MET",
       ";MET (GeV);# count",
-      1000, 0., 1000.,
+      100, 0., 1000.,
       6, 0, 1, false);
 
    BookHistArray(h_MHT,
       "MHT",
       ";MHT (GeV);# count",
-      1000, 0., 1000.,
+      100, 0., 1000.,
       6, 0, 1, false);
 
    BookHistArray(h_MHToverMET,
@@ -127,7 +127,7 @@ void analysisPlots::StandardPlots() {
    BookHistArray(h_hadronicAlphaT,
       "hadronicAlphaT",
       ";alphaT;# count",
-      1000, 0., 10.,
+      100, 0., 10.,
       6, 0, 1, false);
 
    BookHistArray(h_hadronicAlphaTZoom,
@@ -145,13 +145,13 @@ void analysisPlots::StandardPlots() {
    BookHistArray(h_stopGenPtVect,
       "stopGenPtVect",
       ";vectorial gen Pt;# count",
-      1000, 0., 1000.,
+      100, 0., 1000.,
       1, 0, 1, false);
 
    BookHistArray(h_stopGenPtScal,
       "stopGenPtScal",
       ";scalar gen Pt;# count",
-      1000, 0., 1000.,
+      100, 0., 1000.,
       1, 0, 1, false);
 
    BookHistArray(h_delPhi_vs_scalGenPt,
@@ -199,11 +199,11 @@ void analysisPlots::StandardPlots() {
       1, 0, 1, false);   
 
    BookHistArray(h_susyScanPlane,
-    "susyScanPlane",
-    ";mSQ (GeV); mLSP (GeV)",
-    1000, 0., 1000., 
-    1000, 0., 1000.,
-    1, 0, 1, false);
+      "susyScanPlane",
+      ";mSQ (GeV); mLSP (GeV)",
+      100, 0., 1000., 
+      100, 0., 1000.,
+      1, 0, 1, false);
 
    BookHistArray(h_SMSvectGenPt,
       "SMSvectGenPt",
@@ -225,25 +225,33 @@ void analysisPlots::StandardPlots() {
       100, 0., 1000.,
       100, 0., 1000., 
       1, 0, 1, false);   
-
-   BookHistArray(h_evNums,
-      "evNums",
-      ";evNum;",
-      100000, 0., 100000.,
-      1, 0, 1, false);
-   
-   BookHistArray(h_evLS,
-      "evLS",
-      ";evLS;",
-      100, 0., 100.,
-      1, 0, 1, false);        
-
+     
    BookHistArray(h_alphaT_vs_HT,
     "alphaT_vs_HT",
     ";alphaT;HT (GeV)",
     200,0., 2.,
-    1000, 0., 1000.,
+    100, 0., 1000.,
     6, 0, 1, false);
+
+   BookHistArray(h_leadJetPt_vs_HT,
+    "leadJetPt_vs_HT",
+    ";lead jet pT (GeV); HT (GeV)",
+    100, 0., 1000.,
+    100, 0., 1000.,
+    6, 0, 1, false);
+
+   BookHistArray(h_leadminsubJetPt_vs_HT,
+    "leadminsubJetPt_vs_HT",
+    ";(lead-sub) jet pT (GeV); HT (GeV)",
+    100, 0., 1000.,
+    100, 0., 1000.,
+    6, 0, 1, false);
+
+   BookHistArray(h_leadTwoJetsPt,
+   "leadTwoJetsPt",
+   ";lead jets pT (GeV);# count",
+   100, 0., 400.,
+   6, 0, 1, false);
 
 }
 
@@ -281,16 +289,12 @@ bool analysisPlots::StandardPlots( Event::Data& ev ) {
    int nbjet = 0, plotIndex = 0;
 
 
-   h_evNums[0] ->Fill( ev.EventNumber() );
-   h_evLS[0]   ->Fill( ev.LumiSection() );
-
-   
+ 
 
    for(int i=0; i<nCommJet; i++){
       // count number of btagged jets
       if( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), bTagAlgo_) > bTagAlgoCut_ ) nbjet++;
    }
-
 
 
    h_nJets[0]     ->Fill( nCommJet, evWeight );
@@ -308,19 +312,28 @@ bool analysisPlots::StandardPlots( Event::Data& ev ) {
    h_MHToverMET[plotIndex]          ->Fill( v_MHTMET[2], evWeight );
    h_stopGenPtVect[0]               ->Fill( v_StopGenPt.at(0), evWeight );
    h_stopGenPtScal[0]               ->Fill( v_StopGenPt.at(1), evWeight );
-   h_alphaT_vs_HT[plotIndex]        ->Fill( hadronicAlphaT, evHT, evWeight );
+   //h_alphaT_vs_HT[plotIndex]        ->Fill( hadronicAlphaT, evHT, evWeight );
 
-   for(int i=0; i<nCommJet; i++) h_jetPt[plotIndex]->Fill( ev.JD_CommonJets().accepted.at(i)->Pt(), evWeight );
+   for(int i=0; i<nCommJet; i++){
+      h_jetPt[plotIndex]->Fill( ev.JD_CommonJets().accepted.at(i)->Pt(), evWeight );
+   }
 
    double jetDeltaPhi = 0;
    if (ev.JD_CommonJets().accepted.size()>1){
       jetDeltaPhi = ROOT::Math::VectorUtil::DeltaPhi(*ev.JD_CommonJets().accepted.at(0),*ev.JD_CommonJets().accepted.at(1));
       h_leadJetdelPhi[plotIndex] ->Fill( fabs(jetDeltaPhi), evWeight );
-      h_delPhi_vs_scalGenPt[0]   ->Fill( v_StopGenPt.at(1), fabs(jetDeltaPhi), evWeight );
-      h_delPhi_vs_vectGenPt[0]   ->Fill( v_StopGenPt.at(0), fabs(jetDeltaPhi), evWeight );
+      //h_delPhi_vs_scalGenPt[0]   ->Fill( v_StopGenPt.at(1), fabs(jetDeltaPhi), evWeight );
+      //h_delPhi_vs_vectGenPt[0]   ->Fill( v_StopGenPt.at(0), fabs(jetDeltaPhi), evWeight );
       
       h_leadJetPt[plotIndex]     ->Fill( ev.JD_CommonJets().accepted.at(0)->Pt(), evWeight );
       h_subLeadJetPt[plotIndex]  ->Fill( ev.JD_CommonJets().accepted.at(1)->Pt(), evWeight );
+
+      h_leadJetPt_vs_HT[plotIndex]->Fill( ev.JD_CommonJets().accepted.at(0)->Pt(), evHT, evWeight);
+
+      h_leadTwoJetsPt[plotIndex]->Fill(ev.JD_CommonJets().accepted.at(0)->Pt()+ev.JD_CommonJets().accepted.at(1)->Pt(), evWeight);
+
+      //double jetDiff = ev.JD_CommonJets().accepted.at(0)->Pt() - ev.JD_CommonJets().accepted.at(1)->Pt();
+      //h_leadminsubJetPt_vs_HT[plotIndex]->Fill( jetDiff, evHT, evWeight );
    }
    
    Event::GenObject gStop1(0.,0.,0.,0.,0,0,0,0);
@@ -361,9 +374,9 @@ bool analysisPlots::StandardPlots( Event::Data& ev ) {
 
    h_susyScanPlane[0]->Fill( M0, M12, evWeight );
 
-   h_SMSscalGenPt[0]->Fill( M0, M12, v_StopGenPt.at(1) );
-   h_SMSvectGenPt[0]->Fill( M0, M12, v_StopGenPt.at(0) );
-   h_SMSdPhiLeadJetsGenPt[0]->Fill( M0, M12, jetDeltaPhi );
+   //h_SMSscalGenPt[0]->Fill( M0, M12, v_StopGenPt.at(1) );
+   //h_SMSvectGenPt[0]->Fill( M0, M12, v_StopGenPt.at(0) );
+   //h_SMSdPhiLeadJetsGenPt[0]->Fill( M0, M12, jetDeltaPhi );
 
    if( (gStop1!=gEmpty) && (gStop2 !=gEmpty) && (gCharm1 !=gEmpty) && (gCharm2 !=gEmpty) && (gNeut1 !=gEmpty) && (gNeut2 !=gEmpty) ){
       h_dPhiStopCharm[0]  ->Fill( getGenDeltaPhi(gStop1, gCharm1), evWeight );
