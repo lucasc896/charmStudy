@@ -50,6 +50,7 @@ namespace Operation {
       std::vector<TH1D*>  h_nJetsMatchC;
       std::vector<TH1D*>  h_nJetsMatchL;
       std::vector<TH1D*>  h_jetFlavour;
+      std::vector<TH1D*>  h_jetFlavourICF;
       std::vector<TH1D*>  h_nBTagJets;
       std::vector<TH1D*>  h_nBTagJetsMatchB;
       std::vector<TH1D*>  h_nBTagJetsMatchC;
@@ -64,7 +65,11 @@ namespace Operation {
       std::vector<TH1D*>  h_lMatched_response;
       std::vector<TH1D*>  h_charmJetdR1;
       std::vector<TH1D*>  h_charmJetdR2;
-      std::vector<TH1D*>  h_charmEtaSign;
+      std::vector<TH1D*>  h_charmPhiSign;
+      std::vector<TH1D*>  h_charm_index;
+      std::vector<TH1D*>  h_noCLeadJetdR;
+      std::vector<TH1D*>  h_noCLeadJetdPhi;
+      std::vector<TH1D*>  h_bothLeadCharm;
   
       std::vector<TH2D*>  h_Thresh_v_BTagEff;
       std::vector<TH2D*>  h_Thresh_v_CTagEff;
