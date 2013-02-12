@@ -20,7 +20,7 @@ CustomEleID = Electron_Egamma_Veto()
 CustomMuID = OL_TightMuID(mu_2012_had.ps())
 #  Change the settings from golden to use the lowest scaled bin.
 default_common.Jets.PtCut=50.*(275./375.)
-cutTree,blah,blah2,l = MakeDataTree(100.*(275./375.), Muon = None)
+cutTree,blah,blah2 = MakeDataTree(100.*(275./375.), Muon = None)
 
 def addCutFlowData(a) :
   a.AddMuonFilter("PreCC",CustomMuID)
@@ -63,8 +63,24 @@ from data.Run2012.FNAL.HCP.HT_Run2012A_recover_06Aug2012_v1_V17_5_taus_0_yeshaqJ
 HT_Run2012A_13Jul2012_v1_V17_5_taus_0_yeshaqJob358.File = HT_Run2012A_13Jul2012_v1_V17_5_taus_0_yeshaqJob358.File[20:21]
 HT_Run2012A = [HT_Run2012A_13Jul2012_v1_V17_5_taus_0_yeshaqJob358]
 
+
+
+from data.Run2012.FNAL.HCP.HT_Run2012A_13Jul2012_v1_V17_5_taus_0_yeshaqJob358 import *
+from data.Run2012.FNAL.HCP.HT_Run2012A_recover_06Aug2012_v1_V17_5_taus_0_yeshaqJob359 import *
+from data.Run2012.FNAL.HCP.HT_Run2012A_13Jul2012_v1_V17_5_taus_0_yeshaqJob463 import *
+from data.Run2012.FNAL.HCP.HT_Run2012A_recover_06Aug2012_v1_V17_5_taus_0_yeshaqJob475 import *
+from data.Run2012.FNAL.HCP.HTMHT_Run2012B_13Jul2012_v1_V17_5_taus_0_yeshaqJob358 import *
+from data.Run2012.FNAL.HCP.HTMHT_Run2012C_24Aug2012_v1_V17_5_taus_0_yeshaqJob361 import *
+from data.Run2012.FNAL.HCP.HTMHT_Run2012C_PromptReco_v2_V17_5_taus_0_yeshaqJob360 import *
+from data.Run2012.FNAL.HCP.HTMHT_Run2012B_13Jul2012_v1_V17_5_taus_0_yeshaqJob462 import *
+from data.Run2012.FNAL.HCP.HTMHT_Run2012C_24Aug2012_v1_V17_5_taus_0_yeshaqJob468 import *
+from data.Run2012.FNAL.HCP.HTMHT_Run2012C_PromptReco_v2_V17_5_taus_0_yeshaqJob472 import *
+from data.Run2012.FNAL.BeyondHCP.HTMHT_Run2012D_PromptReco_v1_V17_5_taus_0_yeshaqJob508 import *
+
+HTMHT_ABCD = [HT_Run2012A_13Jul2012_v1_V17_5_taus_0_yeshaqJob358, HT_Run2012A_recover_06Aug2012_v1_V17_5_taus_0_yeshaqJob359, HT_Run2012A_13Jul2012_v1_V17_5_taus_0_yeshaqJob463, HT_Run2012A_recover_06Aug2012_v1_V17_5_taus_0_yeshaqJob475, HTMHT_Run2012B_13Jul2012_v1_V17_5_taus_0_yeshaqJob358, HTMHT_Run2012C_24Aug2012_v1_V17_5_taus_0_yeshaqJob361, HTMHT_Run2012C_PromptReco_v2_V17_5_taus_0_yeshaqJob360, HTMHT_Run2012B_13Jul2012_v1_V17_5_taus_0_yeshaqJob462, HTMHT_Run2012C_24Aug2012_v1_V17_5_taus_0_yeshaqJob468, HTMHT_Run2012C_PromptReco_v2_V17_5_taus_0_yeshaqJob472, HTMHT_Run2012D_PromptReco_v1_V17_5_taus_0_yeshaqJob508]
+
 #outDir = "../Split_Jsons_"+strftime("%d_%b")+"/Data37/"
 outDir = "../results_"+strftime("%d_%b")+"//Data37"
 ensure_dir(outDir)
-anal_ak5_caloData.Run(outDir,conf_ak5_caloData,HT_Run2012A)
+anal_ak5_caloData.Run(outDir,conf_ak5_caloData,HTMHT_ABCD)
 
