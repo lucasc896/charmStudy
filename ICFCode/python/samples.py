@@ -14,6 +14,11 @@ from montecarlo.Summer12.FNAL.charmStudy.T2cc_mSQ_220_mLSP_195_v4 import *
 from montecarlo.Summer12.FNAL.charmStudy.T2cc_mSQ_220_mLSP_170_v4 import *
 from montecarlo.Summer12.FNAL.charmStudy.T2cc_mSQ_220_mLSP_145_v4 import *
 
+from montecarlo.Summer12.FNAL.charmStudy.T2cc_mSQ_200_mLSP_125_v1 import *
+
+from montecarlo.Summer12.FNAL.SMS_T2cc_Filter_SumPt_130GeV_mStop_175to250_mLSP_95to240_8TeV_Pythia6Z_Summer12_START52_V9_FSIM_v1_V17_12_taus_0_scan_T2cc_beamHaloVars_0_clucasJob535 import *
+from montecarlo.Summer12.FNAL.SMS_T2cc_NoFilter_mStop_175to250_mLSP_95to240_8TeV_Pythia6Z_Summer12_START52_V9_FSIM_v1_V17_12_taus_0_scan_T2cc_beamHaloVars_0_clucasJob539 import *
+
 sig_T2cc_160 = [T2cc_mSQ_160_mLSP_110_v4]
 sig_T2cc_300 = [T2cc_mSQ_300_mLSP_250_v4]
 sig_T2cc_600 = [T2cc_mGL_600_mLSP_400_v1]
@@ -22,6 +27,11 @@ sig_T2bb = [SMS_T2bb_Msbottom_225to1200_mLSP_0to1175_8TeV_Pythia6Z_Summer12_STAR
 sig_T2cc_220_195 = [T2cc_mSQ_220_mLSP_195_v4]
 sig_T2cc_220_170 = [T2cc_mSQ_220_mLSP_170_v4]
 sig_T2cc_220_145 = [T2cc_mSQ_220_mLSP_145_v4]
+
+sig_T2cc_200_125 = [T2cc_mSQ_200_mLSP_125_v1]
+
+sig_T2cc_filter = [SMS_T2cc_Filter_SumPt_130GeV_mStop_175to250_mLSP_95to240_8TeV_Pythia6Z_Summer12_START52_V9_FSIM_v1_V17_12_taus_0_scan_T2cc_beamHaloVars_0_clucasJob535]
+sig_T2cc_noFilter = [SMS_T2cc_NoFilter_mStop_175to250_mLSP_95to240_8TeV_Pythia6Z_Summer12_START52_V9_FSIM_v1_V17_12_taus_0_scan_T2cc_beamHaloVars_0_clucasJob539]
 
 #-------------------------------------------------------#
             ###// MonteCarlo Samples //###
@@ -79,3 +89,23 @@ from montecarlo.Summer12.FNAL.HCP.WZ_TuneZ2star_8TeV_pythia6_tauola_Summer12_DR5
 
 mc_DiBo = [ZZ_TuneZ2star_8TeV_pythia6_tauola_Summer12_DR53X_PU_S10_START53_V7A_v1_V17_5_taus_0_zmengJob370,WW_TuneZ2star_8TeV_pythia6_tauola_Summer12_DR53X_PU_S10_START53_V7A_v1_V17_5_taus_0_zmengJob370,WZ_TuneZ2star_8TeV_pythia6_tauola_Summer12_DR53X_PU_S10_START53_V7A_v1_V17_5_taus_0_zmengJob370]
 
+#-------------------------------------------------------#
+               ###// Data Samples //###
+               #//       HCP        //#
+#-------------------------------------------------------#
+
+## MuEG 2012
+from data.Run2012.FNAL.MuEG_Run2012A_13Jul2012_v1_V17_5_taus_0_clucasJob560 import *
+from data.Run2012.FNAL.MuEG_Run2012A_recover_06Aug2012_v1_V17_5_taus_0_clucasJob561 import *
+from data.Run2012.FNAL.MuEG_Run2012B_13Jul2012_v1_V17_5_taus_0_clucasJob562 import *
+from data.Run2012.FNAL.MuEG_Run2012C_24Aug2012_v1_V17_5_taus_0_clucasJob563 import *
+from data.Run2012.FNAL.MuEG_Run2012C_PromptReco_v2_V17_5_taus_0_clucasJob564 import *
+from data.Run2012.FNAL.MuEG_Run2012D_PromptReco_v1_V17_5_taus_0_clucasJob565 import *
+
+from data.Run2012.FNAL.BeyondHCP.HTMHT_Run2012D_PromptReco_v1_V17_5_taus_0_yeshaqJob527 import *
+
+#HTMHT_Run2012D_PromptReco_v1_V17_5_taus_0_yeshaqJob527.File = HTMHT_Run2012D_PromptReco_v1_V17_5_taus_0_yeshaqJob527.File[0:10]
+
+test = [HTMHT_Run2012D_PromptReco_v1_V17_5_taus_0_yeshaqJob527]
+
+MuEG_2012 = [MuEG_Run2012A_13Jul2012_v1_V17_5_taus_0_clucasJob560, MuEG_Run2012A_recover_06Aug2012_v1_V17_5_taus_0_clucasJob561, MuEG_Run2012B_13Jul2012_v1_V17_5_taus_0_clucasJob562, MuEG_Run2012C_24Aug2012_v1_V17_5_taus_0_clucasJob563, MuEG_Run2012C_PromptReco_v2_V17_5_taus_0_clucasJob564, MuEG_Run2012D_PromptReco_v1_V17_5_taus_0_clucasJob565]
