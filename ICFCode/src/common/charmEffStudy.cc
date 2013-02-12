@@ -93,17 +93,35 @@ void charmEffStudy::StandardPlots() {
       200, 0., 200.,
       4, 0, 1, false);
 
+   BookHistArray(h_jetFlavourICF,
+      "jetFlavourICF",
+      ";pdgId;# count",
+      200, 0., 200.,
+      4, 0, 1, false);
+
    BookHistArray(h_charmJetdR1,
       "charmJetdR1",
       ";DeltaR;# count",
-      50, 0., 10.,
+      50, 0., 6.,
       4, 0, 1, false);
 
    BookHistArray(h_charmJetdR2,
       "charmJetdR2",
       ";DeltaR;# count",
-      50, 0., 10.,
+      50, 0., 6.,
       4, 0, 1, false);
+
+   BookHistArray(h_noCLeadJetdR,
+      "noCLeadJetdR",
+      ";DeltaR;# count",
+      50, 0., 6.,
+      3, 0, 1, false);
+
+   BookHistArray(h_noCLeadJetdPhi,
+      "noCLeadJetdPhi",
+      ";DeltaPhi;# count",
+      70, 0., 3.5,
+      3, 0, 1, false);
 
    BookHistArray(h_nBTagJets,
       "n_BTagged_Jets",
@@ -165,10 +183,22 @@ void charmEffStudy::StandardPlots() {
       1000, 0., 10.,
       5, 0, 1, false);
 
-   BookHistArray(h_charmEtaSign,
+   BookHistArray(h_charmPhiSign,
       "charmEtaSign",
       ";blah;# count",
       2, 0., 2.,
+      1, 0, 1, false);
+
+   BookHistArray(h_charm_index,
+      "charm_index",
+      ";Particle Index;# count",
+      50, 0., 50.,
+      2, 0, 1, false );
+
+   BookHistArray(h_bothLeadCharm,
+      "bothLeadCharm",
+      ";bothLeadCharm;# count",
+      3, 0., 3.,
       1, 0, 1, false);
 }
 
@@ -209,11 +239,15 @@ bool charmEffStudy::StandardPlots( Event::Data& ev ) {
       njet++;
       
       //match generic jets to partons
-      if( matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 5, minDR_) ) nJetMatchB++;
-      if( matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 4, minDR_) ) nJetMatchC++;
-      if( matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 3, minDR_) || matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 2, minDR_) || matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 1, minDR_) ){
-         nJetMatchL++;
-      }
+      //if( matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 5, minDR_) ) nJetMatchB++;
+      //if( matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 4, minDR_) ) nJetMatchC++;
+      //if( matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 3, minDR_) || matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 2, minDR_) || matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 1, minDR_) ){
+      //   nJetMatchL++;
+      //}
+
+      if( fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(i)->GetIndex())) == 5 ) nJetMatchB++;
+      if( fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(i)->GetIndex())) == 4 ) nJetMatchC++;
+      if( fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(i)->GetIndex())) <= 3 ) nJetMatchL++;
 
       // loop over Tgt/Med/Lse
       for(int j=0; j<3; j++){
@@ -258,6 +292,31 @@ bool charmEffStudy::StandardPlots( Event::Data& ev ) {
         h_noMatch_response[4]->Fill( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), 2) );
    }
 
+   if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(0)->GetIndex())) == 4){
+      if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(1)->GetIndex())) == 4){
+         // both charm
+         h_bothLeadCharm[0]->Fill(2.5);
+      }
+   }
+   else if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(1)->GetIndex())) == 4){
+      if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(0)->GetIndex())) != 4){
+         // only second is charm
+         h_bothLeadCharm[0]->Fill(1.5);
+      }
+   }
+   else if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(0)->GetIndex())) == 4){
+      if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(1)->GetIndex())) != 4){
+         // only first is charm
+         h_bothLeadCharm[0]->Fill(1.5);
+      }
+   }
+   else if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(0)->GetIndex())) != 4){
+      if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(1)->GetIndex())) != 4){
+         // neither is charm
+         h_bothLeadCharm[0]->Fill(0.5);
+      }
+   }
+
    // fill jet multiplicities
    h_nJets[0]->Fill(njet);
    h_nJetsMatchB[0]->Fill(nJetMatchB);
@@ -283,24 +342,40 @@ bool charmEffStudy::StandardPlots( Event::Data& ev ) {
 
    }
 
-   if ((gCharm1.Eta()>0.) && (gCharm2.Eta()<0.)){
-      h_charmEtaSign[0]->Fill(1.5);
+   if ((gCharm1.Phi()>0.) && (gCharm2.Phi()<0.)){
+      h_charmPhiSign[0]->Fill(1.5);
    }
-   else if ((gCharm2.Eta()>0.) && (gCharm1.Eta()<0.)){
-      h_charmEtaSign[0]->Fill(1.5);
+   else if ((gCharm2.Phi()>0.) && (gCharm1.Phi()<0.)){
+      h_charmPhiSign[0]->Fill(1.5);
    }
    else{
-      h_charmEtaSign[0]->Fill(0.5);
+      h_charmPhiSign[0]->Fill(0.5);
    }
+
+   h_charm_index[0]->Fill(gCharm1.GetIndex());
+   h_charm_index[1]->Fill(gCharm2.GetIndex());
    
    for(unsigned int i=0; i<4; i++){
       if (ev.JD_CommonJets().accepted.size()>i){
          h_jetFlavour[i]   ->Fill( getJetFlavour(ev, *ev.JD_CommonJets().accepted.at(i), minDR_) );
+         h_jetFlavourICF[i]->Fill( ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(i)->GetIndex()) );
          h_charmJetdR1[i]  ->Fill( getDeltaR(gCharm1,*ev.JD_CommonJets().accepted.at(i)) );
          h_charmJetdR2[i]  ->Fill( getDeltaR(gCharm2,*ev.JD_CommonJets().accepted.at(i)) );
       }
    }
 
+   // if leadJet not charm, get dR between other three leading jets
+   if( fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(0)->GetIndex())) != 4 ){
+      for(unsigned int i=1; i<4; i++){
+         if (ev.JD_CommonJets().accepted.size()>i){
+            double dRVal = ROOT::Math::VectorUtil::DeltaR( *ev.JD_CommonJets().accepted.at(0), *ev.JD_CommonJets().accepted.at(i) );
+            double dPhiVal = ROOT::Math::VectorUtil::DeltaPhi( *ev.JD_CommonJets().accepted.at(0), *ev.JD_CommonJets().accepted.at(i) );
+            h_noCLeadJetdR[i-1]  ->Fill( fabs(dRVal) );
+            h_noCLeadJetdPhi[i-1]->Fill( fabs(dPhiVal) );
+
+         }
+      }
+   }
 
    //check for truth b
    if( hasTrueQuark(ev, 5) ){
