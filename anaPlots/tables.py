@@ -180,6 +180,8 @@ def getDataYields(bM="inc", debug=False):
 
 #  scale=float(601852./90000.)
 
+  Log.warning("Tables filled with scale factor %d"%scale)
+
   for d in dirs:
     ent=0
     dirTitle = d[4:].replace("_","-")
@@ -245,7 +247,7 @@ def makeTable(bM="inc", debug=False):
   sigSamp  = conf.switches()["signalSample"]
   jM       = conf.switches()["jetMulti"]
 
-  if debug: Log.debug("Making table for %s %s"%(bM, jM))
+  Log.info("\tBin: %s %s\n"%(bM, jM))
 
   smPred = getSMPred(bM, jM)
   dYield = getDataYields(bM, debug=debug)
