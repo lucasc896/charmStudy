@@ -74,4 +74,4 @@ samp_mc = mc_TTbar + mc_WJets + mc_QCD + mc_DiBo + mc_sinT
 samp_sig = sig_T2cc_160 + sig_T2cc_300
 samp_sig = sig_T2cc_220_195 + sig_T2cc_220_170 + sig_T2cc_220_145 + sig_T2cc_300 + sig_T2cc_160
 
-anal_ak5_caloMC.Run(outDir,conf_ak5_caloMC,sig_T2cc_full)
+anal_ak5_caloMC.Run(conf_ak5_caloMC,sig_T2cc_full)
