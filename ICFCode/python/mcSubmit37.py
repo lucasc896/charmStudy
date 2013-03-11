@@ -16,6 +16,7 @@ from ra1objectid.ra3PhotonId2012_cff import *
 from samples import *
 from sys import argv
 from utils import *
+import commands
 
 myDict = {
    "ISR/h_ISRWeight_lastPt_150_100.txt":sig_T2cc_160,
@@ -64,7 +65,10 @@ anal_ak5_caloMC           =Analysis("AK5Calo")
 addCutFlowMC(anal_ak5_caloMC)
 
 
-outDir = "../results_"+strftime("%d_%b/275_")
+outDir = "results_"+strftime("%d_%b/275_")
+scratchDir = commands.getoutput("echo $_CONDOR_SCRATCH_DIR")
+if len(scratchDir) > 0:
+  outDir = scratchDir + outDir
 ensure_dir(outDir)
 
 samp_mc = mc_TTbar + mc_WJets + mc_QCD + mc_DiBo + mc_sinT
