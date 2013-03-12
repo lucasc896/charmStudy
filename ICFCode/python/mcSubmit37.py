@@ -68,7 +68,7 @@ addCutFlowMC(anal_ak5_caloMC)
 outDir = "results_"+strftime("%d_%b/275_")
 scratchDir = commands.getoutput("echo $_CONDOR_SCRATCH_DIR")
 if len(scratchDir) > 0:
-  outDir = scratchDir + outDir
+  outDir = scratchDir + "/" + outDir
 ensure_dir(outDir)
 
 samp_mc = mc_TTbar + mc_WJets + mc_QCD + mc_DiBo + mc_sinT
