@@ -215,8 +215,6 @@ class anaPlot(object):
     """docstring for makeSinglePlot"""
     c1 = r.TCanvas()
 
-    #if self.SetLogy: c1.SetLogy()
-
     for i in range( len(self.hists) ):
       if i==0: h=self.hists[i].Clone()
       elif i>0: h.Add(self.hists[i])   
@@ -228,7 +226,7 @@ class anaPlot(object):
     if "TH1D" in str( type(h) ):
       if rebinX: h.Rebin(rebinX)
       if self.SetLogy:
-        h.SetMinimum(0.01)
+        h.SetMinimum(0.001)
       else:
         h.SetMinimum(0.)
 
@@ -531,11 +529,15 @@ def comparPlots(hList=None, debug=None, doLogy=False):
       if key in sSamp[i]:
         colors[i]=colorDict[key]
 
-  c1 = r.TCanvas()
+  if conf.switches()["hiRes"]:
+    c1 = r.TCanvas("c1", "c1", 1600, 1200)
+  else: 
+    c1 = r.TCanvas()
+
   r.gStyle.SetOptStat(0)
 
   if len(hList)==2:
-    lg = r.TLegend(0.6, 0.73, 0.895, 0.89)
+    lg = r.TLegend(0.57, 0.70, 0.895, 0.89)
   elif len(hList)==3:
     lg = r.TLegend(0.52, 0.72, 0.895, 0.89)
   elif len(hList)==4:
@@ -545,29 +547,28 @@ def comparPlots(hList=None, debug=None, doLogy=False):
 
   hOrder = getHistOrder(hList)
 
-  pd1 = r.TPad("pd1", "pd1", 0., 0.3, 1., 1.)
-  pd1.SetBottomMargin(0.005)
-  pd1.Draw()
+  if len(hList)==2:
+    pd1 = r.TPad("pd1", "pd1", 0., 0.3, 1., 1.)
+    pd1.SetBottomMargin(0.005)
+    pd1.Draw()
 
-  pd2 = r.TPad("pd2", "pd2", 0., 0.02, 1., 0.3)
-  pd2.SetTopMargin(0.05)
-  pd2.SetBottomMargin(0.22)
-  pd2.SetGridx(1)
-  pd2.SetGridy(1)
-  pd2.Draw()
+    pd2 = r.TPad("pd2", "pd2", 0., 0.02, 1., 0.3)
+    pd2.SetTopMargin(0.05)
+    pd2.SetBottomMargin(0.22)
+    pd2.SetGridx(1)
+    pd2.SetGridy(1)
+    pd2.Draw()
 
-  pd1.cd()
+    pd1.cd()
 
   ctr=0
   for i in hOrder:
-    #if ctr==0: hList[i].Draw("hist")
-    #else: hList[i].Draw("histsame")
     hList[i].SetLineColor(colors[i])
     entTitle = sSamp[i]
 
     if entTitle == "T2cc_200": entTitle="Pythia"
     elif entTitle == "T2cc_NF_200_120_cut": entTitle="Madgraph"
-
+    elif "_delta" in entTitle: entTitle = entTitle.split("_")[0]+"_"+entTitle.split("_")[-1]
     lg.AddEntry(hList[i], entTitle, "L")
 
     if ctr==0:
@@ -586,31 +587,30 @@ def comparPlots(hList=None, debug=None, doLogy=False):
   lg.SetLineStyle(0)
   lg.Draw()
 
-  pd2.cd()
-  
-#  hRatio = hList[hOrder[0]].Clone()
-#  hRatio.Divide( hList[hOrder[1]] )
-  hRatio = hList[0].Clone()
-  hRatio.Divide( hList[1] )
-  hRatio.SetMarkerStyle(4)
-  hRatio.SetMarkerSize(.7)
-  hRatio.SetLineWidth(1)
-  hRatio.SetLineColor(r.kBlack)
-  hRatio.GetYaxis().SetTitle("Ratio")
-  hRatio.GetYaxis().SetRangeUser(0.,2.)
-  hRatio.SetLabelSize(0.12, "X")
-  hRatio.SetLabelSize(0.07, "Y")
-  hRatio.SetTitleSize(0.13, "X")
-  hRatio.SetTitleSize(0.11, "Y")
-  hRatio.SetTitleOffset(0.25, "Y")
-  hRatio.SetTitleOffset(.9, "X")
-  hRatio.Draw("pe1")
+  if len(hList)==2:
+    pd2.cd()
+
+    hRatio = hList[0].Clone()
+    hRatio.Divide( hList[1] )
+    hRatio.SetMarkerStyle(4)
+    hRatio.SetMarkerSize(.7)
+    hRatio.SetLineWidth(1)
+    hRatio.SetLineColor(r.kBlack)
+    hRatio.GetYaxis().SetTitle("Ratio")
+    hRatio.GetYaxis().SetRangeUser(0.,2.)
+    hRatio.SetLabelSize(0.12, "X")
+    hRatio.SetLabelSize(0.07, "Y")
+    hRatio.SetTitleSize(0.13, "X")
+    hRatio.SetTitleSize(0.11, "Y")
+    hRatio.SetTitleOffset(0.25, "Y")
+    hRatio.SetTitleOffset(.9, "X")
+    hRatio.Draw("pe1")
 
   if not doLogy:
-    c1.Print("plotDump/compare_%s_%s_%s_%s.png"%(hList[0].GetName(),bM[0], jM, sSamp[0]))
+    c1.Print("plotDump/compare_%s_%s_%s_%s.%s"%(hList[0].GetName(),bM[0], jM, sSamp[0], conf.switches()["outFormat"]))
   else:
     c1.SetLogy(1)
-    c1.Print("plotDump/compar_%s_%s_%s_%s_log.png"%(hList[0].GetName(),bM[0], jM, sSamp[0]))
+    c1.Print("plotDump/compar_%s_%s_%s_%s_log.%s"%(hList[0].GetName(),bM[0], jM, sSamp[0], conf.switches()["outFormat"]))
 
 ###-------------------------------------------------------------------###
 
@@ -635,13 +635,16 @@ def getHistOrder(hList=None):
   maxVals = []
   myOrder = []
 
-  for h, i in zip(hList, range( len(hList) )):
+  for h in hList:
     maxVals.append(h.GetMaximum())
   tmpMax = sorted(maxVals, reverse=True)
 
   for i in range(len(tmpMax)):
     for k in range(len(maxVals)):
       if tmpMax[i] == maxVals[k]:
+        if k in myOrder:
+          Log.error("Repeat in order list. Check plots are non-identical.")
+          exit()
         myOrder.append(k)
 
   return myOrder
@@ -654,6 +657,8 @@ def doRanges(h=None, hD=None):
     if hD["xRange"]:
       ranges=hD["xRange"]
       h.GetXaxis().SetRangeUser(ranges[0], ranges[1])
+    if conf.switches()["printLogy"]:
+      h.SetMinimum(0.001)
   elif "TH2" in str( type(h) ):
     if hD["xRange"]:
       ranges=hD["xRange"]
