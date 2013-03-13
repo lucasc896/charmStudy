@@ -45,11 +45,9 @@ if conf.mode()=="anaPlots":
       if conf.switches()["plotMode"]=="anaPlots":
          anaP.runAnaPlots(debug=options.doDebug)
       elif conf.switches()["plotMode"]=="standardPlots":
-         anaP.runStandPlots(debug=options.doDebug)
+         anaP.runStandPlots(debug=options.doDebug, doLogy=conf.switches()["printLogy"])
       elif conf.switches()["plotMode"]=="comparisonPlots":
-         anaP.runComparPlots(debug=options.doDebug, doLogy=False)
-         if conf.switches()["printLogy"]:
-            anaP.runComparPlots(debug=options.doDebug, doLogy=True)         
+         anaP.runComparPlots(debug=options.doDebug, doLogy=conf.switches()["printLogy"])         
         
    elif conf.switches()["runMode"]=="yieldTables":
       Log.info(">>> Running yield tables\n")
