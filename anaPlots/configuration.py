@@ -14,7 +14,7 @@ import ROOT as r
 
 def mode():
   
-  anaMode = ["bTagEff", "anaPlots", "ISRSystem","dev"][2]
+  anaMode = ["bTagEff", "anaPlots", "ISRSystem","dev"][1]
 
   return anaMode
 
@@ -23,18 +23,44 @@ def mode():
 def switches():
 
   switches={
-          "runMode"       :["plotting", "yieldTables"][1],
+          "runMode"       :["plotting", "yieldTables"][0],
           "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][2],
           "runModeBTag"   :["charmFrac", "standardPlots", "charmPhi"][0],
-          "signalSample"  :"MuEG_2012",
-          "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT","parkedHT"][1],
-          "jetMulti"      :["le3j","ge4j","inc"][0],
+          "signalSample"  :"T2cc_Scan_NoFilter_ISRRW",
+          "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT","parkedHT"][0],
+          "jetMulti"      :["le3j","ge4j","inc"][2],
           "printLogy"     :[False, True][0],
           "norm"          :["None", "Unitary", "xSec", "lumi"][1],
-          "lumiNorm"      :[1, 10, 11.7][0]
+          "lumiNorm"      :[1, 10, 11.7][0],
+          "hiRes"         :[False, True][1], #Warning: Slow!
+          "outFormat"     :["png", "pdf"][1], #PDF for combinations
           }
 
   return switches
+
+###-------------------------------------------------------------------###
+
+def bMulti():
+  bMulti=[]
+  bMultiAll=["inc", "0b", "1b", "2b", "3b", "4b","ge1b","ge2b","ge3b","ge4b"]
+
+  include=[0]
+
+  for val in include:
+    bMulti.append(bMultiAll[val])
+
+  return bMulti
+
+###-------------------------------------------------------------------###
+
+def comparFiles():
+
+  comparFiles = ["T2bb_300", "T2cc_300"]
+  comparFiles = ["T2cc_220_195", "T2cc_220_170", "T2cc_220_145"]
+  comparFiles = ["T2cc_Scan_NoFilter_ISRRW_100_20", "T2cc_Scan_NoFilter_ISRRW"]
+  #comparFiles = ["T2cc_Scan_NoFilter_ISRRW_delta10", "T2cc_Scan_NoFilter_ISRRW_delta80", "T2cc_Scan_NoFilter_ISRRW_delta60", "T2cc_Scan_NoFilter_ISRRW_delta20", "T2cc_Scan_NoFilter_ISRRW_delta40"]
+
+  return comparFiles
 
 ###-------------------------------------------------------------------###
 
@@ -62,76 +88,21 @@ def sigFile():
 
   if mode()=="anaPlots":
     sigFile = {
-            "T2cc_Scan_Filter"          :["%sanaPlots_225/outT2cc_Filter_anaPlots.root"%inDir, 100.],
-            "T2cc_Scan_NoFilter"        :["%sanaPlots_225/outT2cc_NoFilter_anaPlots.root"%inDir, 100.],
-            "T2bb_300"                  :["%sanaPlots_new/outT2bb_300_anaPlots.root"%inDir, 100.],
-            "T2cc_160"                  :["%sanaPlots_225/outT2cc_160_anaPlots.root"%inDir, 100.],
-            "T2cc_300"                  :["%sanaPlots_225/outT2cc_300_anaPlots.root"%inDir, 100.],
-            "T2cc_220_145"              :["%sanaPlots_225/outT2cc_220_145_anaPlots.root"%inDir, 100.],
-            "T2cc_220_170"              :["%sanaPlots_225/outT2cc_220_170_anaPlots.root"%inDir, 100.],
-            "T2cc_220_195"              :["%sanaPlots_225/outT2cc_220_195_anaPlots.root"%inDir, 100.],
-            "T2cc_200"                  :["%sanaPlots_225/outT2cc_200_anaPlots.root"%inDir, 100.],
-            "T2cc_NF_200_120_cut"       :["%sanaPlots_225/outT2cc_Scan_NoFilter_200_120_cut_anaPlots.root"%inDir, 100.],
-            "T2cc_NF_200_190_cut"       :["%sanaPlots_225/outT2cc_Scan_NoFilter_200_190_cut_anaPlots.root"%inDir, 100.],
-            "T2cc_160_alphaT0p6"        :["%sanaPlots_225/outT2cc_160_anaPlots_alphaT0p6.root"%inDir, 100.],
-            "T2cc_300_alphaT0p6"        :["%sanaPlots_225/outT2cc_300_anaPlots_alphaT0p6.root"%inDir, 100.],
-            "T2cc_220_145_alphaT0p6"    :["%sanaPlots_225/outT2cc_220_145_anaPlots_alphaT0p6.root"%inDir, 100.],
-            "T2cc_220_170_alphaT0p6"    :["%sanaPlots_225/outT2cc_220_170_anaPlots_alphaT0p6.root"%inDir, 100.],
-            "T2cc_220_195_alphaT0p6"    :["%sanaPlots_225/outT2cc_220_195_anaPlots_alphaT0p6.root"%inDir, 100.],
-            "T2cc_200_alphaT0p6"        :["%sanaPlots_225/outT2cc_200_anaPlots_alphaT0p6.root"%inDir, 100.],         
-            "T2cc_160_flat50"           :["%sanaPlots_new/outT2cc_160_flat50_anaPlots.root"%inDir, 100.],
-            "T2cc_300_flat50"           :["%sanaPlots_new/outT2cc_300_flat50_anaPlots.root"%inDir, 100.],
-            "T2cc_220_145_flat50"       :["%sanaPlots_new/outT2cc_220_145_flat50_anaPlots.root"%inDir, 100.],
-            "T2cc_220_170_flat50"       :["%sanaPlots_new/outT2cc_220_170_flat50_anaPlots.root"%inDir, 100.],
-            "T2cc_220_195_flat50"       :["%sanaPlots_new/outT2cc_220_195_flat50_anaPlots.root"%inDir, 100.],
-            "T2cc_160_flat50_up10"      :["%sanaPlots_new/outT2cc_160_flat50_up10_anaPlots.root"%inDir, 100.],
-            "T2cc_300_flat50_up10"      :["%sanaPlots_new/outT2cc_300_flat50_up10_anaPlots.root"%inDir, 100.],
-            "T2cc_220_145_flat50_up10"  :["%sanaPlots_new/outT2cc_220_145_flat50_up10_anaPlots.root"%inDir, 100.],
-            "T2cc_220_170_flat50_up10"  :["%sanaPlots_new/outT2cc_220_170_flat50_up10_anaPlots.root"%inDir, 100.],
-            "T2cc_220_195_flat50_up10"  :["%sanaPlots_new/outT2cc_220_195_flat50_up10_anaPlots.root"%inDir, 100.],
-            "T2cc_160_flat50_up5"       :["%sanaPlots_new/outT2cc_160_flat50_up5_anaPlots.root"%inDir, 100.],
-            "T2cc_300_flat50_up5"       :["%sanaPlots_new/outT2cc_300_flat50_up5_anaPlots.root"%inDir, 100.],
-            "T2cc_220_145_flat50_up5"   :["%sanaPlots_new/outT2cc_220_145_flat50_up5_anaPlots.root"%inDir, 100.],
-            "T2cc_220_170_flat50_up5"   :["%sanaPlots_new/outT2cc_220_170_flat50_up5_anaPlots.root"%inDir, 100.],
-            "T2cc_220_195_flat50_up5"   :["%sanaPlots_new/outT2cc_220_195_flat50_up5_anaPlots.root"%inDir, 100.],
-            "T2cc_160_flat50_down10"    :["%sanaPlots_new/outT2cc_160_flat50_down10_anaPlots.root"%inDir, 100.],
-            "T2cc_300_flat50_down10"    :["%sanaPlots_new/outT2cc_300_flat50_down10_anaPlots.root"%inDir, 100.],
-            "T2cc_220_145_flat50_down10":["%sanaPlots_new/outT2cc_220_145_flat50_down10_anaPlots.root"%inDir, 100.],
-            "T2cc_220_170_flat50_down10":["%sanaPlots_new/outT2cc_220_170_flat50_down10_anaPlots.root"%inDir, 100.],
-            "T2cc_220_195_flat50_down10":["%sanaPlots_new/outT2cc_220_195_flat50_down10_anaPlots.root"%inDir, 100.],
-            "T2cc_160_flat50_down5"     :["%sanaPlots_new/outT2cc_160_flat50_down5_anaPlots.root"%inDir, 100.],
-            "T2cc_300_flat50_down5"     :["%sanaPlots_new/outT2cc_300_flat50_down5_anaPlots.root"%inDir, 100.],
-            "T2cc_220_145_flat50_down5" :["%sanaPlots_new/outT2cc_220_145_flat50_down5_anaPlots.root"%inDir, 100.],
-            "T2cc_220_170_flat50_down5" :["%sanaPlots_new/outT2cc_220_170_flat50_down5_anaPlots.root"%inDir, 100.],
-            "T2cc_220_195_flat50_down5" :["%sanaPlots_new/outT2cc_220_195_flat50_down5_anaPlots.root"%inDir, 100.],
-            "T2cc_160_JES_up10"         :["%sanaPlots_new/outT2cc_160_JES_up10_anaPlots.root"%inDir, 100.],
-            "T2cc_300_JES_up10"         :["%sanaPlots_new/outT2cc_300_JES_up10_anaPlots.root"%inDir, 100.],
-            "T2cc_220_145_JES_up10"     :["%sanaPlots_new/outT2cc_220_145_JES_up10_anaPlots.root"%inDir, 100.],
-            "T2cc_220_170_JES_up10"     :["%sanaPlots_new/outT2cc_220_170_JES_up10_anaPlots.root"%inDir, 100.],
-            "T2cc_220_195_JES_up10"     :["%sanaPlots_new/outT2cc_220_195_JES_up10_anaPlots.root"%inDir, 100.],
-            "T2cc_160_JES_up5"          :["%sanaPlots_new/outT2cc_160_JES_up5_anaPlots.root"%inDir, 100.],
-            "T2cc_300_JES_up5"          :["%sanaPlots_new/outT2cc_300_JES_up5_anaPlots.root"%inDir, 100.],
-            "T2cc_220_145_JES_up5"      :["%sanaPlots_new/outT2cc_220_145_JES_up5_anaPlots.root"%inDir, 100.],
-            "T2cc_220_170_JES_up5"      :["%sanaPlots_new/outT2cc_220_170_JES_up5_anaPlots.root"%inDir, 100.],
-            "T2cc_220_195_JES_up5"      :["%sanaPlots_new/outT2cc_220_195_JES_up5_anaPlots.root"%inDir, 100.],
-            "T2cc_160_JES_down10"       :["%sanaPlots_new/outT2cc_160_JES_down10_anaPlots.root"%inDir, 100.],
-            "T2cc_300_JES_down10"       :["%sanaPlots_new/outT2cc_300_JES_down10_anaPlots.root"%inDir, 100.],
-            "T2cc_220_145_JES_down10"   :["%sanaPlots_new/outT2cc_220_145_JES_down10_anaPlots.root"%inDir, 100.],
-            "T2cc_220_170_JES_down10"   :["%sanaPlots_new/outT2cc_220_170_JES_down10_anaPlots.root"%inDir, 100.],
-            "T2cc_220_195_JES_down10"   :["%sanaPlots_new/outT2cc_220_195_JES_down10_anaPlots.root"%inDir, 100.],
-            "T2cc_160_JES_down5"        :["%sanaPlots_new/outT2cc_160_JES_down5_anaPlots.root"%inDir, 100.],
-            "T2cc_300_JES_down5"        :["%sanaPlots_new/outT2cc_300_JES_down5_anaPlots.root"%inDir, 100.],
-            "T2cc_220_145_JES_down5"    :["%sanaPlots_new/outT2cc_220_145_JES_down5_anaPlots.root"%inDir, 100.],
-            "T2cc_220_170_JES_down5"    :["%sanaPlots_new/outT2cc_220_170_JES_down5_anaPlots.root"%inDir, 100.],
-            "T2cc_220_195_JES_down5"    :["%sanaPlots_new/outT2cc_220_195_JES_down5_anaPlots.root"%inDir, 100.],
-            "T2cc_160_ISRRW"            :["%sanaPlots_new/outT2cc_160_ISRRW_anaPlots.root"%inDir, 100.],
-            "T2cc_300_ISRRW"            :["%sanaPlots_new/outT2cc_300_ISRRW_anaPlots.root"%inDir, 100.],
-            "T2cc_220_145_ISRRW"        :["%sanaPlots_new/outT2cc_220_145_ISRRW_anaPlots.root"%inDir, 100.],
-            "T2cc_220_170_ISRRW"        :["%sanaPlots_new/outT2cc_220_170_ISRRW_anaPlots.root"%inDir, 100.],
-            "T2cc_220_195_ISRRW"        :["%sanaPlots_new/outT2cc_220_195_ISRRW_anaPlots.root"%inDir, 100.],
-            "T2cc_220_145_noCuts"        :["%sanaPlots_new/outT2cc_220_145_noCuts_anaPlots.root"%inDir, 100.],
-            "T2cc_220_170_noCuts"        :["%sanaPlots_new/outT2cc_220_170_noCuts_anaPlots.root"%inDir, 100.],
-            "T2cc_220_195_noCuts"        :["%sanaPlots_new/outT2cc_220_195_noCuts_anaPlots.root"%inDir, 100.],               
+            "T2cc_Scan_NoFilter"              :["%sanaPlots_225/outT2cc_NoFilter_anaPlots.root"%inDir, 100.],
+            "T2cc_Scan_NoFilter_ISRRW"        :["%sanaPlots_225/outT2cc_NoFilter_ISRRW13_anaPlots.root"%inDir, 100.],
+            "T2cc_Scan_NoFilter_ISRRW_delta10":["%sanaPlots_225/outT2cc_ISRRW13_delta10_anaPlots.root"%inDir, 100.],
+            "T2cc_Scan_NoFilter_ISRRW_delta20":["%sanaPlots_225/outT2cc_ISRRW13_delta20_anaPlots.root"%inDir, 100.],
+            "T2cc_Scan_NoFilter_ISRRW_delta30":["%sanaPlots_225/outT2cc_ISRRW13_delta30_anaPlots.root"%inDir, 100.],
+            "T2cc_Scan_NoFilter_ISRRW_delta40":["%sanaPlots_225/outT2cc_ISRRW13_delta40_anaPlots.root"%inDir, 100.],
+            "T2cc_Scan_NoFilter_ISRRW_delta60":["%sanaPlots_225/outT2cc_ISRRW13_delta60_anaPlots.root"%inDir, 100.],
+            "T2cc_Scan_NoFilter_ISRRW_delta80":["%sanaPlots_225/outT2cc_ISRRW13_delta80_anaPlots.root"%inDir, 100.],
+            "T2cc_Scan_NoFilter_ISRRW_100_20":["%sanaPlots_225/outT2cc_ISRRW13_100_20_anaPlots.root"%inDir, 100.],
+            "T2cc_160"                        :["%sanaPlots_225/outT2cc_160_anaPlots.root"%inDir, 100.],
+            "T2cc_300"                        :["%sanaPlots_225/outT2cc_300_anaPlots.root"%inDir, 100.],
+            "T2cc_220_145"                    :["%sanaPlots_225/outT2cc_220_145_anaPlots.root"%inDir, 100.],
+            "T2cc_220_170"                    :["%sanaPlots_225/outT2cc_220_170_anaPlots.root"%inDir, 100.],
+            "T2cc_220_195"                    :["%sanaPlots_225/outT2cc_220_195_anaPlots.root"%inDir, 100.],
+              
     }
   elif mode()=="bTagEff":
     sigFile={
@@ -163,17 +134,6 @@ def sigFile():
 
 
   return sigFile
-
-###-------------------------------------------------------------------###
-
-def comparFiles():
-
-  comparFiles = ["T2bb_300", "T2cc_300"]
-  comparFiles = ["T2cc_220_195", "T2cc_220_170", "T2cc_220_145"]
-  comparFiles = ["T2cc_Scan_Filter", "T2cc_Scan_NoFilter"]
-  comparFiles = ["T2cc_200", "T2cc_NF_200_120_cut"]
-
-  return comparFiles
 
 ###-------------------------------------------------------------------###
 
@@ -209,33 +169,22 @@ def inDirs():
 
 ###-------------------------------------------------------------------###
 
-def bMulti():
-  bMulti=[]
-  bMultiAll=["inc", "0b", "1b", "2b", "3b", "4b","ge1b","ge2b","ge3b","ge4b"]
-
-  include=[1]
-
-  for val in include:
-    bMulti.append(bMultiAll[val])
-
-  return bMulti
-
-###-------------------------------------------------------------------###
-
 def sinHists():
   if mode()=="anaPlots":
     singleHists={
-         "stopGenPtScal"       :plotDetails(xRange=[0.,1000.], rebX=4),
-         "stopGenPtVect"       :plotDetails(xRange=[0.,600.], rebX=2),
-         "delPhi_vs_scalGenPt" :plotDetails(xRange=[0., 900.], yRange=[0., 3.2], rebX=5), 
-         "dPhiStopCharm"       :plotDetails(xRange=[0.,3.2], rebX=2),
-         "dPhiStopStop"        :plotDetails(xRange=[0.,3.2], rebX=2),
-         "dPhiNeutCharm"       :plotDetails(xRange=[0.,3.2], rebX=2),
-         "dPhiCharmCharm"      :plotDetails(xRange=[0.,3.2], rebX=2),
-         "dPhiStopNeut"        :plotDetails(xRange=[0.,3.2], rebX=2),
-         #"n_Events_1"          :plotDetails(),
-         "n_Jets"              :plotDetails(xRange=[0.,8.]),
-         "n_BTagged_Jets_all"  :plotDetails(xRange=[0.,6.]),
+#       "stopGenPtScal"        :plotDetails(xRange=[0.,1000.], rebX=4),
+#       "stopGenPtVect"        :plotDetails(xRange=[0.,600.], rebX=2),
+#       #"delPhi_vs_scalGenPt"  :plotDetails(xRange=[0., 900.], yRange=[0., 3.2], rebX=5), 
+#       "dPhiStopCharm"        :plotDetails(xRange=[0.,3.2], rebX=2),
+#       "dPhiStopStop"         :plotDetails(xRange=[0.,3.2], rebX=2),
+#       #"dPhiNeutCharm"        :plotDetails(xRange=[0.,3.2], rebX=2),
+#       "dPhiCharmCharm"       :plotDetails(xRange=[0.,3.2], rebX=2),
+#       #"dPhiStopNeut"         :plotDetails(xRange=[0.,3.2], rebX=2),
+#       #"n_Events_1"           :plotDetails(),
+#       "n_Jets"               :plotDetails(xRange=[0.,8.]),
+#       "n_BTagged_Jets_all"   :plotDetails(xRange=[0.,6.]),
+#       "charmJetPt_0"         :plotDetails(xRange=[0., 350.], rebX=2),
+#       "charmJetPt_1"         :plotDetails(xRange=[0., 350.], rebX=2),
     }
   elif mode()=="bTagEff":
     singleHists={
@@ -264,14 +213,16 @@ def anaHists():
       "MET"               :plotDetails(xRange=[0.,900.], rebX=2),
       "MHT"               :plotDetails(xRange=[0.,900.],rebX=2),
       "commHT"            :plotDetails(xRange=[150.,1000.], rebX=2),
-      "hadronicAlphaTZoom":plotDetails(xRange=[0., 1.5], rebX=5),
-      "leadJetdelPhi"     :plotDetails(xRange=[0.,3.2], rebX=2),
-      "MHToverMET"        :plotDetails(xRange=[0.,2.], rebX=1),
-      "jetPt"             :plotDetails(xRange=[0.,500.], rebX=2),
-      "leadJetPt"         :plotDetails(xRange=[0.,800.], rebX=2),
-      "subLeadJetPt"      :plotDetails(xRange=[0.,500.], rebX=2),
-      #"alphaT_vs_HT"     :plotDetails(xRange=[0.,1.6], yRange=[0.,600.], rebX=2, rebY=2),
-      #"leadTwoJetsPt"     :plotDetails(xRange=[0.,300.], rebX=2),
+  #    "hadronicAlphaTZoom":plotDetails(xRange=[0., 1.5], rebX=5),
+  #    #"leadJetdelPhi"     :plotDetails(xRange=[0.,3.2], rebX=2),
+  #    "MHToverMET"        :plotDetails(xRange=[0.,2.], rebX=1),
+  #    "jetPt"             :plotDetails(xRange=[0.,500.], rebX=2),
+  #    "leadJetPt"         :plotDetails(xRange=[0.,800.], rebX=2),
+  #    "subLeadJetPt"      :plotDetails(xRange=[0.,500.], rebX=2),
+  #    "thirdJetPt"           :plotDetails(xRange=[0., 300.], rebX=2),
+  #    "fourthJetPt"           :plotDetails(xRange=[0., 200.], rebX=2),
+  #    #"alphaT_vs_HT"     :plotDetails(xRange=[0.,1.6], yRange=[0.,600.], rebX=2, rebY=2),
+  #    #"leadTwoJetsPt"     :plotDetails(xRange=[0.,300.], rebX=2),
     }
   elif mode()=="bTagEff":
     hists={}
