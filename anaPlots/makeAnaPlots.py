@@ -98,6 +98,8 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
   sigSamp     = conf.switches()["signalSample"]
   jMulti      = conf.switches()["jetMulti"]
 
+  print dirs
+
   # override the global signal sample if running comparison plots
   if comparSamp: sigSamp = comparSamp
 
@@ -118,7 +120,10 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
   rFile = r.TFile.Open(sFile[sigSamp][0])
   if debug: Log.debug(str(rFile))
 
-  c1 = r.TCanvas()
+  if conf.switches()["hiRes"]:
+    c1 = r.TCanvas("c1", "c1", 1600, 1200)
+  else: 
+    c1 = r.TCanvas()
 
   outHists = []
 
@@ -141,18 +146,11 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
       
       doRanges(hTot, pDet)
 
-      if "TH2D" in str( type(hTot) ):
-        hTot.Draw("colz")
-      elif "TH1D" in str( type(hTot) ):
-        hTot.Draw("hist")
+      width_ = hTot.GetBinWidth(1)
+      yTitle_ = hTot.GetYaxis().GetTitle()
+      hTot.GetYaxis().SetTitle(yTitle_+"/"+str(width_))
 
-      outHists.append(hTot)  
-
-      if printPlots:
-        if "noCut" not in conf.switches()["HTcuts"]:
-          c1.Print("plotDump/%s_%s_%s_%s.png"%(sigSamp, hT, b, jMulti))
-        else:
-          c1.Print("plotDump/%s_%s_%s_%s.png"%(sigSamp, hT, b, "noCuts"))   
+      outHists.append(hTot)    
   
   #plot single plots
   for hT, pDet in sinHists.iteritems():
@@ -170,18 +168,27 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
     
     doRanges(hTot, pDet)
 
-    if "TH2" in str( type(hTot) ): 
-      hTot.Draw("colz")
-    elif "TH1" in str( type(hTot) ):
-      hTot.Draw("hist")
+    width_ = hTot.GetBinWidth(1)
+    yTitle_ = hTot.GetYaxis().GetTitle()
+    hTot.GetYaxis().SetTitle(yTitle_+"/"+str(width_))
 
-    outHists.append(hTot)  
+    outHists.append(hTot)
+
     
-    if printPlots:
-        if "noCut" not in conf.switches()["HTcuts"]:
-          c1.Print("plotDump/%s_%s_%s.png"%(sigSamp, hT, jMulti))
-        else:
-          c1.Print("plotDump/%s_%s_%s.png"%(sigSamp, hT, "noCuts"))
+  if printPlots:
+    for h_ in outHists:
+      if "TH2D" in str( type(h_) ):
+        h_.Draw("colz")
+      elif "TH1D" in str( type(h_) ):
+        if doLogy: c1.SetLogy(1)
+        h_.Draw("hist")
+      suf = ""
+      if doLogy: suf="_log"
+
+      if "noCut" not in conf.switches()["HTcuts"]:
+        c1.Print("plotDump/%s_%s_%s_%s%s.%s"%(sigSamp, h_.GetName(), b, jMulti, suf, conf.switches()["outFormat"]))
+      else:
+        c1.Print("plotDump/%s_%s_%s_%s%s.%s"%(sigSamp, h_.GetName(), b, "noCuts", suf, conf.switches()["outFormat"]))
   
   return outHists
 
@@ -210,4 +217,3 @@ def runComparPlots(debug=False, doLogy=False):
     for k in range( len(hList) ):
       hComp.append(hList[k][i])
     comparPlots(hComp, debug=debug, doLogy=doLogy)
-
