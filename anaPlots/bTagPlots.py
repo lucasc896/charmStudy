@@ -171,7 +171,9 @@ def jetCharmFrac(debug=False):
 
    c1.SetCanvasSize(1400, 1000)
 
-   for iF in inFiles:
+   colours = [r.kRed, r.kBlue, r.kViolet]
+
+   for iF, col in zip(inFiles, colours):
       hList=[]
       g = r.TGraph(4)
       rFile = r.TFile().Open(sFile[iF][0])
@@ -188,7 +190,7 @@ def jetCharmFrac(debug=False):
          hList.append(hT)
 
       ctr1=0
-      for hT in hList:   
+      for hT in hList:
          charmFrac = hT.GetBinContent(5)/hT.GetEntries()
          g.SetPoint(ctr1, ctr1, charmFrac)
 
@@ -207,16 +209,26 @@ def jetCharmFrac(debug=False):
       g.SetMarkerSize(8)
 
       # work out a better way of doing this
-      if "195" in iF: g.SetMarkerColor(r.kRed)
-      if "195_pt50" in iF: g.SetMarkerColor(r.kRed-2)
-      if "170" in iF: g.SetMarkerColor(r.kBlue)
-      if "170_pt50" in iF: g.SetMarkerColor(r.kBlue-2)
-      if "145" in iF: g.SetMarkerColor(r.kViolet)
-      if "145_pt50" in iF: g.SetMarkerColor(r.kViolet+2)
-      if "300" in iF: g.SetMarkerColor(r.kGreen-2)
-      if "160" in iF: g.SetMarkerColor(r.kOrange)
+      #if "195" in iF: g.SetMarkerColor(r.kRed)
+      #if "195_pt50" in iF: g.SetMarkerColor(r.kRed-2)
+      #if "170" in iF: g.SetMarkerColor(r.kBlue)
+      #if "170_pt50" in iF: g.SetMarkerColor(r.kBlue-2)
+      #if "145" in iF: g.SetMarkerColor(r.kViolet)
+      #if "145_pt50" in iF: g.SetMarkerColor(r.kViolet+2)
+      #if "300" in iF: g.SetMarkerColor(r.kGreen-2)
+      #if "160" in iF: g.SetMarkerColor(r.kOrange)
 
-      lg.AddEntry(g, iF, "P")
+      g.SetMarkerColor(col)
+
+      if "_ISRRW_JES+ve" in iF:
+         entTitle = "T2cc_JES+ve"
+      elif "_ISRRW_JES-ve" in iF:
+         entTitle = "T2cc_JES-ve"
+      elif "_ISRRW" in iF:
+         entTitle = "T2cc_noJES"
+      else: entTitle=iF
+
+      lg.AddEntry(g, entTitle, "P")
       mg.Add(g)
 
    mg.SetTitle("Charm Fraction; Jet Rank (pT ordered); genCharm Frac.")
@@ -234,7 +246,7 @@ def jetCharmFrac(debug=False):
    lg.SetFillColor(0)
    lg.Draw()
    c1.SetGrid(1)
-   c1.Print("plotDump/total_charmFrac.png")
+   c1.Print("plotDump/total_charmFrac.%s"%conf.switches()["outFormat"])
 
 ###-------------------------------------------------------------------###
 
