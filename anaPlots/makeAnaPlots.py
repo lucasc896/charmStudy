@@ -98,8 +98,6 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
   sigSamp     = conf.switches()["signalSample"]
   jMulti      = conf.switches()["jetMulti"]
 
-  print dirs
-
   # override the global signal sample if running comparison plots
   if comparSamp: sigSamp = comparSamp
 
@@ -148,7 +146,7 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
 
       width_ = hTot.GetBinWidth(1)
       yTitle_ = hTot.GetYaxis().GetTitle()
-      hTot.GetYaxis().SetTitle(yTitle_+"/"+str(width_))
+      hTot.GetYaxis().SetTitle(yTitle_+" / %.1f GeV"%width_)
 
       outHists.append(hTot)    
   
