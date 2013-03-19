@@ -513,7 +513,7 @@ def comparPlots(hList=None, debug=None, doLogy=False):
     if "TH2" in str( type(h) ): return
 
   #defult colors
-  colors = [r.kRed, r.kBlue, r.kGreen, r.kCyan, r.kMagenta]
+  colors = [r.kRed, r.kBlue, r.kGreen, r.kCyan, r.kMagenta, r.kYellow-1]
 
   colorDict = {
         "T2cc_160":r.kRed,
@@ -543,18 +543,21 @@ def comparPlots(hList=None, debug=None, doLogy=False):
   elif len(hList)==4:
     lg = r.TLegend(0.64, 0.64, 0.895, 0.89)
   elif len(hList)==5:
-    lg = r.TLegend(0.65, 0.61, 0.895, 0.89)
-
+    lg = r.TLegend(0.55, 0.6, 0.945, 0.94)
+  elif len(hList)==6:
+    lg = r.TLegend(0.65, 0.57, 0.895, 0.89)
   hOrder = getHistOrder(hList)
 
   if len(hList)==2:
     pd1 = r.TPad("pd1", "pd1", 0., 0.3, 1., 1.)
     pd1.SetBottomMargin(0.005)
+    pd1.SetRightMargin(0.05)
     pd1.Draw()
 
     pd2 = r.TPad("pd2", "pd2", 0., 0.02, 1., 0.3)
     pd2.SetTopMargin(0.05)
-    pd2.SetBottomMargin(0.22)
+    pd2.SetBottomMargin(0.26)
+    pd2.SetRightMargin(0.05)
     pd2.SetGridx(1)
     pd2.SetGridy(1)
     pd2.Draw()
@@ -569,17 +572,29 @@ def comparPlots(hList=None, debug=None, doLogy=False):
     if entTitle == "T2cc_200": entTitle="Pythia"
     elif entTitle == "T2cc_NF_200_120_cut": entTitle="Madgraph"
     elif "_delta" in entTitle: entTitle = entTitle.split("_")[0]+"_"+entTitle.split("_")[-1]
+    elif "_100_" in entTitle: entTitle = "mStop=%s, mLSP=%s"%(entTitle.split("_")[-2], entTitle.split("_")[-1])
+
     lg.AddEntry(hList[i], entTitle, "L")
 
     if ctr==0:
-      hList[i].Draw("hist e")
-    else: hList[i].Draw("histsame e")
-
+      #hList[i].Draw("hist e")
+      hList[i].Draw("hist")
+    else:
+      #hList[i].Draw("histsame e")
+      hList[i].Draw("histsame")
     ctr+=1
 
   hList[hOrder[0]].SetLabelSize(0.04,"Y")
-  hList[hOrder[0]].SetTitleOffset(0.7, "Y")
-  hList[hOrder[0]].SetTitleSize(0.05, "Y")
+  hList[hOrder[0]].SetTitleOffset(1.2, "Y")
+  hList[hOrder[0]].SetTitleSize(0.04, "Y")
+
+  if len(hList)>2:
+    hList[hOrder[0]].SetTitleSize(0.06, "X")
+    hList[hOrder[0]].SetTitleOffset(0.8, "X")
+    r.gPad.SetLeftMargin(0.12)
+    r.gPad.SetRightMargin(0.05)
+    r.gPad.SetTopMargin(0.05)
+    r.gPad.SetBottomMargin(0.12)
 
   lg.SetFillColor(0)
   lg.SetFillStyle(0)
@@ -607,10 +622,12 @@ def comparPlots(hList=None, debug=None, doLogy=False):
     hRatio.Draw("pe1")
 
   if not doLogy:
-    c1.Print("plotDump/compare_%s_%s_%s_%s.%s"%(hList[0].GetName(),bM[0], jM, sSamp[0], conf.switches()["outFormat"]))
+    c1.Print("plotDump/compare_%s_%s_%s_%s%s.%s"%(hList[0].GetName(),bM[0], jM, sSamp[0].split("_")[0], 
+      "_noCuts" if "noCut" in conf.switches()["HTcuts"] else "", conf.switches()["outFormat"]))
   else:
     c1.SetLogy(1)
-    c1.Print("plotDump/compar_%s_%s_%s_%s_log.%s"%(hList[0].GetName(),bM[0], jM, sSamp[0], conf.switches()["outFormat"]))
+    c1.Print("plotDump/compar_%s_%s_%s_%s_%slog.%s"%(hList[0].GetName(),bM[0], jM, sSamp[0].split("_")[0], 
+      "noCuts_" if "noCut" in conf.switches()["HTcuts"] else "", conf.switches()["outFormat"]))
 
 ###-------------------------------------------------------------------###
 
@@ -644,7 +661,8 @@ def getHistOrder(hList=None):
       if tmpMax[i] == maxVals[k]:
         if k in myOrder:
           Log.error("Repeat in order list. Check plots are non-identical.")
-          exit()
+          Log.error("Plot: %s"%hList[0].GetName())
+          #exit()
         myOrder.append(k)
 
   return myOrder
@@ -679,13 +697,13 @@ def normalise(h=None, normVal=1.):
 
 ###-------------------------------------------------------------------###
 
-def setChrisStyle(generic=False, multiPlot=False, anaPlot=False):
+def setChrisStyle(style="g"):
 
-  if generic:
+  if style=="g":
+    r.gPad.SetRightMargin(0.3)
+  elif style=="m":
     pass
-  elif multiPlot:
-    pass
-  elif anaPlot:
+  elif style=="a":
     pass
   pass
 
