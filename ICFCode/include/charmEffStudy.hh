@@ -73,7 +73,8 @@ namespace Operation {
   
       std::vector<TH2D*>  h_Thresh_v_BTagEff;
       std::vector<TH2D*>  h_Thresh_v_CTagEff;
-     
+      std::vector<TH2D*>  h_susyScanPlane;
+      std::vector<TH2D*>  h_SMS_anyCharm;
   };
 
 }
