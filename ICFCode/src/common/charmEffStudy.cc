@@ -200,6 +200,21 @@ void charmEffStudy::StandardPlots() {
       ";bothLeadCharm;# count",
       3, 0., 3.,
       1, 0, 1, false);
+
+   BookHistArray(h_susyScanPlane,
+      "susyScanPlane",
+      ";mSQ (GeV); mLSP (GeV)",
+      80, 0., 400., 
+      80, 0., 400.,
+      1, 0, 1, false);
+
+   BookHistArray(h_SMS_anyCharm,
+      "h_SMS_anyCharm",
+      ";mSQ (GeV); mLSP (GeV)",
+      80, 0., 400., 
+      80, 0., 400.,
+      1, 0, 1, false);
+
 }
 
 
@@ -221,6 +236,7 @@ bool charmEffStudy::StandardPlots( Event::Data& ev ) {
    int nbjet[3], nbjetMatchB[3], nbjetMatchC[3], nbjetMatchL[3];
    int njet=0, nJetMatchB=0, nJetMatchC=0, nJetMatchL=0;
    double bTagAlgoCut[3]={.898,.679,.244};
+   double evWeight = ev.GetEventWeight();
 
    for(int i=0; i<3; i++){
       nbjetMatchB[i]=0;
@@ -232,6 +248,25 @@ bool charmEffStudy::StandardPlots( Event::Data& ev ) {
    // a couple event level vetoes
    if (!StandardPlots_) return true;
    if( nobjkt < nMin_ || nobjkt > nMax_ ) return true;
+
+   //do some SMS stuff
+   double M0 = 0.;
+   double M12 = 0.;
+
+   if(ev.M0.enabled()){
+      M0 = ev.M0();
+   }
+   if(ev.MG.enabled()){
+      M0 = ev.MG();
+   }
+   if(ev.MLSP.enabled()){
+      M12 = ev.MLSP();
+   }
+   if(ev.M12.enabled()){
+      M12 = ev.M12();
+   }
+
+   h_susyScanPlane[0]->Fill( M0, M12, evWeight );
 
 
    // loop over common jets
@@ -331,13 +366,28 @@ bool charmEffStudy::StandardPlots( Event::Data& ev ) {
       h_nBTagJetsMatchL[i]->Fill(nbjetMatchL[i]);
    }
 
+
+   //find if any of the 3 lead jets is a charm
+   bool charmMatch = false;
+   for(unsigned int i=0; i<njet; i++){
+      if (i<3){
+         if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(i)->GetIndex())) == 4) charmMatch=true;
+      }
+   }
+   if (charmMatch) h_SMS_anyCharm[0]->Fill(M0, M12, evWeight);
+
+
    // get the two genCharms
    Event::GenObject gCharm1(0.,0.,0.,0.,0,0,0,0);
    Event::GenObject gCharm2(0.,0.,0.,0.,0,0,0,0);
+   Event::GenObject gStop1(0.,0.,0.,0.,0,0,0,0);
+   Event::GenObject gStop2(0.,0.,0.,0.,0,0,0,0);
    for( std::vector<Event::GenObject>::const_iterator igen = ev.GenParticles().begin(); igen != ev.GenParticles().end(); ++igen ){
       if( (*igen).GetStatus() == 3 ){   
-         if( (fabs((*igen).GetID()) == 4) && ((*igen).GetMotherID() == 1000006) )         gCharm1 = *igen;
-         if( (fabs((*igen).GetID()) == 4) && ((*igen).GetMotherID() == -1000006) )        gCharm2 = *igen;
+         if( (fabs((*igen).GetID()) == 4) && ((*igen).GetMotherID() == 1000006) )    gCharm1 = *igen;
+         if( (fabs((*igen).GetID()) == 4) && ((*igen).GetMotherID() == -1000006) )   gCharm2 = *igen;
+         if( (fabs((*igen).GetID() == 1000006)))    gStop1 = *igen;
+         if( (fabs((*igen).GetID() == -1000006)))   gStop2 = *igen;
       }
 
    }
