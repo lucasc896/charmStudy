@@ -75,13 +75,13 @@ void ISRSystematic::StandardPlots() {
 
    BookHistArray(h_ISRsystem_pT,
       "ISRsystem_pT",
-      ";;# count",
+      ";ISR system pT (GeV);# count",
       100, 0., 800.,
       1, 0, 1, false);
 
    BookHistArray(h_ttbarsystem_pT,
       "ttbarsystem_pT",
-      ";;# count",
+      ";ttbar system pT (GeV);# count",
       100, 0., 800.,
       1, 0, 1, false);
 
@@ -100,13 +100,7 @@ void ISRSystematic::StandardPlots() {
    BookHistArray(h_LDMuon_n,
       "LDMuon_n",
       ";;# count",
-      9, 0., 8.,
-      1, 0, 1, false); 
-
-   BookHistArray(h_LDMuonCommon_n,
-      "LDMuonCommon_n",
-      ";;# count",
-      9, 0., 8.,
+      9, 0., 9.,
       1, 0, 1, false); 
 
    BookHistArray(h_LDMuon_pT,
@@ -125,37 +119,103 @@ void ISRSystematic::StandardPlots() {
       "LDMuon_iso",
       ";;# count",
       100, 0., 5.,
+      1, 0, 1, false);
+
+   BookHistArray(h_LDMuon_isMuon,
+      "LDMuon_isMuon",
+      ";;# count",
+      2, 0., 2.,
       1, 0, 1, false);   
 
-   BookHistArray(h_LDEle_n,
-      "LDEle_n",
+   BookHistArray(h_LDCommonMuon_n,
+      "LDCommonMuon_n",
       ";;# count",
-      9, 0., 8.,
-      1, 0, 1, false); 
+      9, 0., 9.,
+      1, 0, 1, false);
 
-   BookHistArray(h_LDEleCommon_n,
-      "LDEleCommon_n",
-      ";;# count",
-      9, 0., 8.,
-      1, 0, 1, false); 
-
-   BookHistArray(h_LDEle_pT,
-      "LDEle_pT",
+   BookHistArray(h_LDCommonMuon_pT,
+      "LDCommonMuon_pT",
       ";;# count",
       100, 0., 800.,
       1, 0, 1, false);
 
-   BookHistArray(h_LDEle_eta,
-      "LDEle_eta",
+   BookHistArray(h_LDCommonMuon_eta,
+      "LDCommonMuon_eta",
       ";;# count",
       50, -5., 5.,
       1, 0, 1, false);   
 
-   BookHistArray(h_LDEle_iso,
-      "LDEle_iso",
+   BookHistArray(h_LDCommonMuon_iso,
+      "LDCommonMuon_iso",
       ";;# count",
       100, 0., 5.,
-      1, 0, 1, false);  
+      1, 0, 1, false);
+
+   BookHistArray(h_LDCommonMuon_isMuon,
+      "LDCommonMuon_isMuon",
+      ";;# count",
+      2, 0., 2.,
+      1, 0, 1, false);
+
+   BookHistArray(h_LDElectron_n,
+      "LDElectron_n",
+      ";;# count",
+      9, 0., 9.,
+      1, 0, 1, false); 
+
+   BookHistArray(h_LDElectron_pT,
+      "LDElectron_pT",
+      ";;# count",
+      100, 0., 800.,
+      1, 0, 1, false);
+
+   BookHistArray(h_LDElectron_eta,
+      "LDElectron_eta",
+      ";;# count",
+      50, -5., 5.,
+      1, 0, 1, false);   
+
+   BookHistArray(h_LDElectron_iso,
+      "LDElectron_iso",
+      ";;# count",
+      100, 0., 5.,
+      1, 0, 1, false);
+
+   BookHistArray(h_LDElectron_isElectron,
+      "LDElectron_isElectron",
+      ";;# count",
+      2, 0., 2.,
+      1, 0, 1, false);   
+
+   BookHistArray(h_LDCommonElectron_n,
+      "LDCommonElectron_n",
+      ";;# count",
+      9, 0., 9.,
+      1, 0, 1, false); 
+
+   BookHistArray(h_LDCommonElectron_pT,
+      "LDCommonElectron_pT",
+      ";;# count",
+      100, 0., 800.,
+      1, 0, 1, false);
+
+   BookHistArray(h_LDCommonElectron_eta,
+      "LDCommonElectron_eta",
+      ";;# count",
+      50, -5., 5.,
+      1, 0, 1, false);   
+
+   BookHistArray(h_LDCommonElectron_iso,
+      "LDCommonElectron_iso",
+      ";;# count",
+      100, 0., 5.,
+      1, 0, 1, false);
+
+   BookHistArray(h_LDCommonElectron_isElectron,
+      "LDCommonElectron_isElectron",
+      ";;# count",
+      2, 0., 2.,
+      1, 0, 1, false);
 
 }
 
@@ -182,25 +242,41 @@ bool ISRSystematic::StandardPlots( Event::Data& ev ) {
    for(unsigned int l=0; l<ev.LD_Muons().size(); l++){
       h_LDMuon_pT[0]->Fill(ev.LD_Muons().at(l).Pt(), evWeight);
       h_LDMuon_eta[0]->Fill(ev.LD_Muons().at(l).Eta(), evWeight);
-      h_LDMuon_iso[0]->Fill(ev.LD_Muons().at(l).GetCombIsolation(), evWeight);
+      h_LDMuon_iso[0]->Fill(ev.LD_Muons().at(l).GetPFIsolation(), evWeight);
+      h_LDMuon_isMuon[0]->Fill(ev.muonIsGlobalMuon()->at(ev.LD_Muons().at(l).GetIndex()), evWeight);
+   }
+   for(unsigned int l=0; l<ev.LD_CommonMuons().accepted.size(); l++){
+      h_LDCommonMuon_pT[0]->Fill(ev.LD_CommonMuons().accepted.at(l)->Pt(), evWeight);
+      h_LDCommonMuon_eta[0]->Fill(ev.LD_CommonMuons().accepted.at(l)->Eta(), evWeight);
+      h_LDCommonMuon_iso[0]->Fill(ev.LD_CommonMuons().accepted.at(l)->GetPFIsolation(), evWeight);
+      h_LDCommonMuon_isMuon[0]->Fill(ev.muonIsGlobalMuon()->at(ev.LD_CommonMuons().accepted.at(l)->GetIndex()), evWeight);
    }
    h_LDMuon_n[0]->Fill(ev.LD_Muons().size(), evWeight);
-   h_LDMuonCommon_n[0]->Fill(ev.LD_CommonMuons().accepted.size(), evWeight);
+   h_LDCommonMuon_n[0]->Fill(ev.LD_CommonMuons().accepted.size(), evWeight);
 
    // fill some raw electron info
    for(unsigned int l=0; l<ev.LD_Electrons().size(); l++){
-      h_LDEle_pT[0]->Fill(ev.LD_Electrons().at(l).Pt(), evWeight);
-      h_LDEle_eta[0]->Fill(ev.LD_Electrons().at(l).Eta(), evWeight);
-      h_LDEle_iso[0]->Fill(ev.LD_Electrons().at(l).GetCombIsolation(), evWeight);
+      h_LDElectron_pT[0]->Fill(ev.LD_Electrons().at(l).Pt(), evWeight);
+      h_LDElectron_eta[0]->Fill(ev.LD_Electrons().at(l).Eta(), evWeight);
+      h_LDElectron_iso[0]->Fill(ev.LD_Electrons().at(l).GetPFIsolation(), evWeight);
    }
-   h_LDEle_n[0]->Fill(ev.LD_Electrons().size(), evWeight);
-   h_LDEleCommon_n[0]->Fill(ev.LD_CommonElectrons().accepted.size(), evWeight);
+   for(unsigned int l=0; l<ev.LD_CommonElectrons().accepted.size(); l++){
+      h_LDCommonElectron_pT[0]->Fill(ev.LD_CommonElectrons().accepted.at(l)->Pt(), evWeight);
+      h_LDCommonElectron_eta[0]->Fill(ev.LD_CommonElectrons().accepted.at(l)->Eta(), evWeight);
+      h_LDCommonElectron_iso[0]->Fill(ev.LD_CommonElectrons().accepted.at(l)->GetPFIsolation(), evWeight);
+   }
+   h_LDElectron_n[0]->Fill(ev.LD_Electrons().size(), evWeight);
+   h_LDCommonElectron_n[0]->Fill(ev.LD_CommonElectrons().accepted.size(), evWeight);
 
    h_nEvents[0]->Fill( .5 );
 
    // A couple event level vetoes
    if (!StandardPlots_) return true;
    if( nobjkt < nMin_ || nobjkt > nMax_ ) return true;
+
+   // Check leptonic event content
+   if (ev.LD_CommonMuons().accepted.size()!=1) return true;
+   if (ev.LD_CommonElectrons().accepted.size()!=1) return true;
 
    h_nEvents[1]->Fill( .5, evWeight );
 
@@ -229,13 +305,6 @@ bool ISRSystematic::StandardPlots( Event::Data& ev ) {
    h_nBTagJets[0] ->Fill(nbjet, evWeight);
    h_nJets[0]     ->Fill(nCommJet, evWeight);
 
-
-   // Check leptonic event content
-   if (ev.LD_CommonMuons().accepted.size()!=1) return true;
-   if (ev.LD_CommonElectrons().accepted.size()!=1) return true;
-
-
-
    // Calculate ISR system jetPt
    double isrJetPt = 0.;
 
@@ -248,7 +317,16 @@ bool ISRSystematic::StandardPlots( Event::Data& ev ) {
 
    }
 
-   h_ISRsystem_pT[0]->Fill(isrJetPt, evWeight);
+   if (isrJetPt>0.) h_ISRsystem_pT[0]->Fill(isrJetPt, evWeight);
+
+   // Calculate ttbar system Pt for shiggles
+   double ttbarPt = 0.;
+   ttbarPt += ev.LD_CommonMuons().accepted.at(0)->Pt();
+   ttbarPt += ev.LD_CommonElectrons().accepted.at(0)->Pt();
+   ttbarPt += ev.JD_CommonJets().accepted.at(bIndex_0)->Pt();
+   ttbarPt += ev.JD_CommonJets().accepted.at(bIndex_1)->Pt();
+
+   h_ttbarsystem_pT[0]->Fill( ttbarPt, evWeight );
 
    return true;
 
