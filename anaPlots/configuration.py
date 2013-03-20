@@ -24,15 +24,15 @@ def switches():
 
   switches={
           "runMode"       :["plotting", "yieldTables"][0],
-          "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][2],
+          "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][1],
           "runModeBTag"   :["charmFrac", "standardPlots", "charmPhi"][0],
-          "signalSample"  :"T2cc_Scan_NoFilter_ISRRW",
+          "signalSample"  :"T2cc_Scan_NoFilter_ISRRW_Stop100",
           "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT","parkedHT"][0],
           "jetMulti"      :["le3j","ge4j","inc"][2],
           "printLogy"     :[False, True][0],
           "norm"          :["None", "Unitary", "xSec", "lumi"][1],
           "lumiNorm"      :[1, 10, 11.7][0],
-          "hiRes"         :[False, True][1], #Warning: Slow!
+          "hiRes"         :[False, True][1], #Warning: Slow for png!
           "outFormat"     :["png", "pdf"][1], #PDF for combinations
           }
 
@@ -57,8 +57,13 @@ def comparFiles():
 
   comparFiles = ["T2bb_300", "T2cc_300"]
   comparFiles = ["T2cc_220_195", "T2cc_220_170", "T2cc_220_145"]
-  comparFiles = ["T2cc_Scan_NoFilter_ISRRW_100_20", "T2cc_Scan_NoFilter_ISRRW"]
+  comparFiles = ["T2cc_Scan_NoFilter_ISRRW_100_20",
+                  "T2cc_Scan_NoFilter_ISRRW_100_40",
+                  "T2cc_Scan_NoFilter_ISRRW_100_60",
+                  "T2cc_Scan_NoFilter_ISRRW_100_80",
+                  "T2cc_Scan_NoFilter_ISRRW_100_90",]
   #comparFiles = ["T2cc_Scan_NoFilter_ISRRW_delta10", "T2cc_Scan_NoFilter_ISRRW_delta80", "T2cc_Scan_NoFilter_ISRRW_delta60", "T2cc_Scan_NoFilter_ISRRW_delta20", "T2cc_Scan_NoFilter_ISRRW_delta40"]
+  comparFiles = ["T2cc_Scan_NoFilter_ISRRW_Stop100_Vect100", "T2cc_Scan_NoFilter_ISRRW_Stop175_Vect100", "T2cc_Scan_NoFilter_ISRRW_Stop250_Vect100"]
 
   return comparFiles
 
@@ -88,8 +93,8 @@ def sigFile():
 
   if mode()=="anaPlots":
     sigFile = {
-            "T2cc_Scan_NoFilter"              :["%sanaPlots_225/outT2cc_NoFilter_anaPlots.root"%inDir, 100.],
-            "T2cc_Scan_NoFilter_ISRRW"        :["%sanaPlots_225/outT2cc_NoFilter_ISRRW13_anaPlots.root"%inDir, 100.],
+            "T2cc_Scan_NoFilter"              :["%sanaPlots_225/outT2cc_anaPlots.root"%inDir, 100.],
+            "T2cc_Scan_NoFilter_ISRRW"        :["%sanaPlots_225/outT2cc_ISRRW13_anaPlots.root"%inDir, 100.],
             "T2cc_Scan_NoFilter_ISRRW_delta10":["%sanaPlots_225/outT2cc_ISRRW13_delta10_anaPlots.root"%inDir, 100.],
             "T2cc_Scan_NoFilter_ISRRW_delta20":["%sanaPlots_225/outT2cc_ISRRW13_delta20_anaPlots.root"%inDir, 100.],
             "T2cc_Scan_NoFilter_ISRRW_delta30":["%sanaPlots_225/outT2cc_ISRRW13_delta30_anaPlots.root"%inDir, 100.],
@@ -97,6 +102,17 @@ def sigFile():
             "T2cc_Scan_NoFilter_ISRRW_delta60":["%sanaPlots_225/outT2cc_ISRRW13_delta60_anaPlots.root"%inDir, 100.],
             "T2cc_Scan_NoFilter_ISRRW_delta80":["%sanaPlots_225/outT2cc_ISRRW13_delta80_anaPlots.root"%inDir, 100.],
             "T2cc_Scan_NoFilter_ISRRW_100_20":["%sanaPlots_225/outT2cc_ISRRW13_100_20_anaPlots.root"%inDir, 100.],
+            "T2cc_Scan_NoFilter_ISRRW_100_40":["%sanaPlots_225/outT2cc_ISRRW13_100_40_anaPlots.root"%inDir, 100.],
+            "T2cc_Scan_NoFilter_ISRRW_100_60":["%sanaPlots_225/outT2cc_ISRRW13_100_60_anaPlots.root"%inDir, 100.],
+            "T2cc_Scan_NoFilter_ISRRW_100_70":["%sanaPlots_225/outT2cc_ISRRW13_100_70_anaPlots.root"%inDir, 100.],
+            "T2cc_Scan_NoFilter_ISRRW_100_80":["%sanaPlots_225/outT2cc_ISRRW13_100_80_anaPlots.root"%inDir, 100.],
+            "T2cc_Scan_NoFilter_ISRRW_100_90":["%sanaPlots_225/outT2cc_ISRRW13_100_90_anaPlots.root"%inDir, 100.],
+            "T2cc_Scan_NoFilter_ISRRW_Stop100":["%sanaPlots_225/outT2cc_ISRRW13_Stop100_anaPlots.root"%inDir, 100.],
+            "T2cc_Scan_NoFilter_ISRRW_Stop175":["%sanaPlots_225/outT2cc_ISRRW13_Stop175_anaPlots.root"%inDir, 100.],
+            "T2cc_Scan_NoFilter_ISRRW_Stop250":["%sanaPlots_225/outT2cc_ISRRW13_Stop250_anaPlots.root"%inDir, 100.],
+            "T2cc_Scan_NoFilter_ISRRW_Stop100_Vect100":["%sanaPlots_225/outT2cc_ISRRW13_Stop100_Vect100_anaPlots.root"%inDir, 100.],
+            "T2cc_Scan_NoFilter_ISRRW_Stop175_Vect100":["%sanaPlots_225/outT2cc_ISRRW13_Stop175_Vect100_anaPlots.root"%inDir, 100.],
+            "T2cc_Scan_NoFilter_ISRRW_Stop250_Vect100":["%sanaPlots_225/outT2cc_ISRRW13_Stop250_Vect100_anaPlots.root"%inDir, 100.],
             "T2cc_160"                        :["%sanaPlots_225/outT2cc_160_anaPlots.root"%inDir, 100.],
             "T2cc_300"                        :["%sanaPlots_225/outT2cc_300_anaPlots.root"%inDir, 100.],
             "T2cc_220_145"                    :["%sanaPlots_225/outT2cc_220_145_anaPlots.root"%inDir, 100.],
@@ -106,24 +122,27 @@ def sigFile():
     }
   elif mode()=="bTagEff":
     sigFile={
-          "T2cc_160"                :["%sbTagEff_Study/outT2cc_160_bTagEff.root"%inDir],
-          "T2cc_300"                :["%sbTagEff_Study/outT2cc_300_bTagEff.root"%inDir],
-          "T2cc_220_195"            :["%sbTagEff_Study/outT2cc_220_195_bTagEff.root"%inDir],
-          "T2cc_220_170"            :["%sbTagEff_Study/outT2cc_220_170_bTagEff.root"%inDir],
-          "T2cc_220_145"            :["%sbTagEff_Study/outT2cc_220_145_bTagEff.root"%inDir],
-          "T2cc_220_195_pt50"       :["%sbTagEff_Study/outT2cc_220_195_pt50_bTagEff.root"%inDir],
-          "T2cc_220_170_pt50"       :["%sbTagEff_Study/outT2cc_220_170_pt50_bTagEff.root"%inDir],
-          "T2cc_220_145_pt50"       :["%sbTagEff_Study/outT2cc_220_145_pt50_bTagEff.root"%inDir],    
-          "T2cc_220_195_JES_down10" :["%sbTagEff_Study/outT2cc_220_195_JES_down10_bTagEff.root"%inDir],
-          "T2cc_220_170_JES_down10" :["%sbTagEff_Study/outT2cc_220_170_JES_down10_bTagEff.root"%inDir],
-          "T2cc_220_145_JES_down10" :["%sbTagEff_Study/outT2cc_220_145_JES_down10_bTagEff.root"%inDir],    
-          "T2cc_220_195_JES_up10"   :["%sbTagEff_Study/outT2cc_220_195_JES_up10_bTagEff.root"%inDir],
-          "T2cc_220_170_JES_up10"   :["%sbTagEff_Study/outT2cc_220_170_JES_up10_bTagEff.root"%inDir],
-          "T2cc_220_145_JES_up10"   :["%sbTagEff_Study/outT2cc_220_145_JES_up10_bTagEff.root"%inDir],
-          "T2cc_220_195_noCuts"     :["%sbTagEff_Study/outT2cc_220_195_noCuts_bTagEff.root"%inDir],
-          "T2cc_220_170_noCuts"     :["%sbTagEff_Study/outT2cc_220_170_noCuts_bTagEff.root"%inDir],
-          "T2cc_220_145_noCuts"     :["%sbTagEff_Study/outT2cc_220_145_noCuts_bTagEff.root"%inDir],          
-    }
+          "T2cc_160"                        :["%sbTagEff_Study/outT2cc_160_bTagEff.root"%inDir],
+          "T2cc_300"                        :["%sbTagEff_Study/outT2cc_300_bTagEff.root"%inDir],
+          "T2cc_220_195"                    :["%sbTagEff_Study/outT2cc_220_195_bTagEff.root"%inDir],
+          "T2cc_220_170"                    :["%sbTagEff_Study/outT2cc_220_170_bTagEff.root"%inDir],
+          "T2cc_220_145"                    :["%sbTagEff_Study/outT2cc_220_145_bTagEff.root"%inDir],
+          "T2cc_220_195_pt50"               :["%sbTagEff_Study/outT2cc_220_195_pt50_bTagEff.root"%inDir],
+          "T2cc_220_170_pt50"               :["%sbTagEff_Study/outT2cc_220_170_pt50_bTagEff.root"%inDir],
+          "T2cc_220_145_pt50"               :["%sbTagEff_Study/outT2cc_220_145_pt50_bTagEff.root"%inDir],    
+          "T2cc_220_195_JES_down10"         :["%sbTagEff_Study/outT2cc_220_195_JES_down10_bTagEff.root"%inDir],
+          "T2cc_220_170_JES_down10"         :["%sbTagEff_Study/outT2cc_220_170_JES_down10_bTagEff.root"%inDir],
+          "T2cc_220_145_JES_down10"         :["%sbTagEff_Study/outT2cc_220_145_JES_down10_bTagEff.root"%inDir],    
+          "T2cc_220_195_JES_up10"           :["%sbTagEff_Study/outT2cc_220_195_JES_up10_bTagEff.root"%inDir],
+          "T2cc_220_170_JES_up10"           :["%sbTagEff_Study/outT2cc_220_170_JES_up10_bTagEff.root"%inDir],
+          "T2cc_220_145_JES_up10"           :["%sbTagEff_Study/outT2cc_220_145_JES_up10_bTagEff.root"%inDir],
+          "T2cc_220_195_noCuts"             :["%sbTagEff_Study/outT2cc_220_195_noCuts_bTagEff.root"%inDir],
+          "T2cc_220_170_noCuts"             :["%sbTagEff_Study/outT2cc_220_170_noCuts_bTagEff.root"%inDir],
+          "T2cc_220_145_noCuts"             :["%sbTagEff_Study/outT2cc_220_145_noCuts_bTagEff.root"%inDir],
+          "T2cc_Scan_NoFilter_ISRRW"        :["%sbTagEff_Study/outT2cc_NoFilter_ISRRW_bTagEff.root"%inDir],
+          "T2cc_Scan_NoFilter_ISRRW_JES+ve" :["%sbTagEff_Study/outT2cc_ISRRW13_JES+ve_bTagEff.root"%inDir],
+          "T2cc_Scan_NoFilter_ISRRW_JES-ve" :["%sbTagEff_Study/outT2cc_ISRRW13_JES-ve_bTagEff.root"%inDir],
+    } 
   elif mode()=="ISRSystem":
     sigFile={
           "MuEG_2012" :["%sISRSystem/outMuEG_2012_ISRSystem.root"%inDir],
@@ -181,10 +200,14 @@ def sinHists():
 #       "dPhiCharmCharm"       :plotDetails(xRange=[0.,3.2], rebX=2),
 #       #"dPhiStopNeut"         :plotDetails(xRange=[0.,3.2], rebX=2),
 #       #"n_Events_1"           :plotDetails(),
-#       "n_Jets"               :plotDetails(xRange=[0.,8.]),
-#       "n_BTagged_Jets_all"   :plotDetails(xRange=[0.,6.]),
+       #"n_Jets"               :plotDetails(xRange=[0.,8.]),
+       ###"n_Jets_charm"               :plotDetails(xRange=[0.,8.]),
+       ###"n_Jets_ISR"               :plotDetails(xRange=[0.,8.]),
+       ###"n_BTagged_Jets_all"   :plotDetails(xRange=[0.,6.]),
 #       "charmJetPt_0"         :plotDetails(xRange=[0., 350.], rebX=2),
 #       "charmJetPt_1"         :plotDetails(xRange=[0., 350.], rebX=2),
+#      "genPtLeadCharm_vs_MHT"   :plotDetails(xRange=[0.,200.], yRange=[0.,400.]),
+      "vectGenPt_vs_scalGenPt"  :plotDetails(xRange=[0., 600.], yRange=[0., 1000.])
     }
   elif mode()=="bTagEff":
     singleHists={
@@ -210,19 +233,36 @@ def anaHists():
   
   if mode()=="anaPlots":
     hists={
-      "MET"               :plotDetails(xRange=[0.,900.], rebX=2),
-      "MHT"               :plotDetails(xRange=[0.,900.],rebX=2),
-      "commHT"            :plotDetails(xRange=[150.,1000.], rebX=2),
-  #    "hadronicAlphaTZoom":plotDetails(xRange=[0., 1.5], rebX=5),
-  #    #"leadJetdelPhi"     :plotDetails(xRange=[0.,3.2], rebX=2),
-  #    "MHToverMET"        :plotDetails(xRange=[0.,2.], rebX=1),
-  #    "jetPt"             :plotDetails(xRange=[0.,500.], rebX=2),
-  #    "leadJetPt"         :plotDetails(xRange=[0.,800.], rebX=2),
-  #    "subLeadJetPt"      :plotDetails(xRange=[0.,500.], rebX=2),
-  #    "thirdJetPt"           :plotDetails(xRange=[0., 300.], rebX=2),
-  #    "fourthJetPt"           :plotDetails(xRange=[0., 200.], rebX=2),
-  #    #"alphaT_vs_HT"     :plotDetails(xRange=[0.,1.6], yRange=[0.,600.], rebX=2, rebY=2),
-  #    #"leadTwoJetsPt"     :plotDetails(xRange=[0.,300.], rebX=2),
+      ###"MET"                   :plotDetails(xRange=[0.,900.], rebX=2),
+      ###"MHT"                   :plotDetails(xRange=[0.,900.],rebX=2),
+      ###"commHT"                :plotDetails(xRange=[0.,850.], rebX=2),
+###"HT_charm"                :plotDetails(xRange=[0.,1000.], rebX=2),
+###"HT_ISR"                :plotDetails(xRange=[0.,1000.], rebX=2),
+#"hadronicAlphaTZoom"    :plotDetails(xRange=[0.3, 1.5], rebX=2),
+#"leadJetdelPhi"        :plotDetails(xRange=[0.,3.2], rebX=2),
+###"MHToverMET"            :plotDetails(xRange=[0.,2.], rebX=1),
+###"MHToverHT"            :plotDetails(xRange=[0.,2.], rebX=1),
+###"jetPt"                 :plotDetails(xRange=[0.,500.], rebX=1),
+###"leadJetPt"             :plotDetails(xRange=[50.,500.], rebX=2),
+###"subLeadJetPt"          :plotDetails(xRange=[0.,500.], rebX=1),
+####"thirdJetPt"            :plotDetails(xRange=[0., 300.], rebX=1),
+###"leadISRJetPt"            :plotDetails(xRange=[0., 300.], rebX=1),
+###"subLeadISRJetPt"            :plotDetails(xRange=[0., 300.], rebX=1),
+#"fourthJetPt"           :plotDetails(xRange=[0., 200.], rebX=2),
+#"alphaT_vs_HT"          :plotDetails(xRange=[0.,1.6], yRange=[0.,600.], rebX=2, rebY=2),
+#"leadTwoJetsPt"         :plotDetails(xRange=[0.,300.], rebX=2),
+#"stopGenPtScal"         :plotDetails(xRange=[0.,1000.], rebX=2),
+"stopGenPtVect"         :plotDetails(xRange=[0.,600.], rebX=2),
+#"delPhi_vs_scalGenPt"   :plotDetails(xRange=[0., 900.], yRange=[0., 3.2], rebX=5), 
+###"dPhiStopCharm"         :plotDetails(xRange=[0.,3.2], rebX=1),
+###"dPhiStopStop"          :plotDetails(xRange=[0.,3.2], rebX=1),
+#"dPhiNeutCharm"         :plotDetails(xRange=[0.,3.2], rebX=2),
+###"dPhiCharmCharm"        :plotDetails(xRange=[0.,3.2], rebX=1),
+#"dPhiStopNeut"          :plotDetails(xRange=[0.,3.2], rebX=2),
+#"dPhiLeadJetMHT"        :plotDetails(xRange=[0.,3.2], rebX=1),
+#"dPhiSubLeadJetMHT"        :plotDetails(xRange=[0.,3.2], rebX=1),
+###"charmJetPt_0"          :plotDetails(xRange=[0., 350.], rebX=1),
+###"charmJetPt_1"          :plotDetails(xRange=[0., 350.], rebX=1),
     }
   elif mode()=="bTagEff":
     hists={}
