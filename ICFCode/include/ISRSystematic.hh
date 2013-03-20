@@ -51,16 +51,28 @@ namespace Operation {
       std::vector<TH1D*>  h_nBTagJets;
 
       std::vector<TH1D*>  h_LDMuon_n;
-      std::vector<TH1D*>  h_LDMuonCommon_n;
       std::vector<TH1D*>  h_LDMuon_pT;
       std::vector<TH1D*>  h_LDMuon_eta;
       std::vector<TH1D*>  h_LDMuon_iso;
+      std::vector<TH1D*>  h_LDMuon_isMuon;
 
-      std::vector<TH1D*>  h_LDEle_n;
-      std::vector<TH1D*>  h_LDEleCommon_n;
-      std::vector<TH1D*>  h_LDEle_pT;
-      std::vector<TH1D*>  h_LDEle_eta;
-      std::vector<TH1D*>  h_LDEle_iso;
+      std::vector<TH1D*>  h_LDCommonMuon_n;
+      std::vector<TH1D*>  h_LDCommonMuon_pT;
+      std::vector<TH1D*>  h_LDCommonMuon_eta;
+      std::vector<TH1D*>  h_LDCommonMuon_iso;
+      std::vector<TH1D*>  h_LDCommonMuon_isMuon;
+
+      std::vector<TH1D*>  h_LDElectron_n;
+      std::vector<TH1D*>  h_LDElectron_pT;
+      std::vector<TH1D*>  h_LDElectron_eta;
+      std::vector<TH1D*>  h_LDElectron_iso;
+      std::vector<TH1D*>  h_LDElectron_isElectron;
+
+      std::vector<TH1D*>  h_LDCommonElectron_n;
+      std::vector<TH1D*>  h_LDCommonElectron_pT;
+      std::vector<TH1D*>  h_LDCommonElectron_eta;
+      std::vector<TH1D*>  h_LDCommonElectron_iso;
+      std::vector<TH1D*>  h_LDCommonElectron_isElectron;
 
   };
 
