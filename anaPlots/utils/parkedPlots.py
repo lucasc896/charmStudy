@@ -9,9 +9,11 @@ Copyright (c) 2012 University of Bristol. All rights reserved.
 
 import ROOT as r
 
+r.gROOT.SetBatch(r.kTRUE)
+
 normalise = [False, True][0]
 hNames = ["stopGenPtVect", "commHT", "MHT"]
-point = ["200_120", "200_190"][0]
+point = ["200_120", "200_190"][1]
 
 parkedHTdirs = ["225_275", "275_325", "325_375", "375_475", "475_575", "575_675", "675_775", "775_875", "875"]
 HTdirs = ["275_325", "325_375", "375_475", "475_575", "575_675", "675_775", "775_875", "875"]
