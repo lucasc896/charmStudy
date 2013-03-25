@@ -539,7 +539,7 @@ def comparPlots(hList=None, debug=None, doLogy=False):
   if len(hList)==2:
     lg = r.TLegend(0.57, 0.70, 0.895, 0.89)
   elif len(hList)==3:
-    lg = r.TLegend(0.52, 0.72, 0.895, 0.89)
+    lg = r.TLegend(0.42, 0.72, 0.795, 0.89)
   elif len(hList)==4:
     lg = r.TLegend(0.64, 0.64, 0.895, 0.89)
   elif len(hList)==5:
@@ -572,7 +572,7 @@ def comparPlots(hList=None, debug=None, doLogy=False):
     if entTitle == "T2cc_200": entTitle="Pythia"
     elif entTitle == "T2cc_NF_200_120_cut": entTitle="Madgraph"
     elif "_delta" in entTitle: entTitle = entTitle.split("_")[0]+"_"+entTitle.split("_")[-1]
-    elif "_100_" in entTitle: entTitle = "mStop=%s, mLSP=%s"%(entTitle.split("_")[-2], entTitle.split("_")[-1])
+    elif "_175_" in entTitle: entTitle = "mStop=%s, mLSP=%s"%(entTitle.split("_")[-2], entTitle.split("_")[-1])
 
     lg.AddEntry(hList[i], entTitle, "L")
 
@@ -612,7 +612,7 @@ def comparPlots(hList=None, debug=None, doLogy=False):
     hRatio.SetLineWidth(1)
     hRatio.SetLineColor(r.kBlack)
     hRatio.GetYaxis().SetTitle("Ratio")
-    hRatio.GetYaxis().SetRangeUser(0.,2.)
+    hRatio.GetYaxis().SetRangeUser(0.5,1.5)
     hRatio.SetLabelSize(0.12, "X")
     hRatio.SetLabelSize(0.07, "Y")
     hRatio.SetTitleSize(0.13, "X")
@@ -665,7 +665,7 @@ def getHistOrder(hList=None):
           #exit()
         myOrder.append(k)
 
-  return myOrder
+  return myOrder[0:len(hList)]
 
 ###-------------------------------------------------------------------###
 
