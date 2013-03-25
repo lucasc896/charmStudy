@@ -30,6 +30,9 @@ def ensure_dir(path):
         pass
       else: raise
 
+# -----------------------------------------------------------------------------
+
+
 def runMode():
   return ["OP_analysisPlots", "OP_charmEffStudy"][0]
 
@@ -198,7 +201,7 @@ threshold     = 50.,
 )
 
 
-def makePlotOp(OP = (), cutTree = None, cut = None, label = "", doAlphaTCut=False):
+def makePlotOp(OP = (), cutTree = None, cut = None, label = "", alphaTMode=0.55):
   """docstring for makePlotOp"""
   out = []
   if OP[1] != None:
@@ -208,10 +211,9 @@ def makePlotOp(OP = (), cutTree = None, cut = None, label = "", doAlphaTCut=Fals
   else:
     op = eval(OP[0])
   out.append(op)
-
-  alpha = OP_CommonAlphaTCut(0.55)
-  out.append(alpha)
-  if doAlphaTCut:
+  if alphaTMode!=None:
+    alpha = OP_CommonAlphaTCut(alphaTMode)
+    out.append(alpha)
     cutTree.TAttach(cut, alpha)
     cutTree.TAttach(alpha, op)
   else:
@@ -219,7 +221,7 @@ def makePlotOp(OP = (), cutTree = None, cut = None, label = "", doAlphaTCut=Fals
   return out
   pass
 
-def AddBinedHist(cutTree = None, OP = (), cut = None, htBins = [],TriggerDict = None,lab = "", Muon=None, alphaTCut=True):
+def AddBinedHist(cutTree = None, OP = (), cut = None, htBins = [],TriggerDict = None,lab = "", Muon=None, alphaTCut=None):
   """docstring for AddBinedHist"""
   out = []
 
@@ -296,7 +298,7 @@ def AddBinedHist(cutTree = None, OP = (), cut = None, htBins = [],TriggerDict = 
           out.append(upperCut)
           cutTree.TAttach(lowerCut,upperCut)
         ###pOps = makePlotOp(cutTree = cutTree, OP = OP, cut = lowerCut, label = "%s%d_"%(lab,lower)) 
-        pOps = makePlotOp(cutTree = cutTree, OP = OP, cut = upperCut if upper else lowerCut, label = "%s%d%s"%(lab,lower, "_%d"%upper if upper else ""), doAlphaTCut=alphaTCut)
+        pOps = makePlotOp(cutTree = cutTree, OP = OP, cut = upperCut if upper else lowerCut, label = "%s%d%s"%(lab,lower, "_%d"%upper if upper else ""), alphaTMode=alphaTCut)
         out.append(pOps)
   return out
   pass
@@ -339,8 +341,6 @@ htTakeMuCut225 = RECO_CommonHTTakeMuCut(225.)
 
 htCut275 = RECO_CommonHTCut(275.)
 htTakeMuCut275 = RECO_CommonHTTakeMuCut(275.)
-
-nullCut = RECO_CommonHTCut(0.)
 
 DeadEcalCutData = OP_DeadECALCut(0.3,0.3,0.5,30.,10,0,"./deadRegionList_GR10_P_V10.txt")
 DeadEcalCutMC =   OP_DeadECALCut(0.3,0.3,0.5,30.,10,0,"./deadRegionList_START38_V12.txt")
@@ -448,8 +448,44 @@ Mu50PtCut_LowHT325_MuTrigPlateau = OP_LowerMuPtCut(50.0)
 secondJetET = OP_SecondJetEtCut(0)
 Tot_VertexCut = OP_TotVertexCut(0,100)
 
-SMSMassCut_300 = OP_SSMmasscut(299., 301., 249., 251.)
-SMSMassCut_200 = OP_SSMmasscut(199., 201., 119., 121.)
+SMSMassCut_300 = OP_SMSmasscut(299., 301., 249., 251.)
+SMSMassCut_200 = OP_SMSmasscut(199., 201., 119., 121.)
+
+SMSMassCut_100_20 = OP_SMSmasscut(99., 101., 19., 21.)
+SMSMassCut_100_40 = OP_SMSmasscut(99., 101., 39., 41.)
+SMSMassCut_100_60 = OP_SMSmasscut(99., 101., 59., 61.)
+SMSMassCut_100_70 = OP_SMSmasscut(99., 101., 69., 71.)
+SMSMassCut_100_80 = OP_SMSmasscut(99., 101., 79., 81.)
+SMSMassCut_100_90 = OP_SMSmasscut(99., 101., 89., 91.)
+
+SMSMassCut_175_95 = OP_SMSmasscut(174., 176., 94., 96.)
+SMSMassCut_175_115 = OP_SMSmasscut(174., 176., 114., 116.)
+SMSMassCut_175_135 = OP_SMSmasscut(174., 176., 134., 136.)
+SMSMassCut_175_145 = OP_SMSmasscut(174., 176., 144., 146.)
+SMSMassCut_175_155 = OP_SMSmasscut(174., 176., 154., 156.)
+SMSMassCut_175_165 = OP_SMSmasscut(174., 176., 164., 166.)
+
+SMSMassCut_200_120 = OP_SMSmasscut(199., 202., 119., 122.)
+SMSMassCut_200_190 = OP_SMSmasscut(199., 202., 189., 192.)
+
+SMSStopMassCut_100 = OP_SMSmasscut(99., 101., 0., 500.)
+SMSStopMassCut_175 = OP_SMSmasscut(175., 176., 0., 500.)
+SMSStopMassCut_250 = OP_SMSmasscut(249., 251., 0., 500.)
+
+#some delta mass cuts
+SMSdMassCut_10 = OP_SMSdmasscut(0., 1000., 8., 15.)
+SMSdMassCut_20 = OP_SMSdmasscut(0., 1000., 18., 25.)
+SMSdMassCut_30 = OP_SMSdmasscut(0., 1000., 28., 35.)
+SMSdMassCut_40 = OP_SMSdmasscut(0., 1000., 38., 45.)
+SMSdMassCut_60 = OP_SMSdmasscut(0., 1000., 58., 65.)
+SMSdMassCut_80 = OP_SMSdmasscut(0., 1000., 78., 85.)
+
+#null op to start tree
+count_total = OP_Count("count_total")
+
+# genLevel VectSumPt of stop pair cut
+stopVectPt_le100 = OP_StopGenVectPtSumCut(100.)
+
 
 
 def MakeDataTree(Threshold,Muon = None,Split = None):
@@ -713,6 +749,8 @@ def MakeMCTree(Threshold, Muon = None, Split = None):
   out = []
 
   HTBins = []
+
+  alphaTVal = 0.55
   
   if int(Threshold) is 100 and Split == None : HTBins = [375+100*i for i in range(6)]
   if int(Threshold) is 100 and Split == "Had_One" : HTBins = [375+100*i for i in range(4)]
@@ -722,11 +760,12 @@ def MakeMCTree(Threshold, Muon = None, Split = None):
   if int(Threshold) is 100 and Split == "Muon_Three" : HTBins = [675,775,875]
   if int(Threshold) is 73 : HTBins = [275.,325.]
   if int(Threshold) is 86 : HTBins = [325.,375.]
-  if int(Threshold) is 60 : HTBins = [225.,275.]
-
+  if int(Threshold) is 60 :
+    HTBins = [225.,275.]
+    alphaTVal = 0.6
  
   ### add incl binning for thresh=100, split==None
-  if int(Threshold) is 10 and Split == None : HTBins_inc = [0.,10000.]
+  HTBins_inc = [0.,10000.]
 
   ### override the threshold arguement
   #Threshold=Threshold*1.1
@@ -741,6 +780,43 @@ def MakeMCTree(Threshold, Muon = None, Split = None):
 
   runModeName = runMode()
 
+  SMScut_ = None
+
+  #SMScut_ = SMSdMassCut_10
+  #SMScut_ = SMSdMassCut_20
+  #SMScut_ = SMSdMassCut_30
+  #SMScut_ = SMSdMassCut_40
+  #SMScut_ = SMSdMassCut_60
+  #SMScut_ = SMSdMassCut_80
+
+  #SMScut_ = SMSMassCut_100_20
+  #SMScut_ = SMSMassCut_100_40
+  #SMScut_ = SMSMassCut_100_60
+  #SMScut_ = SMSMassCut_100_70
+  #SMScut_ = SMSMassCut_100_80
+  #SMScut_ = SMSMassCut_100_90
+
+  #SMScut_ = SMSMassCut_175_95
+  #SMScut_ = SMSMassCut_175_115
+  #SMScut_ = SMSMassCut_175_135
+  #SMScut_ = SMSMassCut_175_145
+  #SMScut_ = SMSMassCut_175_155
+  #SMScut_ = SMSMassCut_175_165
+
+  #SMScut_ = SMSMassCut_200_120
+  SMScut_ = SMSMassCut_200_190
+
+  #SMScut_ = SMSMassCut_250_20
+  #SMScut_ = SMSMassCut_250_40
+  #SMScut_ = SMSMassCut_250_60
+  #SMScut_ = SMSMassCut_250_70
+  #SMScut_ = SMSMassCut_250_80
+  #SMScut_ = SMSMassCut_250_90
+
+  #SMScut_ = SMSStopMassCut_100
+  #SMScut_ = SMSStopMassCut_175
+  #SMScut_ = SMSStopMassCut_250
+
 
   if Muon!=None:
       cutTreeMC.Attach(htTakeMu200_Trigger)
@@ -752,15 +828,15 @@ def MakeMCTree(Threshold, Muon = None, Split = None):
       cutTreeMC.TAttach(LeadingJetOrMuEta,secondJetET)
       cutTreeMC.TAttach(secondJetET,oddJet)
   else:
-      cutTreeMC.Attach(nullCut)
-      #cutTreeMC.TAttach(nullCut, SMSMassCut_200)
-      #cutTreeMC.TAttach(SMSMassCut_200, jet_ge2)
-      cutTreeMC.TAttach(nullCut, jet_ge2)
-      #cutTreeMC.TAttach(nullCut,SMSMassCut_300)
-      #cutTreeMC.TAttach(SMSMassCut_300, jet_ge2)
-#      cutTreeMC.TAttach(jet_ge2, ht250_Trigger)
-#      cutTreeMC.TAttach(ht250_Trigger,NoiseFilt)
-      cutTreeMC.TAttach(jet_ge2, ht200_Trigger)
+      cutTreeMC.Attach(count_total)
+      cutTreeMC.TAttach(count_total, jet_ge2)
+
+      if SMScut_:
+        cutTreeMC.TAttach(jet_ge2, SMScut_)
+        cutTreeMC.TAttach(SMScut_,ht200_Trigger)
+      else:
+        cutTreeMC.TAttach(jet_ge2,ht200_Trigger)
+
       cutTreeMC.TAttach(ht200_Trigger,NoiseFilt)
       cutTreeMC.TAttach(NoiseFilt,GoodVertexMonster)
       cutTreeMC.TAttach(GoodVertexMonster,LeadingJetEta)
@@ -789,23 +865,21 @@ def MakeMCTree(Threshold, Muon = None, Split = None):
     cutTreeMC.TAttach(MHT_METCut,jet_le3)
     cutTreeMC.TAttach(MHT_METCut,jet_ge4) # jet ge4
 
-    if int(Threshold) is 10 and Split == None :
-      #pass
-      out.append(AddBinedHist(cutTree = cutTreeMC,
-      OP = (runModeName,genericPSet_mc), cut = jet_ge2,
-      htBins = HTBins_inc, TriggerDict = None, lab ="noCuts_", Muon=False, alphaTCut=False))
-    else:
-      out.append(AddBinedHist(cutTree = cutTreeMC,
-      OP = (runModeName,genericPSet_mc), cut = MHT_METCut,
-      htBins = HTBins, TriggerDict = None, lab ="inc_", Muon=False, alphaTCut=True))
+    out.append(AddBinedHist(cutTree = cutTreeMC,
+    OP = (runModeName,genericPSet_mc), cut =  SMScut_ if SMScut_ else count_total,
+    htBins = HTBins_inc, TriggerDict = None, lab ="noCuts_", Muon=False, alphaTCut=None))
       
-      out.append(AddBinedHist(cutTree = cutTreeMC,
-      OP = (runModeName,genericPSet_mc), cut = jet_le3,
-      htBins = HTBins, TriggerDict = None, lab ="le3j_", Muon=False, alphaTCut=True ))
-      
-      out.append(AddBinedHist(cutTree = cutTreeMC,
-      OP = (runModeName,genericPSet_mc), cut = jet_ge4,
-      htBins = HTBins, TriggerDict = None, lab ="ge4j_", Muon=False, alphaTCut=True))
+    out.append(AddBinedHist(cutTree = cutTreeMC,
+    OP = (runModeName,genericPSet_mc), cut = MHT_METCut,
+    htBins = HTBins, TriggerDict = None, lab ="inc_", Muon=False, alphaTCut=alphaTVal))
+    
+    out.append(AddBinedHist(cutTree = cutTreeMC,
+    OP = (runModeName,genericPSet_mc), cut = jet_le3,
+    htBins = HTBins, TriggerDict = None, lab ="le3j_", Muon=False, alphaTCut=alphaTVal ))
+    
+    out.append(AddBinedHist(cutTree = cutTreeMC,
+    OP = (runModeName,genericPSet_mc), cut = jet_ge4,
+    htBins = HTBins, TriggerDict = None, lab ="ge4j_", Muon=False, alphaTCut=alphaTVal))
 
   else:
     cutTreeMC.TAttach(Tot_VertexCut,htCut275)
