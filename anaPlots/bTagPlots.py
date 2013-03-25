@@ -10,6 +10,7 @@ Copyright (c) 2012 University of Bristol. All rights reserved.
 from sys import argv
 from generalUtils import *
 import configuration as conf
+from Log import *
 
 r.gROOT.SetBatch(True)
 
@@ -163,13 +164,14 @@ def jetCharmFrac(debug=False):
    inFiles  = conf.comparFiles()
    sFile    = conf.sigFile()
 
-   if debug: print sFile
+   if debug: Log.debug(str(sFile))
 
    c1 = r.TCanvas()
    mg = r.TMultiGraph()
-   lg = r.TLegend(0.6, 0.17, 0.85, 0.42)
+   #lg = r.TLegend(0.6, 0.17, 0.85, 0.42)
+   lg = r.TLegend(0.5, 0.65, 0.75, 0.88)
 
-   c1.SetCanvasSize(1400, 1000)
+   c1.SetCanvasSize(1000, 1000)
 
    colours = [r.kRed, r.kBlue, r.kViolet]
 
@@ -177,13 +179,16 @@ def jetCharmFrac(debug=False):
       hList=[]
       g = r.TGraph(4)
       rFile = r.TFile().Open(sFile[iF][0])
-      if debug: print "\n>> %s"%iF
+      if debug: Log.debug(">> %s" % iF)
 
       for i in range(4):
          ctr=0
          for d in dirs:
-            if debug: print "%s/jetFlavourICF_%d"%(d,i)
+            if debug:
+               Log.debug("%s/jetFlavourICF_%d"%(d,i))
             h = rFile.Get("%s/jetFlavourICF_%d"%(d,i))
+            if debug:
+               Log.debug(str(h))
             if ctr==0: hT = h.Clone()
             else: hT.Add(h)
             ctr+=1
@@ -191,7 +196,12 @@ def jetCharmFrac(debug=False):
 
       ctr1=0
       for hT in hList:
-         charmFrac = hT.GetBinContent(5)/hT.GetEntries()
+         print hT
+         try:
+            charmFrac = hT.GetBinContent(5)/hT.GetEntries()
+         except ZeroDivisionError:
+            Log.warning("Zero Entries in hist")
+            charmFrac = 0.
          g.SetPoint(ctr1, ctr1, charmFrac)
 
          myDict = {
@@ -208,6 +218,8 @@ def jetCharmFrac(debug=False):
       g.SetMarkerStyle(29)
       g.SetMarkerSize(8)
 
+      entTitle = iF
+
       # work out a better way of doing this
       #if "195" in iF: g.SetMarkerColor(r.kRed)
       #if "195_pt50" in iF: g.SetMarkerColor(r.kRed-2)
@@ -220,13 +232,16 @@ def jetCharmFrac(debug=False):
 
       g.SetMarkerColor(col)
 
-      if "_ISRRW_JES+ve" in iF:
-         entTitle = "T2cc_JES+ve"
-      elif "_ISRRW_JES-ve" in iF:
-         entTitle = "T2cc_JES-ve"
-      elif "_ISRRW" in iF:
-         entTitle = "T2cc_noJES"
-      else: entTitle=iF
+      #if "_ISRRW_" in iF and "JES+ve" in iF:
+      #   entTitle = "T2cc_JES+ve"
+      #elif "_ISRRW_" in iF and "JES-ve" in iF:
+      #   entTitle = "T2cc_JES-ve"
+      #elif "_ISRRW" in iF:
+      #   entTitle = "T2cc_noJES"
+      #else: entTitle=iF
+
+#      if "_delta10" in iF:
+#         entTitle = "T2cc delta10"
 
       lg.AddEntry(g, entTitle, "P")
       mg.Add(g)
@@ -242,6 +257,7 @@ def jetCharmFrac(debug=False):
    mg.GetXaxis().SetLabelSize(0.05)
    mg.GetXaxis().SetTitleOffset(1.35)
    mg.GetYaxis().SetRangeUser(0., 0.4)
+   mg.GetYaxis().SetTitleOffset(1.40)
 
    lg.SetFillColor(0)
    lg.Draw()
