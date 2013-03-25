@@ -180,7 +180,14 @@ def getDataYields(bM="inc", debug=False):
 
 #  scale=float(601852./90000.)
 
-  Log.warning("Tables filled with scale factor %d"%scale)
+  if "_200_190" in sigSamp:
+    scale = 11700.*18.5245/630563.
+  elif "_200_120" in sigSamp:
+    scale = 11700.*18.5245/630587.
+
+
+
+  Log.warning("Tables filled with scale factor %f"%scale)
 
   for d in dirs:
     ent=0
@@ -191,7 +198,7 @@ def getDataYields(bM="inc", debug=False):
       h = sFile.Get("%s/commHT%s"%(d, suf))
       ent += h.GetEntries()
       if debug: Log.debug(str(ent))
-    ent /= scale  
+    ent *= scale  
     yieldDict[dirTitle[1:]]=[ent, math.sqrt(ent)]
 
   return OrderedDict(sorted(yieldDict.items(), key=lambda t: t[0]))
