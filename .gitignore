@@ -20,3 +20,4 @@ talks/
 *.stderr
 .DS_Store
 *.svn-base
+*.zip
