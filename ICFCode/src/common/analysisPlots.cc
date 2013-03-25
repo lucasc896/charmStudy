@@ -102,43 +102,43 @@ void analysisPlots::StandardPlots() {
 
    BookHistArray(h_jetPt,
       "jetPt",
-      ";jet p_T (GeV);# count",
+      ";jet p_{T} (GeV);# count",
       80, 0., 1000.,
       6, 0, 1, false);   
 
    BookHistArray(h_leadJetPt,
       "leadJetPt",
-      ";lead jet p_T (GeV);# count",
+      ";lead jet p_{T} (GeV);# count",
       80, 0., 1000.,
       6, 0, 1, false);
 
    BookHistArray(h_subLeadJetPt,
       "subLeadJetPt",
-      ";sublead jet p_T (GeV);# count",
+      ";sublead jet p_{T} (GeV);# count",
       80, 0., 1000.,
       6, 0, 1, false);   
 
    BookHistArray(h_thirdJetPt,
       "thirdJetPt",
-      ";third jet p_T (GeV);# count",
+      ";third jet p_{T} (GeV);# count",
       80, 0., 1000.,
       6, 0, 1, false);
 
    BookHistArray(h_fourthJetPt,
       "fourthJetPt",
-      ";fourth jet p_T (GeV);# count",
+      ";fourth jet p_{T} (GeV);# count",
       80, 0., 1000.,
       6, 0, 1, false);   
 
    BookHistArray(h_leadISRJetPt,
       "leadISRJetPt",
-      ";lead ISR jet p_T (GeV);# count",
+      ";lead ISR jet p_{T} (GeV);# count",
       80, 0., 1000.,
       6, 0, 1, false);
 
    BookHistArray(h_subLeadISRJetPt,
       "subLeadISRJetPt",
-      ";sublead ISR jet p_T (GeV);# count",
+      ";sublead ISR jet p_{T} (GeV);# count",
       80, 0., 1000.,
       6, 0, 1, false); 
 
@@ -192,31 +192,31 @@ void analysisPlots::StandardPlots() {
 
    BookHistArray(h_leadJetdelPhi,
       "leadJetdelPhi",
-      ";#delta #phi;# count",
+      ";#delta #phi (lead two jets);# count",
       50, 0., 3.2,
       6, 0, 1, false);
 
    BookHistArray(h_charmJetPt_0,
       "charmJetPt_0",
-      ";lead charm p_T (GeV);# count",
+      ";lead charm p_{T} (GeV);# count",
       150, 0., 800.,
       6, 0, 1, false); 
 
    BookHistArray(h_charmJetPt_1,
       "charmJetPt_1",
-      ";sublead charm p_T (GeV);# count",
+      ";sublead charm p_{T} (GeV);# count",
       64, 0., 800.,
       6, 0, 1, false); 
 
    BookHistArray(h_stopGenPtVect,
       "stopGenPtVect",
-      ";vectorial gen Pt;# count",
+      ";vectorial gen p_{T};# count",
       100, 0., 1000.,
       6, 0, 1, false);
 
    BookHistArray(h_stopGenPtScal,
       "stopGenPtScal",
-      ";scalar gen Pt;# count",
+      ";scalar gen p_{T};# count",
       100, 0., 1000.,
       6, 0, 1, false);
 
@@ -348,14 +348,14 @@ void analysisPlots::StandardPlots() {
 
    BookHistArray(h_vectGenPt_vs_scalGenPt,
       "vectGenPt_vs_scalGenPt",
-      ";vectorial gen p_T stop pair (GeV);scalar gen p_T stop pair (GeV);",
+      ";vectorial gen p_{T} stop pair (GeV);scalar gen p_T stop pair (GeV);",
       64, 0., 1000.,
       64, 0., 1000.,
       1, 0, 1, false);
 
    BookHistArray(h_leadTwoJetsPt,
       "leadTwoJetsPt",
-      ";two lead jets pT (GeV);# count",
+      ";two lead jets p_{T} (GeV);# count",
       32, 0., 400.,
       6, 0, 1, false);
 
