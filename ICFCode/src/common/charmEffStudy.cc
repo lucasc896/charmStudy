@@ -407,8 +407,8 @@ bool charmEffStudy::StandardPlots( Event::Data& ev ) {
    
    for(unsigned int i=0; i<4; i++){
       if (ev.JD_CommonJets().accepted.size()>i){
-         h_jetFlavour[i]   ->Fill( getJetFlavour(ev, *ev.JD_CommonJets().accepted.at(i), minDR_) );
-         h_jetFlavourICF[i]->Fill( ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(i)->GetIndex()) );
+         h_jetFlavour[i]   ->Fill( getJetFlavour(ev, *ev.JD_CommonJets().accepted.at(i), minDR_), evWeight );
+         h_jetFlavourICF[i]->Fill( ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(i)->GetIndex()), evWeight );
          h_charmJetdR1[i]  ->Fill( getDeltaR(gCharm1,*ev.JD_CommonJets().accepted.at(i)) );
          h_charmJetdR2[i]  ->Fill( getDeltaR(gCharm2,*ev.JD_CommonJets().accepted.at(i)) );
       }
