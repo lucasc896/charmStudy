@@ -11,12 +11,12 @@ import sys
 from Log import *
 from generalUtils import *
 import configuration as conf
-import tables as tbl
 
 r.TH1.SetDefaultSumw2()
 r.gROOT.SetBatch(True)
 
 ###-------------------------------------------------------------------###
+
 
 def getbMultis(bM=""):
   bMultiHists = {
@@ -146,7 +146,7 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
 
       width_ = hTot.GetBinWidth(1)
       yTitle_ = hTot.GetYaxis().GetTitle()
-      hTot.GetYaxis().SetTitle(yTitle_+" / %.1f GeV"%width_)
+      hTot.GetYaxis().SetTitle(yTitle_+" / %.1f"%width_)
 
       outHists.append(hTot)    
   
