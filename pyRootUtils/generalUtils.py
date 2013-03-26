@@ -574,6 +574,11 @@ def comparPlots(hList=None, debug=None, doLogy=False):
     elif "_delta" in entTitle: entTitle = entTitle.split("_")[0]+"_"+entTitle.split("_")[-1]
     elif "_175_" in entTitle: entTitle = "mStop=%s, mLSP=%s"%(entTitle.split("_")[-2], entTitle.split("_")[-1])
 
+    entTitle = entTitle.split("_")
+    entTitle.remove("Scan")
+    entTitle.remove("NoFilter")
+    entTitle = " ".join(entTitle)
+
     lg.AddEntry(hList[i], entTitle, "L")
 
     if ctr==0:
@@ -612,7 +617,7 @@ def comparPlots(hList=None, debug=None, doLogy=False):
     hRatio.SetLineWidth(1)
     hRatio.SetLineColor(r.kBlack)
     hRatio.GetYaxis().SetTitle("Ratio")
-    hRatio.GetYaxis().SetRangeUser(0.5,1.5)
+    hRatio.GetYaxis().SetRangeUser(0.,2.0)
     hRatio.SetLabelSize(0.12, "X")
     hRatio.SetLabelSize(0.07, "Y")
     hRatio.SetTitleSize(0.13, "X")
@@ -620,6 +625,12 @@ def comparPlots(hList=None, debug=None, doLogy=False):
     hRatio.SetTitleOffset(0.25, "Y")
     hRatio.SetTitleOffset(.9, "X")
     hRatio.Draw("pe1")
+
+    line = r.TLine()
+    
+    line.SetLineColor(16)
+    line.SetLineWidth(2)
+    line.DrawLineNDC(0.1,.605,0.95,.605)
 
   if not doLogy:
     c1.Print("plotDump/compare_%s_%s_%s_%s%s.%s"%(hList[0].GetName(),bM[0], jM, sSamp[0].split("_")[0], 
