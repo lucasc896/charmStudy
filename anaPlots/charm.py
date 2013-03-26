@@ -24,6 +24,7 @@ parser.add_option("-d", "--debug",
 
 (options, args) = parser.parse_args()
 
+
 def line():
    return "="*40
 
@@ -35,52 +36,51 @@ if options.doDebug:
    print "\n"
    Log.debug("\t>>> RUNNING IN DEBUG MODE\n")
 
-if conf.mode()=="anaPlots":
-   
-   print "\n%s"%line()
+if conf.mode() == "anaPlots":
+
+   print "\n%s" % line()
    print "  ***// Running anaPlots Analysis \\***"
    print line()+"\n"
-   
-   if conf.switches()["runMode"]=="plotting":
-      if conf.switches()["plotMode"]=="anaPlots":
+
+   if conf.switches()["runMode"] == "plotting":
+      if conf.switches()["plotMode"] == "anaPlots":
          anaP.runAnaPlots(debug=options.doDebug)
-      elif conf.switches()["plotMode"]=="standardPlots":
+      elif conf.switches()["plotMode"] == "standardPlots":
          anaP.runStandPlots(debug=options.doDebug, doLogy=conf.switches()["printLogy"])
-      elif conf.switches()["plotMode"]=="comparisonPlots":
-         anaP.runComparPlots(debug=options.doDebug, doLogy=conf.switches()["printLogy"])         
-        
-   elif conf.switches()["runMode"]=="yieldTables":
+      elif conf.switches()["plotMode"] == "comparisonPlots":
+         anaP.runComparPlots(debug=options.doDebug, doLogy=conf.switches()["printLogy"])
+
+   elif conf.switches()["runMode"] == "yieldTables":
       Log.info(">>> Running yield tables\n")
       tabl.printTable(debug=options.doDebug)
 
 
-elif conf.mode()=="bTagEff":
-   
-   print "\n%s"%line()
+elif conf.mode() == "bTagEff":
+
+   print "\n%s" % line()
    print "  ***// Running bTagEff Analysis \\***"
    print line()+"\n"
-   
-   if conf.switches()["runModeBTag"]=="charmFrac":
+
+   if conf.switches()["runModeBTag"] == "charmFrac":
       bTagP.jetCharmFrac(debug=options.doDebug)
-   elif conf.switches()["runModeBTag"]=="standardPlots":
+   elif conf.switches()["runModeBTag"] == "standardPlots":
       bTagP.runStandPlots(debug=options.doDebug)
-   elif conf.switches()["runModeBTag"]=="charmPhi":
+   elif conf.switches()["runModeBTag"] == "charmPhi":
       bTagP.doCharmPhiStudy(debug=options.doDebug)
 
-elif conf.mode()=="ISRSystem":
+elif conf.mode() == "ISRSystem":
 
-   print "\n%s"%line()
+   print "\n%s" % line()
    print "   ***// Running ISR Systematics \\***"
    print line()+"\n"
 
-   if conf.switches()["runMode"]=="plotting":
-      if conf.switches()["plotMode"]=="standardPlots":
+   if conf.switches()["runMode"] == "plotting":
+      if conf.switches()["plotMode"] == "standardPlots":
          anaP.runStandPlots(debug=options.doDebug)
-   
-   elif conf.switches()["runMode"]=="yieldTables":
+
+   elif conf.switches()["runMode"] == "yieldTables":
       Log.info(">>> Running yield tables\n")
       tabl.printTable(debug=options.doDebug)
 
-elif conf.mode()=="dev":
+elif conf.mode() == "dev":
    pass
-
