@@ -196,7 +196,6 @@ def jetCharmFrac(debug=False):
 
       ctr1=0
       for hT in hList:
-         print hT
          try:
             charmFrac = hT.GetBinContent(5)/hT.GetEntries()
          except ZeroDivisionError:
@@ -211,7 +210,8 @@ def jetCharmFrac(debug=False):
                3:"fourth",
                }
          
-         print "Frac of gen charm %s jets: %.2f (from %d charmJets)"%(myDict[ctr1], charmFrac, hT.GetBinContent(5))
+         Log.info("Frac of gen charm %s jets: %.2f (from %d charmJets)" % 
+                  (myDict[ctr1], charmFrac, hT.GetBinContent(5)))
          ctr1+=1
    
       g.Draw("P")
