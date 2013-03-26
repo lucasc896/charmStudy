@@ -13,6 +13,8 @@ from Log import *
 import configuration as conf
 import math
 from collections import OrderedDict
+import re
+
 
 ###-------------------------------------------------------------------###
 
@@ -171,21 +173,41 @@ def getDataYields(bM="inc", debug=False):
 
   yieldDict = {}
 
-  scale=1.
+  # maybe put in config file?
+  targetLumi = 11700.
 
-#  if "200_190" in sigSamp:
-#    scale=494749.
-#  elif "200_120" in sigSamp:
-#    scale=601852.
+  # do regex matching for particle masses
+  regex = re.compile(r"._mSt(\d*)_mL(\d*)")
+  result = regex.findall(sigSamp)
 
-#  scale=float(601852./90000.)
-
-  if "_200_190" in sigSamp:
-    scale = 11700.*18.5245/630563.
-  elif "_200_120" in sigSamp:
-    scale = 11700.*18.5245/630587.
+  masses = result[0] if len(result)>0 else []
 
 
+  # enter loop if both mStop and mLSP are matched
+  # note: eventually make possible for single mass scenario (i.e. an sms strip)
+  if len(masses)>1:
+  
+    # get stop mass
+    # note: eventually change to lookup table
+    if masses[0] == "200":
+      xSec = 18.5245
+      print "xSec 18.5245"
+      
+      # get nEvents
+      # note: eventually change to lookup search
+      if masses[1] == "120":
+        nSource = 630563.
+      elif masses[1] == "190":
+        nSource = 630587.
+      print nSource    
+
+    else:
+      xSec = 1.
+
+    scale = targetLumi*xSec/nSource
+  
+  else:
+    scale = 1
 
   Log.warning("Tables filled with scale factor %f"%scale)
 
@@ -193,15 +215,16 @@ def getDataYields(bM="inc", debug=False):
     ent=0
     dirTitle = d[4:].replace("_","-")
     if d=="inc_875": dirTitle="875-inf"
+
     for suf in getbMultis(bM):
       if debug: Log.debug("Getting %s/commHT%s"%(d, suf))
       h = sFile.Get("%s/commHT%s"%(d, suf))
       ent += h.GetEntries()
       if debug: Log.debug(str(ent))
     ent *= scale  
-    yieldDict[dirTitle[1:]]=[ent, math.sqrt(ent)]
+    yieldDict[dirTitle]=[ent, math.sqrt(ent)]
 
-  return OrderedDict(sorted(yieldDict.items(), key=lambda t: t[0]))
+  return OrderedDict(sorted(yieldDict.items(), key=lambda t: t[0])), scale
 
 ###-------------------------------------------------------------------###
 
@@ -245,7 +268,18 @@ def printEnd():
 
 def printHT():
 
-  return " HT Bins (GeV) & 225-275 & 275-325 & 325-375 & 375-475 & 475-575 & 575-675 & 675-775 & 775-875 & 875-$\\inf$ \\\\ \n"
+  bins = conf.switches()["HTcuts"]
+
+  HTline = " HT Bins (GeV) & 275-325 & 325-375 & 375-475 & 475-575 & 575-675 & 675-775 & 775-875 & 875-$\\inf$ \\\\ \n"
+
+  if "parked" in bins:
+    split = HTline.split("&")
+    split.insert(1, " 225-275 ")
+    HTline = " & ".join(split)
+
+  print HTline
+
+  return HTline
 
 ###-------------------------------------------------------------------###
 
@@ -257,7 +291,7 @@ def makeTable(bM="inc", debug=False):
   Log.info("\tBin: %s %s\n"%(bM, jM))
 
   smPred = getSMPred(bM, jM)
-  dYield = getDataYields(bM, debug=debug)
+  dYield, scale = getDataYields(bM, debug=debug)
 
   if debug: Log.debug("Opening: tableDump/yieldTable_%s_%s_%s.tex"%(sigSamp, jM, bM))
 
@@ -278,6 +312,8 @@ def makeTable(bM="inc", debug=False):
   outTxt += " SM BG Pred "
 
   for key, val in smPred.iteritems():
+    if "parked" not in conf.switches()["HTcuts"] and "225" in key:
+      continue
     print "%s\t%f \\pm %f"%(key, val[0], val[1])
     outTxt += "& %.1f $^{\pm %.1f }$ "%(val[0], val[1])
 
@@ -293,8 +329,11 @@ def makeTable(bM="inc", debug=False):
     totYield += val[0]
 
   print "\n*** Total Yield for %s: %d ***\n"%(sigSamp, totYield)
-  outTxt += "\ntotal: %f"%totYield
   outTxt += " \\\\"
+
+  outTxt += "\n%%Total: %f"%totYield
+  outTxt += "\n%%Filled with Scale: %f" % scale
+
 
   outTxt += printEnd()
 
