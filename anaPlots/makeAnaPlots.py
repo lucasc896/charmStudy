@@ -140,15 +140,16 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
       if doLogy: aPlot.SetLogy = True
       if conf.switches()["norm"]=="lumi": aPlot.xSecNorm=True
       hTot = aPlot.makeSinglePlot(rebinX=pDet["rebinX"], rebinY=pDet["rebinY"], norm=normVal)
+
       del aPlot
       
       doRanges(hTot, pDet)
 
-      width_ = hTot.GetBinWidth(1)
-      yTitle_ = hTot.GetYaxis().GetTitle()
-      hTot.GetYaxis().SetTitle(yTitle_+" / %.1f"%width_)
+    width_ = hTot.GetBinWidth(1)
+    yTitle_ = hTot.GetYaxis().GetTitle()
+    hTot.GetYaxis().SetTitle(yTitle_+" / %.1f"%width_)
 
-      outHists.append(hTot)    
+    outHists.append(hTot)    
   
   #plot single plots
   for hT, pDet in sinHists.iteritems():
@@ -162,6 +163,7 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
     if debug: aPlot.Debug=True
     if doLogy: aPlot.SetLogy=True
     hTot = aPlot.makeSinglePlot(rebinX=pDet["rebinX"], rebinY=pDet["rebinY"], norm=normVal)
+
     del aPlot
     
     doRanges(hTot, pDet)
