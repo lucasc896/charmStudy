@@ -298,7 +298,7 @@ def AddBinedHist(cutTree = None, OP = (), cut = None, htBins = [],TriggerDict = 
           out.append(upperCut)
           cutTree.TAttach(lowerCut,upperCut)
         ###pOps = makePlotOp(cutTree = cutTree, OP = OP, cut = lowerCut, label = "%s%d_"%(lab,lower)) 
-        pOps = makePlotOp(cutTree = cutTree, OP = OP, cut = upperCut if upper else lowerCut, label = "%s%d%s"%(lab,lower, "_%d"%upper if upper else ""), alphaTMode=alphaTCut)
+        pOps = makePlotOp(cutTree = cutTree, OP = OP, cut = upperCut if upper!=10000. else cut, label = "%s%d%s"%(lab,lower, "_%d"%upper if upper else ""), alphaTMode=alphaTCut)
         out.append(pOps)
   return out
   pass
@@ -392,40 +392,6 @@ triggers = {
     "875":["HLT_HT400_AlphaT0p51_v*", ],
     }
 
-single_mu_triggers = {
-    "275_325":["HLT_IsoMu24_eta2p1_v*", ],
-    "325_375":["HLT_IsoMu24_eta2p1_v*", ],
-    "375_475":["HLT_IsoMu24_eta2p1_v*", ],
-    "475_575":["HLT_IsoMu24_eta2p1_v*", ],
-    "575_675":["HLT_IsoMu24_eta2p1_v*", ],
-    "675_775":["HLT_IsoMu24_eta2p1_v*", ],
-    "775_875":["HLT_IsoMu24_eta2p1_v*", ],
-    "875":["HLT_IsoMu24_eta2p1_v*", ],
-}
-
-
-di_mu_triggers = {
-    "275_325":["HLT_Mu17_Mu8_v*", ],
-    "325_375":["HLT_Mu17_Mu8_v*", ],
-    "375_475":["HLT_Mu17_Mu8_v*", ],
-    "475_575":["HLT_Mu17_Mu8_v*", ],
-    "575_675":["HLT_Mu17_Mu8_v*", ],
-    "675_775":["HLT_Mu17_Mu8_v*", ],
-    "775_875":["HLT_Mu17_Mu8_v*", ],
-    "875":["HLT_Mu17_Mu8_v*", ],
-}
-
-
-mu_triggers = {
-    "275_325":["HLT_Mu5_HT200_v3","HLT_Mu5_HT200_v4","HLT_Mu8_HT200_v4","HLT_Mu15_HT200_v2","HLT_Mu15_HT200_v3","HLT_Mu15_HT200_v4","HLT_Mu30_HT200_v1","HLT_Mu30_HT200_v3","HLT_Mu40_HT200_v4","HLT_Mu40_HT300_v4","HLT_Mu40_HT300_v5",],
-    "325_375":["HLT_Mu5_HT200_v3","HLT_Mu5_HT200_v4","HLT_Mu8_HT200_v4","HLT_Mu15_HT200_v2","HLT_Mu15_HT200_v3","HLT_Mu15_HT200_v4","HLT_Mu30_HT200_v1","HLT_Mu30_HT200_v3","HLT_Mu40_HT200_v4","HLT_Mu40_HT300_v4","HLT_Mu40_HT300_v5",],
-    "375_475":["HLT_Mu5_HT200_v3","HLT_Mu5_HT200_v4","HLT_Mu8_HT200_v4","HLT_Mu15_HT200_v2","HLT_Mu15_HT200_v3","HLT_Mu15_HT200_v4","HLT_Mu30_HT200_v1","HLT_Mu30_HT200_v3","HLT_Mu40_HT200_v4","HLT_Mu40_HT300_v4","HLT_Mu40_HT300_v5",],
-    "475_575":["HLT_Mu5_HT200_v3","HLT_Mu5_HT200_v4","HLT_Mu8_HT200_v4","HLT_Mu15_HT200_v2","HLT_Mu15_HT200_v3","HLT_Mu15_HT200_v4","HLT_Mu30_HT200_v1","HLT_Mu30_HT200_v3","HLT_Mu40_HT200_v4","HLT_Mu40_HT300_v4","HLT_Mu40_HT300_v5",],
-    "575_675":["HLT_Mu5_HT200_v3","HLT_Mu5_HT200_v4","HLT_Mu8_HT200_v4","HLT_Mu15_HT200_v2","HLT_Mu15_HT200_v3","HLT_Mu15_HT200_v4","HLT_Mu30_HT200_v1","HLT_Mu30_HT200_v3","HLT_Mu40_HT200_v4","HLT_Mu40_HT300_v4","HLT_Mu40_HT300_v5",],
-    "675_775":["HLT_Mu5_HT200_v3","HLT_Mu5_HT200_v4","HLT_Mu8_HT200_v4","HLT_Mu15_HT200_v2","HLT_Mu15_HT200_v3","HLT_Mu15_HT200_v4","HLT_Mu30_HT200_v1","HLT_Mu30_HT200_v3","HLT_Mu40_HT200_v4","HLT_Mu40_HT300_v4","HLT_Mu40_HT300_v5",],
-    "775_875":["HLT_Mu5_HT200_v3","HLT_Mu5_HT200_v4","HLT_Mu8_HT200_v4","HLT_Mu15_HT200_v2","HLT_Mu15_HT200_v3","HLT_Mu15_HT200_v4","HLT_Mu30_HT200_v1","HLT_Mu30_HT200_v3","HLT_Mu40_HT200_v4","HLT_Mu40_HT300_v4","HLT_Mu40_HT300_v5",],
-    "875":["HLT_Mu5_HT200_v3","HLT_Mu5_HT200_v4","HLT_Mu8_HT200_v4","HLT_Mu15_HT200_v2","HLT_Mu15_HT200_v3","HLT_Mu15_HT200_v4","HLT_Mu30_HT200_v1","HLT_Mu30_HT200_v3","HLT_Mu40_HT200_v4","HLT_Mu40_HT300_v4","HLT_Mu40_HT300_v5",],
-}
 
 json = JSONFilter("Json Mask", json_to_pset("Jsons/json_DCSONLY_23Aug_run2012C.txt") )
 recHitCut = OP_SumRecHitPtCut(30.)
@@ -804,7 +770,7 @@ def MakeMCTree(Threshold, Muon = None, Split = None):
   #SMScut_ = SMSMassCut_175_165
 
   #SMScut_ = SMSMassCut_200_120
-  SMScut_ = SMSMassCut_200_190
+  #SMScut_ = SMSMassCut_200_190
 
   #SMScut_ = SMSMassCut_250_20
   #SMScut_ = SMSMassCut_250_40
@@ -829,14 +795,14 @@ def MakeMCTree(Threshold, Muon = None, Split = None):
       cutTreeMC.TAttach(secondJetET,oddJet)
   else:
       cutTreeMC.Attach(count_total)
-      cutTreeMC.TAttach(count_total, jet_ge2)
 
       if SMScut_:
-        cutTreeMC.TAttach(jet_ge2, SMScut_)
-        cutTreeMC.TAttach(SMScut_,ht200_Trigger)
+        cutTreeMC.TAttach(count_total, SMScut_)
+        cutTreeMC.TAttach(SMScut_,jet_ge2)
       else:
-        cutTreeMC.TAttach(jet_ge2,ht200_Trigger)
+        cutTreeMC.TAttach(count_total,jet_ge2)
 
+      cutTreeMC.TAttach(jet_ge2, ht200_Trigger)
       cutTreeMC.TAttach(ht200_Trigger,NoiseFilt)
       cutTreeMC.TAttach(NoiseFilt,GoodVertexMonster)
       cutTreeMC.TAttach(GoodVertexMonster,LeadingJetEta)
@@ -864,10 +830,11 @@ def MakeMCTree(Threshold, Muon = None, Split = None):
 
     cutTreeMC.TAttach(MHT_METCut,jet_le3)
     cutTreeMC.TAttach(MHT_METCut,jet_ge4) # jet ge4
-
-    out.append(AddBinedHist(cutTree = cutTreeMC,
-    OP = (runModeName,genericPSet_mc), cut =  SMScut_ if SMScut_ else count_total,
-    htBins = HTBins_inc, TriggerDict = None, lab ="noCuts_", Muon=False, alphaTCut=None))
+    
+    if int(Threshold) is 100:
+      out.append(AddBinedHist(cutTree = cutTreeMC,
+      OP = (runModeName,genericPSet_mc), cut =  SMScut_ if SMScut_ else count_total,
+      htBins = HTBins_inc, TriggerDict = None, lab ="noCuts_", Muon=False, alphaTCut=None))
       
     out.append(AddBinedHist(cutTree = cutTreeMC,
     OP = (runModeName,genericPSet_mc), cut = MHT_METCut,
@@ -974,9 +941,15 @@ PSet(GoodVertexWeights = [ 0.0, 0.00188151, 0.00878233, 0.0420452, 0.098297, 0.1
 vertex_reweight_PUS_MC8TeVData8TeV = GoodVertexReweighting(
 PSet(GoodVertexWeights = [ 0., 2.13881, 6.19557, 4.38383, 9.65705, 10.5397, 11.0608, 8.87249, 6.3986, 5.61017, 4.59699, 3.81157, 2.22687, 2.00172, 1.59634, 1.3718, 0.938535, 0.81193, 0.671217, 0.502157, 0.432198, 0.338219, 0.279123, 0.23935, 0.191275, 0.148133, 0.104935, 0.106231, 0.0679703, 0.0599905, 0.0580532, 0.0279169, 0.0253552, 0.0384467, 0.00802036, 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., ]).ps())
 
-""" READ ME """
-""" Split/split == Muon_All: using mu_had trigger but only for high HT bins (> 375 GeV), low HT bins trigger are ht_alphaT, so the Split/split == else actually (normally None)"""
-""" Split/split == Muon_Add: treat muon as a jet, but using ht_alphaT trigger for all the HT bins"""
-""" Split/split == Muon_Add_SingleMuTrig: treat muon as a jet, but using single muon trigger for all the HT bins to avoid the shift in HT for the ht_alphaT trigger"""
-""" Split/split == Muon_Add_SingleMutrigPlateau: treat muon as a jet and using single muon trigger. However, to avoid the inefficiency for the tow low HT bins, the common muon (which is treated a jet) pT cut is 45 GeV instead of 50.0*275./375. and 50.0*325./375. GeV. at 45 GeV, as studied the trigger efficienty is at 95%"""
+PU_2012 = [3.3526156883828602, 5.0000390543531159, 5.0000387186660964, 5.0000387864635014, 5.0000390502495184, 5.0000389494780535, 
+  3.4145539861479008, 1.7907397611093883, 1.5290439653662495, 1.5740788042135916, 1.6530978708241377, 1.6462211050178599, 
+  1.5287603131779848, 1.350159932499021, 1.1605480712613019, 1.0167357240277282, 0.94570196626791592, 0.92969500964238916, 
+  0.94911635831102081, 0.98744363579509253, 1.0189148078013086, 1.0293893415021849, 1.0212259726950803, 1.000824346166683, 
+  0.97311858818444352, 0.94213734571363006, 0.91015183950802869, 0.87804921585398921, 0.84564433493107471, 0.81305212352685896, 
+  0.7803616157059774, 0.74750993300650936, 0.71409776929773849, 0.68074164080016197, 0.64779490297963582, 0.61464959710449685, 
+  0.58197264454021658, 0.55012656573179264, 0.51876819929979823, 0.48823394292261296, 0.45864392634163109, 0.43010947665090771, 
+  0.40265257271948524, 0.37615982828793132, 0.35110986448841147, 0.32716124272580405, 0.30431197427324258, 0.28274399234289738, 
+  0.26242234978760065, 0.24325970866189159]
+
+pileup_reweight = PileUpReweighting(PSet(PileUpWeights = PU_2012).ps())
 
