@@ -21,19 +21,14 @@ from utils import *
 ###-------------------------------------------------------------------###
 
 
-consts = {
-    'modelSuffix': '',
-    'useProto': False,
-    'debug': False,
-}
 switches = {
     'sample': ["sig_T2cc_full"][0:],
     'sele': ["had", "muon"][:1],
     'thresh': [(30.0, 60.0), (36.7, 73.7), (43.3, 86.7), (50.0, 100.0)],
-    'isr': [False, True][0],
+    'isr': [False, True][1],
     'jes': ["", "-ve", "+ve"][0],
     'pu': [False, True][0],
-    'year': [2011, 2012][-1:],
+    'year': [2011, 2012][-1],
 }
 bins = {
     30.0: "225",
@@ -45,19 +40,13 @@ bins = {
 ###-------------------------------------------------------------------###
 
 
-#def addCutFlowMC(b, cutTree, CustomEleID, CustomMuID, ra3PhotonIdFilter, isr, jes, pu):
-#
-#    if pu:
-#        b.AddWeightFilter("Weight", pileup_reweight)
-#    if isr:
-#        b.AddWeightFilter("Weight", ISR_reweight)
-#    if jes:
-#        b.AddJetFilter("PreCC", JES_reweight)
-#    b.AddMuonFilter("PreCC", CustomMuID)
-#    b.AddPhotonFilter("PreCC", ra3PhotonIdFilter)
-#    b.AddElectronFilter("PreCC", CustomEleID)
-#
-#    b += cutTree
+def uniqueStr(sample, sele, thresh, jes, isr, pu, year):
+
+    s = '{sample}_{sel}_{year}_{thr}_{jes}_{isr}'.format(
+            sample=sample, sel=sele, thr=thresh[1], jes=jes,
+            isr=isr, year=year)
+
+    return s
 
 ###-------------------------------------------------------------------###
 
@@ -85,7 +74,6 @@ def run_analysis(sample, sele, thresh, isr, jes, pu, year):
     if len(scratchDir) > 0:
       outDir = scratchDir + "/" + outDir
     ensure_dir(outDir)
-    print "\n\n OUTDIR: ", outDir, "\n\n"
 
     #AK5 Calo
     conf_ak5_caloMC           = deepcopy(defaultConfig)
@@ -93,7 +81,8 @@ def run_analysis(sample, sele, thresh, isr, jes, pu, year):
     conf_ak5_caloMC.XCleaning = deepcopy(default_cc)
     conf_ak5_caloMC.Common    = deepcopy(default_common)
 
-    anal_ak5_caloMC           = Analysis("AK5Calo")
+    anal_ak5_caloMC = Analysis("AK5Calo_{ustr}".format(ustr=uniqueStr(sample,
+                                          sele, thresh, jes, isr, pu, year)))
 
     # add weights and IDs
     if pu:
@@ -114,7 +103,7 @@ def run_analysis(sample, sele, thresh, isr, jes, pu, year):
 
 
 def main():
-        
+
     variables_to_iterate = ['sample', 'sele', 'thresh', 'isr', 'jes', 'pu',
                             'year']
 
@@ -131,8 +120,6 @@ def main():
     arg_list = [dict(zip(variables_to_iterate, x)) for x in argument_set]
 
     for kwargs in arg_list:
-        #kwargs.update(consts)
-        print kwargs
         run_analysis(**kwargs)
 
 ###-------------------------------------------------------------------###
