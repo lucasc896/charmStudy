@@ -36,7 +36,8 @@ namespace Operation {
       double minDR_;
       bool StandardPlots_;
       double threshold_;      
-  
+      bool NoCuts_; 
+ 
       void StandardPlots();
       bool StandardPlots( Event::Data& ev );
 
@@ -45,6 +46,7 @@ namespace Operation {
       vector<double> getMHTandMET( Event::Data& ev );
       vector<double> getStopGenPt( Event::Data& ev );
       double getGenDeltaPhi( const Event::GenObject& gOb1, const Event::GenObject& gOb2 );
+      int verticesN( Event::Data& ev );
   
       // Histos
       std::vector<TH1D*>  h_nEvents;
@@ -94,7 +96,11 @@ namespace Operation {
       std::vector<TH2D*>  h_vectGenPt_vs_scalGenPt;
       std::vector<TH2D*>  h_genPtLeadCharm_vs_MHT;
       std::vector<TH2D*>  h_delPhiLeadJetMHT_vs_MHT;  
-      std::vector<TH1D*>  h_leadTwoJetsPt;   
+      std::vector<TH1D*>  h_leadTwoJetsPt;  
+      std::vector<TH2D*>  h_commHT_vs_nVtx;
+      std::vector<TH2D*>  h_MHT_vs_nVtx;
+      std::vector<TH2D*>  h_jetPt_vs_nVtx; 
+      std::vector<TH1D*>  h_nVertex;
   };
 
 }

@@ -35,7 +35,8 @@ namespace Operation {
       double bTagAlgoCut_;
       double minDR_;
       bool StandardPlots_;      
-  
+      bool NoCuts_;  
+
       void StandardPlots();
       bool StandardPlots( Event::Data& ev);
       bool hasTrueQuark( const Event::Data& ev, int pdgID);
