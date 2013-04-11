@@ -27,7 +27,8 @@ charmEffStudy::charmEffStudy( const Utils::ParameterSet& ps ) :
    bTagAlgo_( ps.Get<int>("BTagAlgo") ),
    bTagAlgoCut_( ps.Get<double>("BTagAlgoCut") ),
    minDR_( ps.Get<double>("minDR") ),
-   StandardPlots_( ps.Get<bool>("StandardPlots") )
+   StandardPlots_( ps.Get<bool>("StandardPlots") ),
+   NoCuts_( ps.Get<bool>("NoCutsMode") )
 
    { 
    }
@@ -222,7 +223,7 @@ void charmEffStudy::StandardPlots() {
 //
 std::ostream& charmEffStudy::Description( std::ostream& ostrm ) {
    ostrm << "Charm tag efficiency study ";
-   ostrm << "(bins " << nMin_ << " to " << nMax_ << ") ";
+   ostrm << "(bins " << nMin_ << " to " << nMax_ << ") " << dirName_.c_str();
    return ostrm;
 }
 
@@ -245,9 +246,12 @@ bool charmEffStudy::StandardPlots( Event::Data& ev ) {
       nbjet[i]=0;
    }
 
+
    // a couple event level vetoes
    if (!StandardPlots_) return true;
-   if( nobjkt < nMin_ || nobjkt > nMax_ ) return true;
+   if (!NoCuts_){
+      if( nobjkt < nMin_ || nobjkt > nMax_) return true;
+   }
 
    //do some SMS stuff
    double M0 = 0.;
@@ -327,28 +331,30 @@ bool charmEffStudy::StandardPlots( Event::Data& ev ) {
         h_noMatch_response[4]->Fill( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), 2) );
    }
 
-   if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(0)->GetIndex())) == 4){
-      if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(1)->GetIndex())) == 4){
-         // both charm
-         h_bothLeadCharm[0]->Fill(2.5);
+   if (ev.JD_CommonJets().accepted.size()>1){
+      if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(0)->GetIndex())) == 4){
+         if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(1)->GetIndex())) == 4){
+            // both charm
+            h_bothLeadCharm[0]->Fill(2.5);
+         }
       }
-   }
-   else if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(1)->GetIndex())) == 4){
-      if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(0)->GetIndex())) != 4){
-         // only second is charm
-         h_bothLeadCharm[0]->Fill(1.5);
+      else if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(1)->GetIndex())) == 4){
+         if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(0)->GetIndex())) != 4){
+            // only second is charm
+            h_bothLeadCharm[0]->Fill(1.5);
+         }
       }
-   }
-   else if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(0)->GetIndex())) == 4){
-      if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(1)->GetIndex())) != 4){
-         // only first is charm
-         h_bothLeadCharm[0]->Fill(1.5);
+      else if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(0)->GetIndex())) == 4){
+         if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(1)->GetIndex())) != 4){
+            // only first is charm
+            h_bothLeadCharm[0]->Fill(1.5);
+         }
       }
-   }
-   else if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(0)->GetIndex())) != 4){
-      if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(1)->GetIndex())) != 4){
-         // neither is charm
-         h_bothLeadCharm[0]->Fill(0.5);
+      else if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(0)->GetIndex())) != 4){
+         if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(1)->GetIndex())) != 4){
+            // neither is charm
+            h_bothLeadCharm[0]->Fill(0.5);
+         }
       }
    }
 
@@ -407,22 +413,24 @@ bool charmEffStudy::StandardPlots( Event::Data& ev ) {
    
    for(unsigned int i=0; i<4; i++){
       if (ev.JD_CommonJets().accepted.size()>i){
-         h_jetFlavour[i]   ->Fill( getJetFlavour(ev, *ev.JD_CommonJets().accepted.at(i), minDR_), evWeight );
-         h_jetFlavourICF[i]->Fill( ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(i)->GetIndex()), evWeight );
+         h_jetFlavour[i]   ->Fill( fabs(getJetFlavour(ev, *ev.JD_CommonJets().accepted.at(i), minDR_)), evWeight );
+         h_jetFlavourICF[i]->Fill( fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(i)->GetIndex())), evWeight );
          h_charmJetdR1[i]  ->Fill( getDeltaR(gCharm1,*ev.JD_CommonJets().accepted.at(i)) );
          h_charmJetdR2[i]  ->Fill( getDeltaR(gCharm2,*ev.JD_CommonJets().accepted.at(i)) );
       }
    }
 
    // if leadJet not charm, get dR between other three leading jets
-   if( fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(0)->GetIndex())) != 4 ){
-      for(unsigned int i=1; i<4; i++){
-         if (ev.JD_CommonJets().accepted.size()>i){
-            double dRVal = ROOT::Math::VectorUtil::DeltaR( *ev.JD_CommonJets().accepted.at(0), *ev.JD_CommonJets().accepted.at(i) );
-            double dPhiVal = ROOT::Math::VectorUtil::DeltaPhi( *ev.JD_CommonJets().accepted.at(0), *ev.JD_CommonJets().accepted.at(i) );
-            h_noCLeadJetdR[i-1]  ->Fill( fabs(dRVal) );
-            h_noCLeadJetdPhi[i-1]->Fill( fabs(dPhiVal) );
+   if (ev.JD_CommonJets().accepted.size()>0){
+      if( fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(0)->GetIndex())) != 4 ){
+         for(unsigned int i=1; i<4; i++){
+            if (ev.JD_CommonJets().accepted.size()>i){
+               double dRVal = ROOT::Math::VectorUtil::DeltaR( *ev.JD_CommonJets().accepted.at(0), *ev.JD_CommonJets().accepted.at(i) );
+               double dPhiVal = ROOT::Math::VectorUtil::DeltaPhi( *ev.JD_CommonJets().accepted.at(0), *ev.JD_CommonJets().accepted.at(i) );
+               h_noCLeadJetdR[i-1]  ->Fill( fabs(dRVal) );
+               h_noCLeadJetdPhi[i-1]->Fill( fabs(dPhiVal) );
 
+            }
          }
       }
    }
