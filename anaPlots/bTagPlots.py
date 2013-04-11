@@ -166,7 +166,7 @@ def jetCharmFrac(debug=False):
    c1 = r.TCanvas()
    mg = r.TMultiGraph()
    #lg = r.TLegend(0.6, 0.17, 0.85, 0.42)
-   lg = r.TLegend(0.5, 0.65, 0.75, 0.88)
+   lg = r.TLegend(0.6, 0.65, 0.85, 0.88)
 
    c1.SetCanvasSize(1000, 1000)
 
@@ -253,7 +253,7 @@ def jetCharmFrac(debug=False):
    mg.GetXaxis().LabelsOption("d")
    mg.GetXaxis().SetLabelSize(0.05)
    mg.GetXaxis().SetTitleOffset(1.35)
-   mg.GetYaxis().SetRangeUser(0., 0.4)
+   mg.GetYaxis().SetRangeUser(0., 1.0)
    mg.GetYaxis().SetTitleOffset(1.40)
 
    lg.SetFillColor(0)
