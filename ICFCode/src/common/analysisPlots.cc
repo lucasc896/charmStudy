@@ -28,7 +28,8 @@ analysisPlots::analysisPlots( const Utils::ParameterSet& ps ) :
    bTagAlgoCut_( ps.Get<double>("BTagAlgoCut") ),
    minDR_( ps.Get<double>("minDR") ),
    StandardPlots_( ps.Get<bool>("StandardPlots") ),
-   threshold_( ps.Get<double>("threshold") )
+   threshold_( ps.Get<double>("threshold") ),
+   NoCuts_( ps.Get<bool>("NoCutsMode") )
 
    { 
    }
@@ -359,6 +360,33 @@ void analysisPlots::StandardPlots() {
       32, 0., 400.,
       6, 0, 1, false);
 
+   BookHistArray(h_commHT_vs_nVtx,
+      "commHT_vs_nVtx",
+      ";HT (GeV); nVertices;# count",
+      50, 0., 1000.,
+      40, 0., 40.,
+      6, 0, 1, false);
+
+   BookHistArray(h_MHT_vs_nVtx,
+      "MHT_vs_nVtx",
+      ";MHT (GeV); nVertices;# count",
+      50, 0., 1000.,
+      40, 0., 40.,
+      6, 0, 1, false);
+
+   BookHistArray(h_jetPt_vs_nVtx,
+      "jetPt_vs_nVtx",
+      ";jet p_{T} (GeV); nVertices;# count",
+      80, 0., 1000.,
+      40, 0., 40.,
+      6, 0, 1, false);
+
+   BookHistArray(h_nVertex,
+      "nVertex",
+      ";nVertices;# count",
+      40., 0., 40.,
+      6, 0, 1, false);
+
 }
 
 
@@ -383,7 +411,9 @@ bool analysisPlots::StandardPlots( Event::Data& ev ) {
 
    // a couple event level vetoes
    if (!StandardPlots_) return true;
-   if( nobjkt < nMin_ || nobjkt > nMax_ ) return true;
+   if (!NoCuts_){
+      if( nobjkt < nMin_ || nobjkt > nMax_ ) return true;
+   }
 
    h_nEvents[1]->Fill( .5, evWeight );
 
@@ -422,11 +452,17 @@ bool analysisPlots::StandardPlots( Event::Data& ev ) {
    h_nJets_ISR[0]    ->Fill( nISRJets, evWeight );
    h_nBTagJets[0]    ->Fill( nbjet, evWeight );
 
+   // get nVertices
+   int nVertex = verticesN( ev );
+
    // get plot index
    plotIndex = getPlotIndex( nbjet );
 
+   h_nVertex[plotIndex]->Fill(nVertex, evWeight);
+
    for(int i=0; i<nCommJet; i++){
-      h_jetPt[plotIndex]->Fill( ev.JD_CommonJets().accepted.at(i)->Pt(), evWeight );
+      h_jetPt[plotIndex]         ->Fill( ev.JD_CommonJets().accepted.at(i)->Pt(), evWeight );
+      h_jetPt_vs_nVtx[plotIndex] ->Fill( ev.JD_CommonJets().accepted.at(i)->Pt(), nVertex, evWeight );
    }
 
    if( nCharmJets > 0 ){
@@ -446,18 +482,20 @@ bool analysisPlots::StandardPlots( Event::Data& ev ) {
 
    h_nBTagJets[plotIndex+1]            ->Fill( nbjet );
    h_commHT[plotIndex]                 ->Fill( evHT, evWeight );
+   h_commHT_vs_nVtx[plotIndex]         ->Fill( evHT, nVertex, evWeight );
    h_HT_charm[plotIndex]               ->Fill( charmHT, evWeight );
    h_HT_ISR[plotIndex]                 ->Fill( isrHT, evWeight );
    //h_hadronicAlphaT[plotIndex]         ->Fill( hadronicAlphaT, evWeight );
    h_hadronicAlphaTZoom[plotIndex]     ->Fill( hadronicAlphaT, evWeight );
    h_MHT[plotIndex]                    ->Fill( mht, evWeight );
+   h_MHT_vs_nVtx[plotIndex]            ->Fill( mht, nVertex, evWeight);
    h_MET[plotIndex]                    ->Fill( v_MHTMET[1], evWeight );
    h_MHToverMET[plotIndex]             ->Fill( v_MHTMET[2], evWeight );
    h_stopGenPtVect[plotIndex]          ->Fill( v_StopGenPt.at(0), evWeight );
    h_stopGenPtScal[plotIndex]          ->Fill( v_StopGenPt.at(1), evWeight );
    //h_alphaT_vs_HT[plotIndex]           ->Fill( hadronicAlphaT, evHT, evWeight );
    h_MHToverHT[plotIndex]              ->Fill( mht/evHT, evWeight );
-   h_vectGenPt_vs_scalGenPt[0] ->Fill( v_StopGenPt.at(0), v_StopGenPt.at(1), evWeight );
+   h_vectGenPt_vs_scalGenPt[0]         ->Fill( v_StopGenPt.at(0), v_StopGenPt.at(1), evWeight );
 
    double leadJetMHTdPhi = 0.;
    if (ev.JD_CommonJets().accepted.size()>0){
@@ -662,3 +700,18 @@ double analysisPlots::getGenDeltaPhi( const Event::GenObject& gOb1, const Event:
 
 }
 
+
+// -----------------------------------------------------------------------------
+// Module to get number of vertices passing quality cuts - from Z. Meng
+int analysisPlots::verticesN( Event::Data& ev ){
+  int nVertex=0;
+  for(std::vector<float>::const_iterator vtx= ev.vertexSumPt()->begin();vtx != ev.vertexSumPt()->end();++vtx){
+    if(!ev.vertexIsFake()->at( vtx-ev.vertexSumPt()->begin()) &&
+       fabs((ev.vertexPosition()->at( vtx-ev.vertexSumPt()->begin())).Z()) < 24.0 &&
+       ev.vertexNdof()->at( vtx-ev.vertexSumPt()->begin() ) > 4 &&
+       (ev.vertexPosition()->at( vtx-ev.vertexSumPt()->begin())).Rho() < 2.0 ){
+      nVertex++;
+    }
+  }
+  return nVertex;
+}
