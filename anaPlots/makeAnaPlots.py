@@ -125,6 +125,16 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
 
   outHists = []
 
+  #Log.warning("Running in mStop=200 sample point mode")
+#
+  #if "3jet" in sigSamp:
+  #  if "mSt200_mL190" in sigSamp:
+  #    normVal = 550261./714441.
+  #  elif "mSt200_mL120" in sigSamp:
+  #    normVal = 602438./620669.
+  #else:
+  #  normVal = 1.
+
   #plot b-Multi plots
   for hT, pDet in hists.iteritems():
     for b in bMulti:
