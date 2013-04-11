@@ -216,8 +216,8 @@ class anaPlot(object):
     c1 = r.TCanvas()
 
     for i in range( len(self.hists) ):
-      if i==0: h=self.hists[i].Clone()
-      elif i>0: h.Add(self.hists[i])   
+      if i == 0: h=self.hists[i].Clone()
+      else: h.Add(self.hists[i])   
 
     h.SetLineColor(r.kMagenta+1)
     h.SetLineWidth(2)
@@ -264,6 +264,7 @@ class anaPlot(object):
       scaleF = normVal
     else:
       scaleF = normVal/float(h.GetEntries())
+
     h.Scale( scaleF )
     
 ###-------------------------------------------------------------------###
@@ -617,7 +618,7 @@ def comparPlots(hList=None, debug=None, doLogy=False):
     hRatio.SetLineWidth(1)
     hRatio.SetLineColor(r.kBlack)
     hRatio.GetYaxis().SetTitle("Ratio")
-    hRatio.GetYaxis().SetRangeUser(0.,2.0)
+    hRatio.GetYaxis().SetRangeUser(0.3,1.7)
     hRatio.SetLabelSize(0.12, "X")
     hRatio.SetLabelSize(0.07, "Y")
     hRatio.SetTitleSize(0.13, "X")
