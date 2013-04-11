@@ -24,11 +24,11 @@ from utils import *
 switches = {
     'sample': ["sig_T2cc_full"][0:],
     'sele': ["had", "muon"][:1],
-    'thresh': [(30.0, 60.0), (36.7, 73.7), (43.3, 86.7), (50.0, 100.0)],
+    'thresh': [(30.0, 60.0)], (36.7, 73.7), (43.3, 86.7), (50.0, 100.0)],
     'isr': [False, True][1],
     'jes': ["", "-ve", "+ve"][0],
     'pu': [False, True][0],
-    'year': [2011, 2012][-1],
+    'year': [2011, 2012][-1:],
 }
 bins = {
     30.0: "225",
@@ -42,7 +42,7 @@ bins = {
 
 def uniqueStr(sample, sele, thresh, jes, isr, pu, year):
 
-    s = '{sample}_{sel}_{year}_{thr}_{jes}_{isr}'.format(
+    s = '{sample}_{sel}_{year}_{thr}_jes-{jes}_isr-{isr}'.format(
             sample=sample, sel=sele, thr=thresh[1], jes=jes,
             isr=isr, year=year)
 
@@ -80,6 +80,7 @@ def run_analysis(sample, sele, thresh, isr, jes, pu, year):
     conf_ak5_caloMC.Ntuple    = deepcopy(ak5_calo)
     conf_ak5_caloMC.XCleaning = deepcopy(default_cc)
     conf_ak5_caloMC.Common    = deepcopy(default_common)
+    conf_ak5_caloMC.Common.print_out()
 
     anal_ak5_caloMC = Analysis("AK5Calo_{ustr}".format(ustr=uniqueStr(sample,
                                           sele, thresh, jes, isr, pu, year)))
