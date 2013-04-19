@@ -14,7 +14,7 @@ import ROOT as r
 
 def mode():
   
-  anaMode = ["bTagEff", "anaPlots", "ISRSystem","dev"][0]
+  anaMode = ["bTagEff", "anaPlots", "ISRSystem","dev"][1]
 
   return anaMode
 
@@ -26,8 +26,8 @@ def switches():
           "runMode"       :["plotting", "yieldTables"][0],
           "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][2],
           "runModeBTag"   :["charmFrac", "standardPlots", "charmPhi"][0],
-          "signalSample"  :"T2cc_Scan_NoFilter_mSt200_mL190",
-          "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT","parkedHT"][0],
+          "signalSample"  :"T2cc_mSt200_mL190",
+          "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT","parkedHT"][1],
           "jetMulti"      :["le3j","ge4j","inc"][2],
           "printLogy"     :[False, True][0],
           "norm"          :["None", "Unitary", "xSec", "lumi"][2],
@@ -57,21 +57,8 @@ def comparFiles():
 
   comparFiles = ["T2bb_300", "T2cc_300"]
   comparFiles = ["T2cc_220_195", "T2cc_220_170", "T2cc_220_145"]
-  comparFiles = ["T2cc_Scan_NoFilter_ISRRW_100_20",
-                  "T2cc_Scan_NoFilter_ISRRW_100_40",
-                  "T2cc_Scan_NoFilter_ISRRW_100_60",
-                  "T2cc_Scan_NoFilter_ISRRW_100_80",
-                  "T2cc_Scan_NoFilter_ISRRW_100_90",]
-  #comparFiles = ["T2cc_Scan_NoFilter_ISRRW_100_20",
-  #                "T2cc_Scan_NoFilter_ISRRW_100_90",]
-  #comparFiles = ["T2cc_Scan_NoFilter_ISRRW_delta10", "T2cc_Scan_NoFilter_ISRRW_delta80", "T2cc_Scan_NoFilter_ISRRW_delta60", "T2cc_Scan_NoFilter_ISRRW_delta20", "T2cc_Scan_NoFilter_ISRRW_delta40"]
-  ##comparFiles = ["T2cc_Scan_NoFilter_ISRRW_Stop100_Vect100", "T2cc_Scan_NoFilter_ISRRW_Stop175_Vect100", "T2cc_Scan_NoFilter_ISRRW_Stop250_Vect100"]
-  #comparFiles = ["T2cc_Scan_NoFilter_ISRRW_delta80", "T2cc_Scan_NoFilter_ISRRW_delta80_JES-ve", "T2cc_Scan_NoFilter_ISRRW_delta80_JES+ve"]
-  comparFiles = ["T2cc_ISRRW_175_165", "T2cc_ISRRW_175_95", "T2cc_ISRRW"]
-  #comparFiles = ["T2cc_Scan_NoFilter_ISRRW", "T2cc_Scan_NoFilter"]
-  #comparFiles = ["T2cc_Scan_NoFilter_ISRRW", "T2cc_Scan_NoFilter_ISRRW_delta10", "T2cc_Scan_NoFilter_ISRRW_delta80"]
-  #comparFiles = ["T2cc_Scan_NoFilter_mSt200_mL120", "T2cc_Scan_NoFilter_3jet_mSt200_mL120"]
-#  comparFiles = ["T2cc_Scan_NoFilter_mSt200_mL190", "T2cc_Scan_NoFilter_3jet_mSt200_mL190"]
+  comparFiles = ["T2cc", "T2cc_ISRRW"]
+  comparFiles = ["T2cc_mSt200_mL190", "T2cc_3jet_mSt200_mL190"]
 
   return comparFiles
 
@@ -101,13 +88,13 @@ def sigFile():
 
   if mode()=="anaPlots":
     sigFile = {
-            "T2cc"                      :["%sanaPlots_225/outT2cc_anaPlots.root"%inDir, 100.],
-            "T2cc_mSt200_mL120"         :["%sanaPlots_225/outT2cc_200_120_anaPlots.root"%inDir, 100.],
-            "T2cc_mSt200_mL190"         :["%sanaPlots_225/outT2cc_200_190_anaPlots.root"%inDir, 100.],
-            "T2cc_3jet_mSt200_mL120"    :["%sanaPlots_225/outT2cc_3jet_200_120_anaPlots.root"%inDir, 100.],
-            "T2cc_3jet_mSt200_mL190"    :["%sanaPlots_225/outT2cc_3jet_200_190_anaPlots.root"%inDir, 100.],
+            "T2cc"                      :["%sanaPlots_v3/outT2cc_anaPlots.root"%inDir, 100.],
+            "T2cc_mSt200_mL120"         :["%sanaPlots_v3/outT2cc_200_120_anaPlots_v3.root"%inDir, 100.],
+            "T2cc_mSt200_mL190"         :["%sanaPlots_v3/outT2cc_200_190_anaPlots_v3.root"%inDir, 100.],
+            "T2cc_3jet_mSt200_mL120"    :["%sanaPlots_v3/outT2cc_3jet_200_120_anaPlots_v3.root"%inDir, 100.],
+            "T2cc_3jet_mSt200_mL190"    :["%sanaPlots_v3/outT2cc_3jet_200_190_anaPlots_v3.root"%inDir, 100.],
             "T2cc_aT0p6"                :["%sanaPlots_225/outT2cc_aT0p6_anaPlots.root"%inDir, 100.],
-            "T2cc_ISRRW"                :["%sanaPlots_225/outT2cc_ISRRW13_anaPlots.root"%inDir, 100.],
+            "T2cc_ISRRW"                :["%sanaPlots_v3/outT2cc_ISRRW13_anaPlots.root"%inDir, 100.],
             "T2cc_ISRRW_delta10"        :["%sanaPlots_225/outT2cc_ISRRW13_delta10_anaPlots.root"%inDir, 100.],
             "T2cc_ISRRW_delta20"        :["%sanaPlots_225/outT2cc_ISRRW13_delta20_anaPlots.root"%inDir, 100.],
             "T2cc_ISRRW_delta30"        :["%sanaPlots_225/outT2cc_ISRRW13_delta30_anaPlots.root"%inDir, 100.],
@@ -192,7 +179,7 @@ def sinHists():
 #       #"dPhiNeutCharm"        :plotDetails(xRange=[0.,3.2], rebX=2),
 #       "dPhiCharmCharm"       :plotDetails(xRange=[0.,3.2], rebX=2),
 #       #"dPhiStopNeut"         :plotDetails(xRange=[0.,3.2], rebX=2),
-#       "n_Events_1"           :plotDetails(),
+       # "n_Events_1"           :plotDetails(),
        "n_Jets"               :plotDetails(xRange=[0.,8.]),
        ###"n_Jets_charm"               :plotDetails(xRange=[0.,8.]),
        ###"n_Jets_ISR"               :plotDetails(xRange=[0.,8.]),
@@ -236,16 +223,17 @@ def anaHists():
   # "MHToverMET"            :plotDetails(xRange=[0.,2.], rebX=1),
    ###"MHToverHT"            :plotDetails(xRange=[0.,2.], rebX=1),
    "jetPt"                 :plotDetails(xRange=[0.,500.], rebX=1),
-   "leadJetPt"             :plotDetails(xRange=[50.,500.], rebX=1),
+   "leadJetPt"             :plotDetails(xRange=[0.,500.], rebX=1),
    "subLeadJetPt"          :plotDetails(xRange=[0.,500.], rebX=1),
    "thirdJetPt"            :plotDetails(xRange=[0., 300.], rebX=1),
    ###"leadISRJetPt"            :plotDetails(xRange=[0., 300.], rebX=1),
    ###"subLeadISRJetPt"            :plotDetails(xRange=[0., 300.], rebX=1),
-   "fourthJetPt"           :plotDetails(xRange=[0., 200.], rebX=2),
+    "fourthJetPt"           :plotDetails(xRange=[0., 200.], rebX=1),
+    "fivePlusJetPt"           :plotDetails(xRange=[0., 200.], rebX=1),
    #"alphaT_vs_HT"          :plotDetails(xRange=[0.,1.6], yRange=[0.,600.], rebX=2, rebY=2),
    #"leadTwoJetsPt"         :plotDetails(xRange=[0.,300.], rebX=2),
   # "stopGenPtScal"         :plotDetails(xRange=[0.,1000.], rebX=2),
-   #"stopGenPtVect"         :plotDetails(xRange=[0.,600.], rebX=2),
+   "stopGenPtVect"         :plotDetails(xRange=[0.,600.], rebX=2),
    #"delPhi_vs_scalGenPt"   :plotDetails(xRange=[0., 900.], yRange=[0., 3.2], rebX=5), 
   # "dPhiStopCharm"         :plotDetails(xRange=[0.,3.2], rebX=1),
   # "dPhiStopStop"          :plotDetails(xRange=[0.,3.2], rebX=1),
