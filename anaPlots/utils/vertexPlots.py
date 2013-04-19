@@ -1,7 +1,3 @@
-import os
-
-print os.environ
-
 import ROOT as r
 
 r.gROOT.SetBatch(r.kTRUE)
