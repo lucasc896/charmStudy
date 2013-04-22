@@ -399,7 +399,11 @@ class stackPlots(object):
 
   def drawStack(self):
 
-    c1=r.TCanvas()
+    if conf.switches()["hiRes"]:
+      c1 = r.TCanvas("myStack", "myStack", 1600, 1200)
+    else: 
+      c1 = r.TCanvas()
+
     stTitle = "%s;%s;%s"%(self.canvTitle, self.bgHists[0].GetXaxis().GetTitle(), self.bgHists[0].GetYaxis().GetTitle())
     st1 = r.THStack("hs", stTitle)
     lg = r.TLegend(0.62, 0.72, 0.82, 0.85)
@@ -450,7 +454,6 @@ class stackPlots(object):
     c1.Print(self.oFileName)
 
     if self.PrintLogy:
-      oFileName = self.oFileName[:len(self.oFileName)-4]+"_log.png"
       c1.SetLogy(1)
       c1.Print(oFileName)
 
@@ -576,8 +579,8 @@ def comparPlots(hList=None, debug=None, doLogy=False):
     elif "_175_" in entTitle: entTitle = "mStop=%s, mLSP=%s"%(entTitle.split("_")[-2], entTitle.split("_")[-1])
 
     entTitle = entTitle.split("_")
-    entTitle.remove("Scan")
-    entTitle.remove("NoFilter")
+    #entTitle.remove("Scan")
+    #entTitle.remove("NoFilter")
     entTitle = " ".join(entTitle)
 
     lg.AddEntry(hList[i], entTitle, "L")
@@ -588,6 +591,10 @@ def comparPlots(hList=None, debug=None, doLogy=False):
     else:
       #hList[i].Draw("histsame e")
       hList[i].Draw("histsame")
+
+    if conf.switches()["printLogy"]:
+      pd1.SetLogy(r.kTRUE)
+
     ctr+=1
 
   hList[hOrder[0]].SetLabelSize(0.04,"Y")
@@ -617,7 +624,7 @@ def comparPlots(hList=None, debug=None, doLogy=False):
     hRatio.SetMarkerSize(.7)
     hRatio.SetLineWidth(1)
     hRatio.SetLineColor(r.kBlack)
-    hRatio.GetYaxis().SetTitle("Ratio")
+    hRatio.GetYaxis().SetTitle("2Part/3Part")
     hRatio.GetYaxis().SetRangeUser(0.3,1.7)
     hRatio.SetLabelSize(0.12, "X")
     hRatio.SetLabelSize(0.07, "Y")
@@ -645,13 +652,14 @@ def comparPlots(hList=None, debug=None, doLogy=False):
 
 def getPlotsFromFile(histName="", dirs=None, bSufs=None, inFile=None, scale=None):
 
-  ctr=0
+  h1=None
   for d in dirs:
     for suf in bSufs:
       h = inFile.Get("%s/%s%s"%(d, histName, suf))
-      if ctr==0: h1 = h.Clone()
-      else: h1.Add(h)
-      ctr+=1
+      if not h1:
+        h1 = h.Clone()
+      else:
+        h1.Add(h)
   if scale: h1.Scale(scale)
     
   return h1    
