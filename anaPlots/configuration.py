@@ -26,12 +26,12 @@ def switches():
           "runMode"       :["plotting", "yieldTables"][0],
           "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][0],
           "runModeBTag"   :["charmFrac", "standardPlots", "charmPhi"][0],
-          "signalSample"  :None, #"T2cc_dev",
+          "signalSample"  :"T2cc_mSt200_dev",
           "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT","parkedHT"][1],
           "jetMulti"      :["le3j","ge4j","inc"][2],
           "printLogy"     :[False, True][0],
           "norm"          :["None", "Unitary", "xSec", "lumi"][0],
-          "lumiNorm"      :[1, 10, 11.7][0],
+          "lumiNorm"      :[1, 10, 11.7][2],
           "hiRes"         :[False, True][1], #Warning: Slow for png!
           "outFormat"     :["png", "pdf"][1], #PDF for combinations
           }
@@ -67,7 +67,8 @@ def comparFiles():
 def bgFile():
   """syntax is "Name":["path", scale]"""
 
-  mcScale = 116.9 # corresponding to intL for had sample
+  mcScale = switches()["lumiNorm"]*10. # corresponding to intL for had sample
+
   inDir = "/Users/cl7359/SUSY/charmStudy/ANALYSIS/rootfiles/"
 
   if mode()=="anaPlots":
@@ -88,7 +89,7 @@ def sigFile():
 
   if mode()=="anaPlots":
     sigFile = {
-            "T2cc_dev"                  :["%sdev/outT2cc_anaPlots.root"%inDir, 100.],
+            "T2cc_mSt200_dev"                  :["%sdev/outT2cc_anaPlots.root"%inDir, 100.],
             "T2cc"                      :["%sanaPlots_v3/outT2cc_anaPlots.root"%inDir, 100.],
             "T2cc_mSt200_mL120"         :["%sanaPlots_v3/outT2cc_200_120_anaPlots_v3.root"%inDir, 100.],
             "T2cc_mSt200_mL190"         :["%sanaPlots_v3/outT2cc_200_190_anaPlots_v3.root"%inDir, 100.],
