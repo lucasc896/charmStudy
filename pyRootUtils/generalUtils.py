@@ -11,7 +11,9 @@ import sys
 import os
 import ROOT as r
 import math
+import re
 import configuration as conf
+import xSec as xS
 from Log import *
 from sys import exit
 
@@ -388,6 +390,8 @@ class stackPlots(object):
     self.canvTitle = ""
     self.oFileName = ""
     self.listColors = [r.kBlue+1, r.kRed-3, r.kYellow+2, r.kGreen+1, r.kViolet]
+    self.nSignal = 0
+    self.targLumi = conf.switches()["lumiNorm"] # units: fb-1
     if sigHist:
       self.sigHist = sigHist
     else:
@@ -415,6 +419,7 @@ class stackPlots(object):
     for h, hT in zip(self.bgHists, self.bgTitles):
       h.SetLineWidth(2)
       h.SetLineColor(self.listColors[ctr])
+      h.SetFillColor(self.listColors[ctr])
       h.Rebin(self.xRebin)
       st1.Add(h)
       lg.AddEntry(h, hT, "L")
@@ -442,6 +447,7 @@ class stackPlots(object):
       self.sigHist.Rebin(self.xRebin)
       lg.AddEntry(self.sigHist, self.sigTitle, "L")
       self.sigHist.Draw("samehist")
+      self.sigHist.Scale(self.getSigNorm())
     if self.dataHist: 
       self.dataHist.SetLineStyle(2)
       self.dataHist.SetLineWidth(2)
@@ -462,6 +468,30 @@ class stackPlots(object):
     lg = r.TLegend(0.62, 0.72, 0.9, 0.85)
     lg.SetFillColor(0)
     lg.SetLineColor(0)
+
+  def getSigNorm(self):
+
+    # do regex matching for particle masses
+    pattern = r"._mSt(\d*)_."
+
+    regex = re.compile(pattern)
+    result = regex.findall(self.sigTitle)
+
+    if len(result) > 0:
+      mass = eval(result[0])
+    else:
+      Log.error("No regex match for stop mass found")
+      sys.exit()
+
+    # here assuming mass is of a stop particle
+    print "Normalising for mStop = %d" % mass
+
+    xsec = xS.stopXSec[mass]
+
+    factor = (self.targLumi*xsec)/float(self.nSignal)
+
+    return factor
+
 
 
 ###-------------------------------------------------------------------###
