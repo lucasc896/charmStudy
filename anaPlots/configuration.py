@@ -24,13 +24,13 @@ def switches():
 
   switches={
           "runMode"       :["plotting", "yieldTables"][0],
-          "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][2],
+          "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][0],
           "runModeBTag"   :["charmFrac", "standardPlots", "charmPhi"][0],
-          "signalSample"  :"T2cc_mSt200_mL190",
+          "signalSample"  :None, #"T2cc_dev",
           "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT","parkedHT"][1],
           "jetMulti"      :["le3j","ge4j","inc"][2],
           "printLogy"     :[False, True][0],
-          "norm"          :["None", "Unitary", "xSec", "lumi"][2],
+          "norm"          :["None", "Unitary", "xSec", "lumi"][0],
           "lumiNorm"      :[1, 10, 11.7][0],
           "hiRes"         :[False, True][1], #Warning: Slow for png!
           "outFormat"     :["png", "pdf"][1], #PDF for combinations
@@ -64,7 +64,7 @@ def comparFiles():
 
 ###-------------------------------------------------------------------###
 
-def inFiles():
+def bgFile():
   """syntax is "Name":["path", scale]"""
 
   mcScale = 116.9 # corresponding to intL for had sample
@@ -72,11 +72,11 @@ def inFiles():
 
   if mode()=="anaPlots":
     files = {
-          "WJets"     :["%sanaPlots/outWJets_anaPlots.root"%inDir, mcScale],
-          #"QCD"      :["%sanaPlots/outQCD_anaPlots.root"%inDir, mcScale],
-          "SingleTop" :["%sanaPlots/outSinT_anaPlots.root"%inDir, mcScale],
-          "TTJets"    :["%sanaPlots/outTTbar_anaPlots.root"%inDir, mcScale],
-          "DiBoson"   :["%sanaPlots/outDiBo_anaPlots.root"%inDir, mcScale],
+          "WJets"     :["%sdev/outWJets_anaPlots.root"%inDir, mcScale],
+          #"QCD"      :["%sdev/outQCD_anaPlots.root"%inDir, mcScale],
+          #"SingleTop" :["%sdev/outSinT_anaPlots.root"%inDir, mcScale],
+          "TTJets"    :["%sdev/outTTbar_anaPlots.root"%inDir, mcScale],
+          #"DiBoson"   :["%sdev/outDiBo_anaPlots.root"%inDir, mcScale],
           }
 
   return files
@@ -88,6 +88,7 @@ def sigFile():
 
   if mode()=="anaPlots":
     sigFile = {
+            "T2cc_dev"                  :["%sdev/outT2cc_anaPlots.root"%inDir, 100.],
             "T2cc"                      :["%sanaPlots_v3/outT2cc_anaPlots.root"%inDir, 100.],
             "T2cc_mSt200_mL120"         :["%sanaPlots_v3/outT2cc_200_120_anaPlots_v3.root"%inDir, 100.],
             "T2cc_mSt200_mL190"         :["%sanaPlots_v3/outT2cc_200_190_anaPlots_v3.root"%inDir, 100.],
@@ -213,38 +214,38 @@ def anaHists():
   
   if mode()=="anaPlots":
     hists={
-  #    "MET"                   :plotDetails(xRange=[0.,900.], rebX=2),
-      #"MHT"                   :plotDetails(xRange=[0.,900.],rebX=2),
+      # "MET"                   :plotDetails(xRange=[0.,900.], rebX=2),
+      # "MHT"                   :plotDetails(xRange=[0.,900.],rebX=2),
       "commHT"                :plotDetails(xRange=[0.,850.], rebX=2),
-   ###"HT_charm"                :plotDetails(xRange=[0.,1000.], rebX=2),
-   ###"HT_ISR"                :plotDetails(xRange=[0.,1000.], rebX=2),
-  # "hadronicAlphaTZoom"    :plotDetails(xRange=[0.3, 1.5], rebX=2),
-  # "leadJetdelPhi"        :plotDetails(xRange=[0.,3.2], rebX=2),
-  # "MHToverMET"            :plotDetails(xRange=[0.,2.], rebX=1),
-   ###"MHToverHT"            :plotDetails(xRange=[0.,2.], rebX=1),
-   "jetPt"                 :plotDetails(xRange=[0.,500.], rebX=1),
-   "leadJetPt"             :plotDetails(xRange=[0.,500.], rebX=1),
-   "subLeadJetPt"          :plotDetails(xRange=[0.,500.], rebX=1),
-   "thirdJetPt"            :plotDetails(xRange=[0., 300.], rebX=1),
-   ###"leadISRJetPt"            :plotDetails(xRange=[0., 300.], rebX=1),
-   ###"subLeadISRJetPt"            :plotDetails(xRange=[0., 300.], rebX=1),
-    "fourthJetPt"           :plotDetails(xRange=[0., 200.], rebX=1),
-    "fivePlusJetPt"           :plotDetails(xRange=[0., 200.], rebX=1),
-   #"alphaT_vs_HT"          :plotDetails(xRange=[0.,1.6], yRange=[0.,600.], rebX=2, rebY=2),
-   #"leadTwoJetsPt"         :plotDetails(xRange=[0.,300.], rebX=2),
-  # "stopGenPtScal"         :plotDetails(xRange=[0.,1000.], rebX=2),
-   "stopGenPtVect"         :plotDetails(xRange=[0.,600.], rebX=2),
-   #"delPhi_vs_scalGenPt"   :plotDetails(xRange=[0., 900.], yRange=[0., 3.2], rebX=5), 
-  # "dPhiStopCharm"         :plotDetails(xRange=[0.,3.2], rebX=1),
-  # "dPhiStopStop"          :plotDetails(xRange=[0.,3.2], rebX=1),
-  # "dPhiNeutCharm"         :plotDetails(xRange=[0.,3.2], rebX=1),
-  # "dPhiCharmCharm"        :plotDetails(xRange=[0.,3.2], rebX=1),
-   #"dPhiStopNeut"          :plotDetails(xRange=[0.,3.2], rebX=2),
-   #"dPhiLeadJetMHT"        :plotDetails(xRange=[0.,3.2], rebX=1),
-   #"leadJetdelPhi"         :plotDetails(xRange=[0.,3.2], rebX=1),
-   #"dPhiSubLeadJetMHT"        :plotDetails(xRange=[0.,3.2], rebX=1),
-  # "charmJetPt_0"          :plotDetails(xRange=[0., 350.], rebX=1),
-  # "charmJetPt_1"          :plotDetails(xRange=[0., 350.], rebX=1),
+      # "HT_charm"                :plotDetails(xRange=[0.,1000.], rebX=2),
+      # "HT_ISR"                :plotDetails(xRange=[0.,1000.], rebX=2),
+      # "hadronicAlphaTZoom"    :plotDetails(xRange=[0.3, 1.5], rebX=2),
+      # "leadJetdelPhi"        :plotDetails(xRange=[0.,3.2], rebX=2),
+      # "MHToverMET"            :plotDetails(xRange=[0.,2.], rebX=1),
+      # "MHToverHT"            :plotDetails(xRange=[0.,2.], rebX=1),
+      # "jetPt"                 :plotDetails(xRange=[0.,500.], rebX=1),
+      # "leadJetPt"             :plotDetails(xRange=[0.,500.], rebX=1),
+      # "subLeadJetPt"          :plotDetails(xRange=[0.,500.], rebX=1),
+      # "thirdJetPt"            :plotDetails(xRange=[0., 300.], rebX=1),
+      # "leadISRJetPt"            :plotDetails(xRange=[0., 300.], rebX=1),
+      # "subLeadISRJetPt"            :plotDetails(xRange=[0., 300.], rebX=1),
+      # "fourthJetPt"           :plotDetails(xRange=[0., 200.], rebX=1),
+      # "fivePlusJetPt"           :plotDetails(xRange=[0., 200.], rebX=1),
+      # "alphaT_vs_HT"          :plotDetails(xRange=[0.,1.6], yRange=[0.,600.], rebX=2, rebY=2),
+      # "leadTwoJetsPt"         :plotDetails(xRange=[0.,300.], rebX=2),
+      # "stopGenPtScal"         :plotDetails(xRange=[0.,1000.], rebX=2),
+      # "stopGenPtVect"         :plotDetails(xRange=[0.,600.], rebX=2),
+      # "delPhi_vs_scalGenPt"   :plotDetails(xRange=[0., 900.], yRange=[0., 3.2], rebX=5), 
+      # "dPhiStopCharm"         :plotDetails(xRange=[0.,3.2], rebX=1),
+      # "dPhiStopStop"          :plotDetails(xRange=[0.,3.2], rebX=1),
+      # "dPhiNeutCharm"         :plotDetails(xRange=[0.,3.2], rebX=1),
+      # "dPhiCharmCharm"        :plotDetails(xRange=[0.,3.2], rebX=1),
+      # "dPhiStopNeut"          :plotDetails(xRange=[0.,3.2], rebX=2),
+      # "dPhiLeadJetMHT"        :plotDetails(xRange=[0.,3.2], rebX=1),
+      # "leadJetdelPhi"         :plotDetails(xRange=[0.,3.2], rebX=1),
+      # "dPhiSubLeadJetMHT"        :plotDetails(xRange=[0.,3.2], rebX=1),
+      # "charmJetPt_0"          :plotDetails(xRange=[0., 350.], rebX=1),
+      # "charmJetPt_1"          :plotDetails(xRange=[0., 350.], rebX=1),
     }
   elif mode()=="bTagEff":
     hists={}
