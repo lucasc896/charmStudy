@@ -16,9 +16,8 @@ def oldRemove(label="", ana="anaPlots"):
     if "No such file" not in c[1]:
         cmd.append("rm")
         cmd.append("../haddOut/out%s_%s.root"%(label, ana))
-        #if query_yes_no("Remove out%s_%s.root" % (label, ana)):
-        #    subprocess.call(cmd)
-        subprocess.call(cmd)
+        if query_yes_no("Remove out%s_%s.root" % (label, ana)):
+            subprocess.call(cmd)
         cmd = []
 
 ###-------------------------------------------------------------------###
@@ -78,8 +77,9 @@ def query_yes_no(question, default="yes"):
 
 def main():
 
+    baseTime = time()
+
     parDir = sys.argv[1]
-    dirs = ["225_", "275_", "325_", "375_"]
     lsOut = []
 
     samps = {
@@ -92,35 +92,17 @@ def main():
         }
 
     haddDict = {}
+     
+    for key, val in samps.iteritems():
+        oldRemove(key)
+        tmp = commands.getstatusoutput("ls %s/*/*%s*.root" % (parDir, val[0]))
+        if tmp[0]==0:
+            haddDict[key] = tmp[1].split("\n")
 
-    # get list of root files
-    for d in dirs:
-        tmp = commands.getstatusoutput("ls %s/%s/*root" % (parDir, d))
-        tmp = tmp[1].split("\n")
-        if len(tmp)>1: lsOut += tmp
+    for s in haddDict:
+        doHadd(haddDict[s], s)
+        
 
-    # would save time if could remove non-present samples
-
-    # group all files into samples within hadd dict
-    # slow!!
-    for f in lsOut:
-        found = False
-        for key, val in samps.iteritems():
-            oldRemove(key)
-            if key not in haddDict:
-                haddDict[key] = []
-            for v in val:
-                if v in f:
-                    if len(haddDict[key]) < 3:haddDict[key].append(f)
-                    found = True
-            if found: break
-
-    # do some hadd'ing!
-    for key, val in haddDict.iteritems():
-        if len(val) > 0:
-            doHadd(val, key)
-
-            
 ###-------------------------------------------------------------------###
 ###-------------------------------------------------------------------###
 
