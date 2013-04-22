@@ -54,14 +54,22 @@ def runAnaPlots(debug=False):
   #sigNorm = 0.01*conf.switches()["lumiNorm"]*sigXSec
   sigNorm = 100.
 
+  if sigSamp:
+    sFile = r.TFile().Open(sigFile[sigSamp][0])
+    nHist = sFile.Get("noCuts_0_10000/n_Events_0")
+    sigEvents = nHist.GetEntries()
+  else:
+    sFile = None
+
+
   for hT, pDet in hists.iteritems():
     for b in bMulti:
       if debug: Log.debug(hT)
-      if sigSamp:
-        sFile=r.TFile().Open(sigFile[sigSamp][0])
+      if sigFile:
         if debug: Log.debug(str(sFile))
         hS = getPlotsFromFile(hT, dirs, getbMultis(b), sFile, sigNorm)
-      else: hS=None
+      else:
+        hS=None
 
       bgHists=[]
       bgTitles=[]
@@ -75,6 +83,7 @@ def runAnaPlots(debug=False):
       oFileName="plotDump/Stack_%s_%s%s.%s"%(hT, b, "_log" if conf.switches()["printLogy"] else "",
                                             conf.switches()["outFormat"])
 
+
       a1 = stackPlots(bgHists, bgTitles, hS)
       if debug: a1.Debug=True
       a1.xRange = pDet["xRange"]
@@ -84,6 +93,7 @@ def runAnaPlots(debug=False):
       a1.canvTitle = hT
       a1.oFileName = oFileName
       a1.sigTitle = sigSamp
+      a1.nSignal = sigEvents
       if conf.switches()["printLogy"]: a1.PrintLogy = True
       a1.drawStack()
       del a1
