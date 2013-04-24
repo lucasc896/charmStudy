@@ -410,7 +410,7 @@ class stackPlots(object):
 
     stTitle = "%s;%s;%s"%(self.canvTitle, self.bgHists[0].GetXaxis().GetTitle(), self.bgHists[0].GetYaxis().GetTitle())
     st1 = r.THStack("hs", stTitle)
-    lg = r.TLegend(0.62, 0.72, 0.82, 0.85)
+    lg = r.TLegend(0.62, 0.65, 0.9, 0.88)
     lg.SetFillColor(0)
     lg.SetLineColor(0)
 
@@ -463,12 +463,6 @@ class stackPlots(object):
       c1.SetLogy(1)
       c1.Print(oFileName)
 
-
-  def MakeLegend(self):
-    lg = r.TLegend(0.62, 0.72, 0.9, 0.85)
-    lg.SetFillColor(0)
-    lg.SetLineColor(0)
-
   def getSigNorm(self):
 
     # do regex matching for particle masses
@@ -484,7 +478,7 @@ class stackPlots(object):
       sys.exit()
 
     # here assuming mass is of a stop particle
-    print "Normalising for mStop = %d" % mass
+    Log.info("Normalising for mStop = %d\n" % mass)
 
     xsec = xS.stopXSec[mass]
 
