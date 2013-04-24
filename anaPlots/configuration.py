@@ -74,10 +74,10 @@ def bgFile():
   if mode()=="anaPlots":
     files = {
           "WJets"     :["%sdev/outWJets_anaPlots.root"%inDir, mcScale],
-          #"QCD"      :["%sdev/outQCD_anaPlots.root"%inDir, mcScale],
-          #"SingleTop" :["%sdev/outSinT_anaPlots.root"%inDir, mcScale],
+          "QCD"      :["%sdev/outQCD_anaPlots.root"%inDir, mcScale],
+          "SingleTop" :["%sdev/outSingTop_anaPlots.root"%inDir, mcScale],
           "TTJets"    :["%sdev/outTTbar_anaPlots.root"%inDir, mcScale],
-          #"DiBoson"   :["%sdev/outDiBo_anaPlots.root"%inDir, mcScale],
+          "DiBoson"   :["%sdev/outDiBoson_anaPlots.root"%inDir, mcScale],
           }
 
   return files
