@@ -186,6 +186,7 @@ BTagAlgoCut   = 0.679,
 StandardPlots = True,
 minDR         = 0.5,
 threshold     = 50.,
+NoCutsMode    = False,
 )
 
 genericPSet_data = PSet(
@@ -207,6 +208,10 @@ def makePlotOp(OP = (), cutTree = None, cut = None, label = "", alphaTMode=0.55)
   if OP[1] != None:
     plotpset = deepcopy(OP[1])
     plotpset.DirName = label
+    if "noCut" in label:
+      plotpset.NoCutsMode = True
+    else:
+      plotpset.NoCutsMode = False
     op = eval(OP[0]+"(plotpset.ps())")
   else:
     op = eval(OP[0])
@@ -298,7 +303,7 @@ def AddBinedHist(cutTree = None, OP = (), cut = None, htBins = [],TriggerDict = 
           out.append(upperCut)
           cutTree.TAttach(lowerCut,upperCut)
         ###pOps = makePlotOp(cutTree = cutTree, OP = OP, cut = lowerCut, label = "%s%d_"%(lab,lower)) 
-        pOps = makePlotOp(cutTree = cutTree, OP = OP, cut = upperCut if upper!=10000. else cut, label = "%s%d%s"%(lab,lower, "_%d"%upper if upper else ""), alphaTMode=alphaTCut)
+        pOps = makePlotOp(cutTree = cutTree, OP = OP, cut = upperCut if "noCut" not in lab else cut, label = "%s%d%s"%(lab,lower, "_%d"%upper if upper else ""), alphaTMode=alphaTCut)
         out.append(pOps)
   return out
   pass
@@ -746,6 +751,8 @@ def MakeMCTree(Threshold, Muon = None, Split = None):
 
   runModeName = runMode()
 
+  #genericPSet_mc.threshold = Threshold
+
   SMScut_ = None
 
   #SMScut_ = SMSdMassCut_10
@@ -762,15 +769,15 @@ def MakeMCTree(Threshold, Muon = None, Split = None):
   #SMScut_ = SMSMassCut_100_80
   #SMScut_ = SMSMassCut_100_90
 
-  #SMScut_ = SMSMassCut_175_95
+  SMScut_ = SMSMassCut_175_95
   #SMScut_ = SMSMassCut_175_115
   #SMScut_ = SMSMassCut_175_135
   #SMScut_ = SMSMassCut_175_145
   #SMScut_ = SMSMassCut_175_155
-  #SMScut_ = SMSMassCut_175_165
+  # SMScut_ = SMSMassCut_175_165
 
-  #SMScut_ = SMSMassCut_200_120
-  #SMScut_ = SMSMassCut_200_190
+  # SMScut_ = SMSMassCut_200_120
+  # SMScut_ = SMSMassCut_200_190
 
   #SMScut_ = SMSMassCut_250_20
   #SMScut_ = SMSMassCut_250_40
@@ -884,23 +891,10 @@ def MakeMCTree(Threshold, Muon = None, Split = None):
 
 # Define the custom muon ID
 
-mu_2012 = PSet(
+mu_2012_mu = PSet(
         MuID = "Tight",
         MinPt = 10.,
         MaxEta = 2.1,
-        MaxIsolation = 0.12,
-        GlobalChi2 = 10,
-        MaxGlbTrkDxy = 0.2,
-        MinNumTrkLayers = 6,
-        Match2GlbMu = 1,
-        NumPixelHits = 1,
-        MaxInrTrkDz = 0.5
-              )
-
-mu_2012_veto = PSet(
-        MuID = "Tight",
-        MinPt = 10.,
-        MaxEta = 2.5,
         MaxIsolation = 0.12,
         GlobalChi2 = 10,
         MaxGlbTrkDxy = 0.2,
@@ -921,8 +915,39 @@ mu_2012_had = PSet(
     Match2GlbMu = 1,
     NumPixelHits = 1,
     MaxInrTrkDz = 0.5
-        )
+)
 
+# Define the custom eleID (taken from RA4)
+
+el_id_2012_RA4 = PSet(
+      IsData           = False,
+      QCDEstimation    = False,
+      ScEtaMax         = 2.5,
+      RecoPfPtDifMax   = 10.,
+      PtMin_eb         = 20.,
+      PfRelIso_eb      = 0.15,
+      HoE_eb           = 0.12,
+      TrkDphi_eb       = 0.06,
+      TrkDeta_eb       = 0.004,
+      SigmaIetaIeta_eb = 0.01 ,
+      ConvRejection_eb = True ,
+      MissingHits_eb   = 1 ,
+      Dxy_eb           = 0.02 ,
+      Dz_eb            = 0.1 ,
+      EoP_eb           = 0.05 ,
+      PtMin_ee         = 20.,
+      PfRelIso_ee      = 0.15,
+      HoE_ee           = 0.10 ,
+      TrkDphi_ee       = 0.03 ,
+      TrkDeta_ee       = 0.007 ,
+      SigmaIetaIeta_ee = 0.03 ,
+      ConvRejection_ee = True ,
+      MissingHits_ee   = 1 ,
+      Dxy_ee           = 0.02 ,
+      Dz_ee            = 0.1 ,
+      EoP_ee           = 0.05,
+      PF_Electron      = False,
+)
 
 
 vertex_reweight_PUS4 = GoodVertexReweighting(
