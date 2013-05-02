@@ -2,6 +2,7 @@
 import setupSUSY
 import commands
 import itertools
+import os
 
 from libFrameworkSUSY import *
 from libHadronic import *
@@ -22,9 +23,10 @@ from utils import *
 
 
 switches = {
-    'sample': ["sig_T2cc_full"][0:],
+    'sample': ["sig_T2cc_full", "sig_T2cc_3jet_200_120", "mc_TTbar", "mc_WJets",
+                "mc_sinT", "mc_DiBo", "mc_QCD", "sig_T2cc_175_95"][-1],
     'sele': ["had", "muon"][:1],
-    'thresh': [(30.0, 60.0)], (36.7, 73.7), (43.3, 86.7), (50.0, 100.0)],
+    'thresh': [(30.0, 60.0), (36.7, 73.7), (43.3, 86.7), (50.0, 100.0)][1:],
     'isr': [False, True][1],
     'jes': ["", "-ve", "+ve"][0],
     'pu': [False, True][0],
@@ -66,8 +68,8 @@ def run_analysis(sample, sele, thresh, isr, jes, pu, year):
 
     cutTreeMC, junkVar, junkVar2 = MakeMCTree(thresh[1], Muon=None if "had" in sele else True)
     ra3PhotonIdFilter            = Photon_IDFilter2012(ra3photonid2012ps.ps())
-    CustomEleID                  = Electron_Egamma_Veto()
-    CustomMuID                   = OL_TightMuID(mu_2012.ps())
+    RA4EleID                     = CutBasedElId2012(el_id_2012_RA4.ps())
+    CustomMuID                   = OL_TightMuID(mu_2012_had.ps())
 
     outDir = "results_"+strftime("%d_%b")+"/%s_" % bins[thresh[0]]
     scratchDir = commands.getoutput("echo $_CONDOR_SCRATCH_DIR")
@@ -94,7 +96,7 @@ def run_analysis(sample, sele, thresh, isr, jes, pu, year):
         anal_ak5_caloMC.AddJetFilter("PreCC", JES_reweight)
     anal_ak5_caloMC.AddMuonFilter("PreCC", CustomMuID)
     anal_ak5_caloMC.AddPhotonFilter("PreCC", ra3PhotonIdFilter)
-    anal_ak5_caloMC.AddElectronFilter("PreCC", CustomEleID)
+    anal_ak5_caloMC.AddElectronFilter("PreCC", RA4EleID)
 
     anal_ak5_caloMC += cutTreeMC
 
@@ -104,6 +106,11 @@ def run_analysis(sample, sele, thresh, isr, jes, pu, year):
 
 
 def main():
+
+    # check ISR weighting only applied to sigSamps
+    if switches["isr"] and "sig" not in switches["sample"]:
+        print "\n\t>>> ERROR: Cannot run ISR reweighting on non-signal samples\n"
+        exit()
 
     variables_to_iterate = ['sample', 'sele', 'thresh', 'isr', 'jes', 'pu',
                             'year']

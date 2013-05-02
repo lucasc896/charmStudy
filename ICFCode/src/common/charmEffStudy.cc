@@ -274,7 +274,7 @@ bool charmEffStudy::StandardPlots( Event::Data& ev ) {
 
 
    // loop over common jets
-   for(unsigned int i=0; i<ev.JD_CommonJets().accepted.size(); i++) {
+   for(auto jet: ev.JD_CommonJets().accepted) {
       njet++;
       
       //match generic jets to partons
@@ -284,51 +284,51 @@ bool charmEffStudy::StandardPlots( Event::Data& ev ) {
       //   nJetMatchL++;
       //}
 
-      if( fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(i)->GetIndex())) == 5 ) nJetMatchB++;
-      if( fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(i)->GetIndex())) == 4 ) nJetMatchC++;
-      if( fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(i)->GetIndex())) <= 3 ) nJetMatchL++;
+      if( fabs(ev.GetBtagJetFlavour(jet->GetIndex())) == 5 ) nJetMatchB++;
+      if( fabs(ev.GetBtagJetFlavour(jet->GetIndex())) == 4 ) nJetMatchC++;
+      if( fabs(ev.GetBtagJetFlavour(jet->GetIndex())) <= 3 ) nJetMatchL++;
 
       // loop over Tgt/Med/Lse
       for(int j=0; j<3; j++){
-         if(ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), bTagAlgo_) > bTagAlgoCut[j]){
-            nbjet[i]++;
-            if( matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 5, minDR_) ) nbjetMatchB[j]++;
-            if( matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 4, minDR_) ) nbjetMatchC[j]++;
-            if( matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 3, minDR_) || matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 2, minDR_) || matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 1, minDR_) ){
+         if(ev.GetBTagResponse(jet->GetIndex(), bTagAlgo_) > bTagAlgoCut[j]){
+            nbjet[j]++;
+            if( matchedToGenQuark(ev, (*jet), 5, minDR_) ) nbjetMatchB[j]++;
+            if( matchedToGenQuark(ev, (*jet), 4, minDR_) ) nbjetMatchC[j]++;
+            if( matchedToGenQuark(ev, (*jet), 3, minDR_) || matchedToGenQuark(ev, (*jet), 2, minDR_) || matchedToGenQuark(ev, (*jet), 1, minDR_) ){
                nbjetMatchL[j]++;
             }
          }
       }
 
       //look for b and c quark matching
-      if ( matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 5, minDR_) ){
-         h_bMatched_response[0]->Fill( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), 5) );
-         h_bMatched_response[1]->Fill( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), 6) );
-         h_bMatched_response[2]->Fill( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), 7) );
-         h_bMatched_response[3]->Fill( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), 8) );
-         h_bMatched_response[4]->Fill( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), 2) );
+      if ( matchedToGenQuark(ev, (*jet), 5, minDR_) ){
+         h_bMatched_response[0]->Fill( ev.GetBTagResponse(jet->GetIndex(), 5) );
+         h_bMatched_response[1]->Fill( ev.GetBTagResponse(jet->GetIndex(), 6) );
+         h_bMatched_response[2]->Fill( ev.GetBTagResponse(jet->GetIndex(), 7) );
+         h_bMatched_response[3]->Fill( ev.GetBTagResponse(jet->GetIndex(), 8) );
+         h_bMatched_response[4]->Fill( ev.GetBTagResponse(jet->GetIndex(), 2) );
       }
-      if ( matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 4, minDR_) ){
-         h_cMatched_response[0]->Fill( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), 5) );
-         h_cMatched_response[1]->Fill( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), 6) );
-         h_cMatched_response[2]->Fill( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), 7) );
-         h_cMatched_response[3]->Fill( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), 8) );
-         h_cMatched_response[4]->Fill( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), 2) );     
+      if ( matchedToGenQuark(ev, (*jet), 4, minDR_) ){
+         h_cMatched_response[0]->Fill( ev.GetBTagResponse(jet->GetIndex(), 5) );
+         h_cMatched_response[1]->Fill( ev.GetBTagResponse(jet->GetIndex(), 6) );
+         h_cMatched_response[2]->Fill( ev.GetBTagResponse(jet->GetIndex(), 7) );
+         h_cMatched_response[3]->Fill( ev.GetBTagResponse(jet->GetIndex(), 8) );
+         h_cMatched_response[4]->Fill( ev.GetBTagResponse(jet->GetIndex(), 2) );     
       }
-      if( matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 3, minDR_) || matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 2, minDR_) || matchedToGenQuark(ev, (*ev.JD_CommonJets().accepted.at(i)), 1, minDR_) ){
-         h_lMatched_response[0]->Fill( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), 5) );
-         h_lMatched_response[1]->Fill( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), 6) );
-         h_lMatched_response[2]->Fill( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), 7) );
-         h_lMatched_response[3]->Fill( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), 8) );
-         h_lMatched_response[4]->Fill( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), 2) );
+      if( matchedToGenQuark(ev, (*jet), 3, minDR_) || matchedToGenQuark(ev, (*jet), 2, minDR_) || matchedToGenQuark(ev, (*jet), 1, minDR_) ){
+         h_lMatched_response[0]->Fill( ev.GetBTagResponse(jet->GetIndex(), 5) );
+         h_lMatched_response[1]->Fill( ev.GetBTagResponse(jet->GetIndex(), 6) );
+         h_lMatched_response[2]->Fill( ev.GetBTagResponse(jet->GetIndex(), 7) );
+         h_lMatched_response[3]->Fill( ev.GetBTagResponse(jet->GetIndex(), 8) );
+         h_lMatched_response[4]->Fill( ev.GetBTagResponse(jet->GetIndex(), 2) );
       }
 
       //fill for any jet
-        h_noMatch_response[0]->Fill( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), 5) );
-        h_noMatch_response[1]->Fill( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), 6) );
-        h_noMatch_response[2]->Fill( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), 7) );
-        h_noMatch_response[3]->Fill( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), 8) );
-        h_noMatch_response[4]->Fill( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), 2) );
+        h_noMatch_response[0]->Fill( ev.GetBTagResponse(jet->GetIndex(), 5) );
+        h_noMatch_response[1]->Fill( ev.GetBTagResponse(jet->GetIndex(), 6) );
+        h_noMatch_response[2]->Fill( ev.GetBTagResponse(jet->GetIndex(), 7) );
+        h_noMatch_response[3]->Fill( ev.GetBTagResponse(jet->GetIndex(), 8) );
+        h_noMatch_response[4]->Fill( ev.GetBTagResponse(jet->GetIndex(), 2) );
    }
 
    if (ev.JD_CommonJets().accepted.size()>1){
@@ -375,7 +375,7 @@ bool charmEffStudy::StandardPlots( Event::Data& ev ) {
 
    //find if any of the 3 lead jets is a charm
    bool charmMatch = false;
-   for(unsigned int i=0; i<njet; i++){
+ for(int i=0; i<njet; i++){
       if (i<3){
          if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(i)->GetIndex())) == 4) charmMatch=true;
       }
@@ -384,39 +384,36 @@ bool charmEffStudy::StandardPlots( Event::Data& ev ) {
 
 
    // get the two genCharms
-   Event::GenObject gCharm1(0.,0.,0.,0.,0,0,0,0);
-   Event::GenObject gCharm2(0.,0.,0.,0.,0,0,0,0);
-   Event::GenObject gStop1(0.,0.,0.,0.,0,0,0,0);
-   Event::GenObject gStop2(0.,0.,0.,0.,0,0,0,0);
-   for( std::vector<Event::GenObject>::const_iterator igen = ev.GenParticles().begin(); igen != ev.GenParticles().end(); ++igen ){
-      if( (*igen).GetStatus() == 3 ){   
-         if( (fabs((*igen).GetID()) == 4) && ((*igen).GetMotherID() == 1000006) )    gCharm1 = *igen;
-         if( (fabs((*igen).GetID()) == 4) && ((*igen).GetMotherID() == -1000006) )   gCharm2 = *igen;
-         if( (fabs((*igen).GetID() == 1000006)))    gStop1 = *igen;
-         if( (fabs((*igen).GetID() == -1000006)))   gStop2 = *igen;
+   Event::GenObject *gCharm1=NULL;
+   Event::GenObject *gCharm2=NULL;
+   for( auto igen: ev.GenParticles() ){
+      if( igen.GetStatus() == 3 ){   
+         if( (fabs(igen.GetID()) == 4) && (igen.GetMotherID() == 1000006) )    gCharm1 = &igen;
+         if( (fabs(igen.GetID()) == 4) && (igen.GetMotherID() == -1000006) )   gCharm2 = &igen;
+      }
+   }
+
+   if (gCharm1 && gCharm2){
+      if ((gCharm1->Phi()>0.) && (gCharm2->Phi()<0.)){
+         h_charmPhiSign[0]->Fill(1.5);
+      }
+      else if ((gCharm2->Phi()>0.) && (gCharm1->Phi()<0.)){
+         h_charmPhiSign[0]->Fill(1.5);
+      }
+      else{
+         h_charmPhiSign[0]->Fill(0.5);
       }
 
+      h_charm_index[0]->Fill(gCharm1->GetIndex());
+      h_charm_index[1]->Fill(gCharm2->GetIndex());
    }
 
-   if ((gCharm1.Phi()>0.) && (gCharm2.Phi()<0.)){
-      h_charmPhiSign[0]->Fill(1.5);
-   }
-   else if ((gCharm2.Phi()>0.) && (gCharm1.Phi()<0.)){
-      h_charmPhiSign[0]->Fill(1.5);
-   }
-   else{
-      h_charmPhiSign[0]->Fill(0.5);
-   }
-
-   h_charm_index[0]->Fill(gCharm1.GetIndex());
-   h_charm_index[1]->Fill(gCharm2.GetIndex());
-   
    for(unsigned int i=0; i<4; i++){
       if (ev.JD_CommonJets().accepted.size()>i){
          h_jetFlavour[i]   ->Fill( fabs(getJetFlavour(ev, *ev.JD_CommonJets().accepted.at(i), minDR_)), evWeight );
          h_jetFlavourICF[i]->Fill( fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(i)->GetIndex())), evWeight );
-         h_charmJetdR1[i]  ->Fill( getDeltaR(gCharm1,*ev.JD_CommonJets().accepted.at(i)) );
-         h_charmJetdR2[i]  ->Fill( getDeltaR(gCharm2,*ev.JD_CommonJets().accepted.at(i)) );
+         if (gCharm1) h_charmJetdR1[i]  ->Fill( getDeltaR(*gCharm1,*ev.JD_CommonJets().accepted.at(i)) );
+         if (gCharm2) h_charmJetdR2[i]  ->Fill( getDeltaR(*gCharm2,*ev.JD_CommonJets().accepted.at(i)) );
       }
    }
 
@@ -457,10 +454,10 @@ bool charmEffStudy::StandardPlots( Event::Data& ev ) {
 bool charmEffStudy::hasTrueQuark( const Event::Data& ev, int pdgID ) {
 // check if an event has a genLevel quark of certain pdgID
 
-   for( std::vector<Event::GenObject>::const_iterator igen = ev.GenParticles().begin(); igen != ev.GenParticles().end(); ++igen ) {
+   for( auto igen: ev.GenParticles() ) {
 
-      if( fabs((*igen).GetID()) == pdgID ){
-         if( (*igen).GetStatus() == 3 ){
+      if( fabs(igen.GetID()) == pdgID ){
+         if( igen.GetStatus() == 3 ){
             return true;
          }
       }
@@ -478,10 +475,10 @@ int charmEffStudy::numTrueQuarks( const Event::Data& ev, int pdgID) {
 
    int nParticle=0;
 
-   for( std::vector<Event::GenObject>::const_iterator igen = ev.GenParticles().begin(); igen != ev.GenParticles().end(); ++igen ) {
+   for( auto igen: ev.GenParticles() ) {
   
-      if( fabs((*igen).GetID()) == pdgID ){
-         if( (*igen).GetStatus() == 3 ){
+      if( fabs(igen.GetID()) == pdgID ){
+         if( igen.GetStatus() == 3 ){
             nParticle++;
          }
       }
@@ -497,11 +494,11 @@ int charmEffStudy::numTrueQuarks( const Event::Data& ev, int pdgID) {
 bool charmEffStudy::matchedToGenQuark( const Event::Data& ev, const Event::Jet &jet, int pdgID, float minDR ){
 // check if passed jet is matched to genLevel quark of certain pdgID, in cone minDR
 
-   for( std::vector<Event::GenObject>::const_iterator igen = ev.GenParticles().begin(); igen != ev.GenParticles().end(); ++igen ) {
+   for( auto igen: ev.GenParticles() ) {
 
-      if( fabs((*igen).GetID()) == pdgID ){
-         if( (*igen).GetStatus() == 3 ){
-            if( fabs(ROOT::Math::VectorUtil::DeltaR( (*igen),jet) ) < minDR ) return true;
+      if( fabs(igen.GetID()) == pdgID ){
+         if( igen.GetStatus() == 3 ){
+            if( fabs(ROOT::Math::VectorUtil::DeltaR( igen,jet) ) < minDR ) return true;
          }
       }
 
@@ -517,10 +514,10 @@ int charmEffStudy::getJetFlavour( const Event::Data& ev, const Event::Jet &jet, 
 
    float myPdgId=-1;
 
-   for( std::vector<Event::GenObject>::const_iterator igen = ev.GenParticles().begin(); igen != ev.GenParticles().end(); ++igen ) {
-      if( (*igen).GetStatus() == 3 ){
-         if( fabs(ROOT::Math::VectorUtil::DeltaR( (*igen),jet) ) < minDR ){
-            myPdgId=(*igen).GetID();
+   for( auto igen: ev.GenParticles() ) {
+      if( igen.GetStatus() == 3 ){
+         if( fabs(ROOT::Math::VectorUtil::DeltaR( igen,jet) ) < minDR ){
+            myPdgId=igen.GetID();
          }
       }
    }

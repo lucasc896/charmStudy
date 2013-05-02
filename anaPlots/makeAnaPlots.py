@@ -37,9 +37,10 @@ def getbMultis(bM=""):
 
 def runAnaPlots(debug=False):
   
-  Log.info("\n >>> Making Analysis Plots\n")
+  Log.info(">>> Making Analysis Plots\n")
 
-  files       = conf.inFiles()
+  
+  bgFiles     = conf.bgFile()
   dirs        = conf.inDirs()
   bMulti      = conf.bMulti()
   hists       = conf.anaHists()
@@ -48,28 +49,40 @@ def runAnaPlots(debug=False):
 
   c1 = r.TCanvas()
 
-  sigXSec = conf.getXSec()
+  #sigXSec = conf.getXSec()
 
-  sigNorm = 0.01*conf.switches()["lumiNorm"]*sigXSec
+  #sigNorm = 0.01*conf.switches()["lumiNorm"]*sigXSec
+  sigNorm = 100.
+
+  if sigSamp:
+    sFile = r.TFile().Open(sigFile[sigSamp][0])
+    nHist = sFile.Get("noCuts_0_10000/n_Events_0")
+    sigEvents = nHist.GetEntries()
+  else:
+    sFile = None
+
 
   for hT, pDet in hists.iteritems():
     for b in bMulti:
       if debug: Log.debug(hT)
-      if sigSamp:
-        sFile=r.TFile().Open(sigFile[sigSamp][0])
-        if debug: Log.debug(sFile)
+      if sigFile:
+        if debug: Log.debug(str(sFile))
         hS = getPlotsFromFile(hT, dirs, getbMultis(b), sFile, sigNorm)
-      else: hS=None
+      else:
+        hS=None
 
       bgHists=[]
       bgTitles=[]
-      for sName, iF in files.iteritems():
+      for sName, iF in bgFiles.iteritems():
         rFile = r.TFile().Open(iF[0])
+        if debug: Log.debug(str(iF[0]))
         h = getPlotsFromFile(hT, dirs, getbMultis(b), rFile, iF[1])
         bgHists.append(h)
         bgTitles.append(sName)
 
-      oFileName="plotDump/Stack_%s_%s.png"%(hT, b)
+      oFileName="plotDump/Stack_%s_%s%s.%s"%(hT, b, "_log" if conf.switches()["printLogy"] else "",
+                                            conf.switches()["outFormat"])
+
 
       a1 = stackPlots(bgHists, bgTitles, hS)
       if debug: a1.Debug=True
@@ -80,6 +93,7 @@ def runAnaPlots(debug=False):
       a1.canvTitle = hT
       a1.oFileName = oFileName
       a1.sigTitle = sigSamp
+      a1.nSignal = sigEvents
       if conf.switches()["printLogy"]: a1.PrintLogy = True
       a1.drawStack()
       del a1
@@ -125,15 +139,15 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
 
   outHists = []
 
-  #Log.warning("Running in mStop=200 sample point mode")
-#
-  #if "3jet" in sigSamp:
-  #  if "mSt200_mL190" in sigSamp:
-  #    normVal = 550261./714441.
-  #  elif "mSt200_mL120" in sigSamp:
-  #    normVal = 602438./620669.
-  #else:
-  #  normVal = 1.
+  Log.warning("Running in mStop=200 sample point mode")
+
+  if "3jet" in sigSamp:
+    if "mSt200_mL190" in sigSamp:
+      normVal = 550261./714441.
+    elif "mSt200_mL120" in sigSamp:
+      normVal = 602438./620669.
+  else:
+    normVal = 1.
 
   #plot b-Multi plots
   for hT, pDet in hists.iteritems():
