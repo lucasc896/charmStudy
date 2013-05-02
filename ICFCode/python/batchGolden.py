@@ -347,8 +347,8 @@ htTakeMuCut225 = RECO_CommonHTTakeMuCut(225.)
 htCut275 = RECO_CommonHTCut(275.)
 htTakeMuCut275 = RECO_CommonHTTakeMuCut(275.)
 
-DeadEcalCutData = OP_DeadECALCut(0.3,0.3,0.5,30.,10,0,"./deadRegionList_GR10_P_V10.txt")
-DeadEcalCutMC =   OP_DeadECALCut(0.3,0.3,0.5,30.,10,0,"./deadRegionList_START38_V12.txt")
+DeadEcalCutData = OP_DeadECALCut(0.3,0.3,0.5,30.,10,0,"./deadEcal/deadRegionList_GR10_P_V10.txt")
+DeadEcalCutMC =   OP_DeadECALCut(0.3,0.3,0.5,30.,10,0,"./deadEcal/deadRegionList_START38_V12.txt")
 
 MHT_METCut = OP_MHToverMET(1.25,50.)
 MHT_METReverseCut = OP_Reverse_MHToverMET(1.25,50.)
