@@ -131,6 +131,12 @@ void analysisPlots::StandardPlots() {
       80, 0., 1000.,
       6, 0, 1, false);   
 
+   BookHistArray(h_fivePlusJetPt,
+      "fivePlusJetPt",
+      ";fivePlus jet p_{T} (GeV);# count",
+      80, 0., 1000.,
+      6, 0, 1, false);  
+
    BookHistArray(h_leadISRJetPt,
       "leadISRJetPt",
       ";lead ISR jet p_{T} (GeV);# count",
@@ -403,6 +409,8 @@ std::ostream& analysisPlots::Description( std::ostream& ostrm ) {
 // Main module
 bool analysisPlots::StandardPlots( Event::Data& ev ) {
    
+   // double start_time = omp_get_wtime();
+
    unsigned int nobjkt = ev.CommonObjects().size();
    double evWeight = ev.GetEventWeight();
 
@@ -430,16 +438,16 @@ bool analysisPlots::StandardPlots( Event::Data& ev ) {
    std::vector< Event::Jet const * > ISRjets;   
    std::vector< Event::Jet const * > charmjets;
 
-   for(int i=0; i<nCommJet; i++){
+   for(auto jet: ev.JD_CommonJets().accepted){
       // count number of btagged jets
-      if( ev.GetBTagResponse(ev.JD_CommonJets().accepted.at(i)->GetIndex(), bTagAlgo_) > bTagAlgoCut_ ) nbjet++;
+      if( ev.GetBTagResponse(jet->GetIndex(), bTagAlgo_) > bTagAlgoCut_ ) nbjet++;
       
       // fill jet subcategories
-      if (fabs(ev.GetBtagJetFlavour(ev.JD_CommonJets().accepted.at(i)->GetIndex())) == 4){
-         charmjets.push_back( ev.JD_CommonJets().accepted.at(i) );
+      if (fabs(ev.GetBtagJetFlavour(jet->GetIndex())) == 4){
+         charmjets.push_back( jet );
       }
       else{
-         ISRjets.push_back( ev.JD_CommonJets().accepted.at(i) );
+         ISRjets.push_back( jet );
       }
    }
 
@@ -460,9 +468,9 @@ bool analysisPlots::StandardPlots( Event::Data& ev ) {
 
    h_nVertex[plotIndex]->Fill(nVertex, evWeight);
 
-   for(int i=0; i<nCommJet; i++){
-      h_jetPt[plotIndex]         ->Fill( ev.JD_CommonJets().accepted.at(i)->Pt(), evWeight );
-      h_jetPt_vs_nVtx[plotIndex] ->Fill( ev.JD_CommonJets().accepted.at(i)->Pt(), nVertex, evWeight );
+   for(auto jet: ev.JD_CommonJets().accepted){
+      h_jetPt[plotIndex]         ->Fill( jet->Pt(), evWeight );
+      h_jetPt_vs_nVtx[plotIndex] ->Fill( jet->Pt(), nVertex, evWeight );
    }
 
    if( nCharmJets > 0 ){
@@ -475,8 +483,8 @@ bool analysisPlots::StandardPlots( Event::Data& ev ) {
 
    double charmHT = 0.;
    double isrHT = 0.;
-   for(int i=0; i<nCharmJets; i++){
-      charmHT += charmjets.at(i)->Pt();
+   for(auto cJet: charmjets){
+      charmHT += cJet->Pt();
    }
    isrHT = evHT - charmHT;
 
@@ -507,6 +515,10 @@ bool analysisPlots::StandardPlots( Event::Data& ev ) {
       subLeadJetMHTdPhi = ROOT::Math::VectorUtil::DeltaPhi( *ev.JD_CommonJets().accepted.at(1),ev.CommonMHT() );
    }   
 
+   if (ev.JD_CommonJets().accepted.size()>0){
+     h_leadJetPt[plotIndex]     ->Fill( ev.JD_CommonJets().accepted.at(0)->Pt(), evWeight );
+   }
+
    double jetDeltaPhi = 0.;
    if (ev.JD_CommonJets().accepted.size()>1){
       jetDeltaPhi = ROOT::Math::VectorUtil::DeltaPhi(*ev.JD_CommonJets().accepted.at(0),*ev.JD_CommonJets().accepted.at(1));
@@ -514,7 +526,7 @@ bool analysisPlots::StandardPlots( Event::Data& ev ) {
       //h_delPhi_vs_scalGenPt[0]   ->Fill( v_StopGenPt.at(1), fabs(jetDeltaPhi), evWeight );
       //h_delPhi_vs_vectGenPt[0]   ->Fill( v_StopGenPt.at(0), fabs(jetDeltaPhi), evWeight );
       
-      h_leadJetPt[plotIndex]     ->Fill( ev.JD_CommonJets().accepted.at(0)->Pt(), evWeight );
+      
       h_subLeadJetPt[plotIndex]  ->Fill( ev.JD_CommonJets().accepted.at(1)->Pt(), evWeight );
 
       //h_leadJetPt_vs_HT[plotIndex]->Fill( ev.JD_CommonJets().accepted.at(0)->Pt(), evHT, evWeight);
@@ -532,71 +544,71 @@ bool analysisPlots::StandardPlots( Event::Data& ev ) {
    if (ev.JD_CommonJets().accepted.size()>2) h_thirdJetPt[plotIndex]->Fill(ev.JD_CommonJets().accepted.at(2)->Pt(), evWeight);
    if (ev.JD_CommonJets().accepted.size()>3) h_fourthJetPt[plotIndex]->Fill(ev.JD_CommonJets().accepted.at(3)->Pt(), evWeight);
 
+   for(unsigned int i=0; i<ev.JD_CommonJets().accepted.size(); i++){
+      if (i>3) h_fivePlusJetPt[plotIndex]->Fill(ev.JD_CommonJets().accepted.at(i)->Pt(), evWeight);
+   }
+
 
    // do some gen matching
-   Event::GenObject gStop1(0.,0.,0.,0.,0,0,0,0);
-   Event::GenObject gStop2(0.,0.,0.,0.,0,0,0,0);
-   Event::GenObject gCharm1(0.,0.,0.,0.,0,0,0,0);
-   Event::GenObject gCharm2(0.,0.,0.,0.,0,0,0,0);
-   Event::GenObject gNeut1(0.,0.,0.,0.,0,0,0,0);
-   Event::GenObject gNeut2(0.,0.,0.,0.,0,0,0,0); 
-   Event::GenObject gEmpty(0.,0.,0.,0.,0,0,0,0);  
-   for( std::vector<Event::GenObject>::const_iterator igen = ev.GenParticles().begin(); igen != ev.GenParticles().end(); ++igen ){
-      if( (*igen).GetStatus() == 3 ){
-         if( (*igen).GetID() == 1000006 )    gStop1 = *igen;
-         if( (*igen).GetID() == -1000006 )   gStop2 = *igen;
-         if( (fabs((*igen).GetID()) == 4) && ((*igen).GetMotherID() == 1000006) )         gCharm1 = *igen;
-         if( (fabs((*igen).GetID()) == 4) && ((*igen).GetMotherID() == -1000006) )        gCharm2 = *igen;
-         if( (fabs((*igen).GetID()) == 1000022) && ((*igen).GetMotherID() == 1000006) )   gNeut1 = *igen;
-         if( (fabs((*igen).GetID()) == 1000022) && ((*igen).GetMotherID() == -1000006) )  gNeut2 = *igen;
+   Event::GenObject *gStop1=NULL;
+   Event::GenObject *gStop2=NULL;
+   Event::GenObject *gCharm1=NULL;
+   Event::GenObject *gCharm2=NULL;
+   Event::GenObject *gNeut1=NULL;
+   Event::GenObject *gNeut2=NULL;
+
+   for(auto igen: ev.GenParticles()){
+      if( igen.GetStatus() == 3 ){
+         if( igen.GetID() == 1000006 )                                              gStop1   = &igen; 
+         if( igen.GetID() == -1000006 )                                             gStop2   = &igen; 
+         if( (fabs(igen.GetID()) == 4) && (igen.GetMotherID() == 1000006) )         gCharm1  = &igen;
+         if( (fabs(igen.GetID()) == 4) && (igen.GetMotherID() == -1000006) )        gCharm2  = &igen;
+         if( (fabs(igen.GetID()) == 1000022) && (igen.GetMotherID() == 1000006) )   gNeut1   = &igen; 
+         if( (fabs(igen.GetID()) == 1000022) && (igen.GetMotherID() == -1000006) )  gNeut2   = &igen; 
       }
 
    }
 
-   if ((gCharm1!=gEmpty) && (gCharm2!=gEmpty)){
-      if ( gCharm1.Pt() >= gCharm2.Pt() ){
-         h_genPtLeadCharm_vs_MHT[0]->Fill( gCharm1.Pt(), mht, evWeight );
+   if (gCharm1 && gCharm2){
+      if ( gCharm1->Pt() >= gCharm2->Pt() ){
+         h_genPtLeadCharm_vs_MHT[0]->Fill( gCharm1->Pt(), mht, evWeight );
       }
       else{
-         h_genPtLeadCharm_vs_MHT[0]->Fill( gCharm2.Pt(), mht, evWeight );
+         h_genPtLeadCharm_vs_MHT[0]->Fill( gCharm2->Pt(), mht, evWeight );
       }
    }
 
    // fill gen-level dPhi distros
-   if( (gStop1!=gEmpty) && (gStop2!=gEmpty) && (gCharm1!=gEmpty) && (gCharm2!=gEmpty) && (gNeut1!=gEmpty) && (gNeut2!=gEmpty) ){
-      h_dPhiStopCharm[plotIndex]  ->Fill( getGenDeltaPhi(gStop1, gCharm1), evWeight );
-      h_dPhiStopCharm[plotIndex]  ->Fill( getGenDeltaPhi(gStop2, gCharm2), evWeight );
-      h_dPhiNeutCharm[plotIndex]  ->Fill( getGenDeltaPhi(gNeut1, gCharm1), evWeight );
-      h_dPhiNeutCharm[plotIndex]  ->Fill( getGenDeltaPhi(gNeut2, gCharm2), evWeight );
-      h_dPhiStopNeut[plotIndex]   ->Fill( getGenDeltaPhi(gStop1, gNeut1), evWeight );
-      h_dPhiStopNeut[plotIndex]   ->Fill( getGenDeltaPhi(gStop2, gNeut2), evWeight );
-      h_dPhiStopStop[plotIndex]   ->Fill( getGenDeltaPhi(gStop1, gStop2), evWeight );
-      h_dPhiCharmCharm[plotIndex] ->Fill( getGenDeltaPhi(gCharm1, gCharm2), evWeight );
+   if( gStop1 && gStop2 && gCharm1 && gCharm2 && gNeut1 && gNeut2 ){
+      h_dPhiStopCharm[plotIndex]  ->Fill( getGenDeltaPhi(*gStop1, *gCharm1), evWeight );
+      h_dPhiStopCharm[plotIndex]  ->Fill( getGenDeltaPhi(*gStop2, *gCharm2), evWeight );
+      h_dPhiNeutCharm[plotIndex]  ->Fill( getGenDeltaPhi(*gNeut1, *gCharm1), evWeight );
+      h_dPhiNeutCharm[plotIndex]  ->Fill( getGenDeltaPhi(*gNeut2, *gCharm2), evWeight );
+      h_dPhiStopNeut[plotIndex]   ->Fill( getGenDeltaPhi(*gStop1, *gNeut1), evWeight );
+      h_dPhiStopNeut[plotIndex]   ->Fill( getGenDeltaPhi(*gStop2, *gNeut2), evWeight );
+      h_dPhiStopStop[plotIndex]   ->Fill( getGenDeltaPhi(*gStop1, *gStop2), evWeight );
+      h_dPhiCharmCharm[plotIndex] ->Fill( getGenDeltaPhi(*gCharm1, *gCharm2), evWeight );
    }
 
    // get out SMS variables
    double M0 = 0.;
    double M12 = 0.;
 
-   if(ev.M0.enabled()){
-      M0 = ev.M0();
-   }
-   if(ev.MG.enabled()){
-      M0 = ev.MG();
-   }
-   if(ev.MLSP.enabled()){
-      M12 = ev.MLSP();
-   }
-   if(ev.M12.enabled()){
-      M12 = ev.M12();
-   }
+   if(ev.M0.enabled())     M0 = ev.M0();
+   if(ev.MG.enabled())     M0 = ev.MG();
+   if(ev.MLSP.enabled())   M12 = ev.MLSP();
+   if(ev.M12.enabled())    M12 = ev.M12();
 
    h_susyScanPlane[plotIndex]->Fill( M0, M12, evWeight );
 
-   //h_SMSscalGenPt[0]->Fill( M0, M12, v_StopGenPt.at(1*evWeight) );
-   //h_SMSvectGenPt[0]->Fill( M0, M12, v_StopGenPt.at(0)*evWeight );
-   //h_SMSdPhiLeadJetsGenPt[0]->Fill( M0, M12, jetDeltaPhi*evWeight );
-   //h_SMSAlphaT[0]   ->Fill( M0, M12, hadronicAlphaT*evWeight );
+   // h_SMSscalGenPt[0]->Fill( M0, M12, v_StopGenPt.at(1*evWeight) );
+   // h_SMSvectGenPt[0]->Fill( M0, M12, v_StopGenPt.at(0)*evWeight );
+   // h_SMSdPhiLeadJetsGenPt[0]->Fill( M0, M12, jetDeltaPhi*evWeight );
+   // h_SMSAlphaT[0]   ->Fill( M0, M12, hadronicAlphaT*evWeight );
+
+   // double run_time = omp_get_wtime() - start_time;
+
+   // std::cout << "Code executed in " << run_time << std::endl;
 
    return true;
 
@@ -624,19 +636,19 @@ vector<double> analysisPlots::getMHTandMET( Event::Data& ev ){
   vector<double> rev;
 
   PolarLorentzV mHT(0.,0.,0.,0.);
-  std::vector<Event::Jet const *>::const_iterator ijet = ev.JD_CommonJets().accepted.begin();
-  std::vector<Event::Jet const *>::const_iterator jjet = ev.JD_CommonJets().accepted.end();
-  std::vector<Event::Jet const *>::const_iterator ibaby = ev.JD_CommonJets().baby.begin();
-  std::vector<Event::Jet const *>::const_iterator jbaby = ev.JD_CommonJets().baby.end();
+  // std::vector<Event::Jet const *>::const_iterator ijet = ev.JD_CommonJets().accepted.begin();
+  // std::vector<Event::Jet const *>::const_iterator jjet = ev.JD_CommonJets().accepted.end();
+  // std::vector<Event::Jet const *>::const_iterator ibaby = ev.JD_CommonJets().baby.begin();
+  // std::vector<Event::Jet const *>::const_iterator jbaby = ev.JD_CommonJets().baby.end();
 
-  for(; ijet!=jjet; ++ijet){
-    if( (*ijet)->Pt() > threshold_ ){
-      mHT -= (**ijet);
+  for(auto ijet: ev.JD_CommonJets().accepted){
+    if( ijet->Pt() > threshold_ ){
+      mHT -= *ijet;
     }
   }
-  for( ; ibaby!=jbaby; ++ibaby){
-    if( (*ibaby)->pt() > threshold_ ){
-      mHT -= (**ibaby);
+  for(auto ibaby: ev.JD_CommonJets().baby){
+    if( ibaby->pt() > threshold_ ){
+      mHT -= *ibaby;
     }
   }
 
