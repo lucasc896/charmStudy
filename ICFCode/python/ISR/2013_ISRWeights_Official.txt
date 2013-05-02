@@ -1,0 +1,5 @@
+ISRReWeight_0_120 1.00
+ISRReWeight_120_150 0.95
+ISRReweight_150_250 0.90
+ISRReweight_250_10000 0.80
+ISRReweight_10000_100000 2.0
