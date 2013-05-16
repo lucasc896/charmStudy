@@ -175,6 +175,8 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
 
     outHists.append(hTot)    
   
+  Log.error("CHRIS IS AWESOME")
+
   #plot single plots
   for hT, pDet in sinHists.iteritems():
     histList = []
