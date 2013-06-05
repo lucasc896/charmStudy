@@ -87,7 +87,7 @@ if len(argv) < 2:
    print "\t'e' for efficiency"
    exit()
 
-inFile = open('in.txt', 'r')
+inFile = open('inTTbar.txt', 'r')
 
 inStuff = {
       "All":[],
@@ -125,8 +125,8 @@ for i in inStuff:
 if "e" in argv[1]:
    printEffs(inStuff)
 
-elif "p" in argv[1]:
+if "p" in argv[1]:
    printPurs(inStuff)
 
-elif "t" in argv[1]:
+if "t" in argv[1]:
    printTotals(inStuff)
