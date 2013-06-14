@@ -14,7 +14,7 @@ import ROOT as r
 
 def mode():
   
-  anaMode = ["bTagEff", "anaPlots", "ISRSystem","dev"][1]
+  anaMode = ["bTagEff", "anaPlots", "isoTrackPlots","dev"][1]
 
   return anaMode
 
@@ -24,16 +24,17 @@ def switches():
 
   switches={
           "runMode"       :["plotting", "yieldTables"][0],
-          "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][0],
+          "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][2],
           "runModeBTag"   :["charmFrac", "standardPlots", "charmPhi"][0],
-          "signalSample"  :"T2cc_mSt200_dev",
-          "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT","parkedHT"][1],
-          "jetMulti"      :["le3j","ge4j","inc"][2],
+          "signalSample"  :"T2cc_ISRRW_mSt175_mL165",
+          "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT","parkedHT"][0],
+          "jetMulti"      :["le3j","ge4j","inc","after","before"][2],
           "printLogy"     :[False, True][0],
           "norm"          :["None", "Unitary", "xSec", "lumi"][0],
           "lumiNorm"      :[1, 10, 11.7][2],
           "hiRes"         :[False, True][1], #Warning: Slow for png!
           "outFormat"     :["png", "pdf"][1], #PDF for combinations
+          "BGcomp"        :[False, True][0], #option to decompose BG in tables - requires isoTrackPlots file
           }
 
   return switches
@@ -41,10 +42,10 @@ def switches():
 ###-------------------------------------------------------------------###
 
 def bMulti():
-  bMulti=[]
-  bMultiAll=["inc", "0b", "1b", "2b", "3b", "4b","ge1b","ge2b","ge3b","ge4b"]
+  bMulti = []
+  bMultiAll = ["inc", "0b", "1b", "2b", "3b", "4b","ge1b","ge2b","ge3b","ge4b"]
 
-  include=[0]
+  include = [0]
 
   for val in include:
     bMulti.append(bMultiAll[val])
@@ -53,12 +54,18 @@ def bMulti():
 
 ###-------------------------------------------------------------------###
 
+
 def comparFiles():
 
   comparFiles = ["T2bb_300", "T2cc_300"]
-  comparFiles = ["T2cc_220_195", "T2cc_220_170", "T2cc_220_145"]
   comparFiles = ["T2cc", "T2cc_ISRRW"]
-  comparFiles = ["T2cc_mSt200_mL190", "T2cc_3jet_mSt200_mL190"]
+  comparFiles = ["T2cc_ISRRW_mSt175_mL95", "T2cc_ISRRW_mSt175_mL95_TEST"]
+  comparFiles = ["WJets_isoTrack", "TTbar_isoTrack"]
+  comparFiles = ["T2cc_ISRRW_175_165", "T2cc_ISRRW_175_145", "T2cc_ISRRW_175_95"]
+
+  comparFiles = ["T1ttcc", "T2cc_ISRRW_mSt250"]
+
+  comparFiles = ["T2cc_ISRRW_mSt175_mL165", "T2cc_ISRRW_mSt175_mL95"]
 
   return comparFiles
 
@@ -69,7 +76,7 @@ def bgFile():
 
   mcScale = switches()["lumiNorm"]*10. # corresponding to intL for had sample
 
-  inDir = "/Users/cl7359/SUSY/charmStudy/ANALYSIS/rootfiles/"
+  inDir = "/Users/chrislucas/SUSY/charmStudy/ANALYSIS/rootfiles/"
 
   if mode()=="anaPlots":
     files = {
@@ -85,11 +92,11 @@ def bgFile():
 ###-------------------------------------------------------------------###
 
 def sigFile():
-  inDir = "/Users/cl7359/SUSY/charmStudy/ANALYSIS/rootfiles/"
+  inDir = "/Users/chrislucas/SUSY/charmStudy/ANALYSIS/rootfiles/"
 
   if mode()=="anaPlots":
     sigFile = {
-            "T2cc_mSt200_dev"                  :["%sdev/outT2cc_anaPlots.root"%inDir, 100.],
+            "T2cc_mSt200_dev"           :["%sdev/outT2cc_anaPlots.root"%inDir, 100.],
             "T2cc"                      :["%sanaPlots_v3/outT2cc_anaPlots.root"%inDir, 100.],
             "T2cc_mSt200_mL120"         :["%sanaPlots_v3/outT2cc_200_120_anaPlots_v3.root"%inDir, 100.],
             "T2cc_mSt200_mL190"         :["%sanaPlots_v3/outT2cc_200_190_anaPlots_v3.root"%inDir, 100.],
@@ -109,7 +116,7 @@ def sigFile():
             "T2cc_ISRRW_mSt100_mL70"    :["%sanaPlots_225/outT2cc_ISRRW13_100_70_anaPlots.root"%inDir, 100.],
             "T2cc_ISRRW_mSt100_mL80"    :["%sanaPlots_225/outT2cc_ISRRW13_100_80_anaPlots.root"%inDir, 100.],
             "T2cc_ISRRW_mSt100_mL90"    :["%sanaPlots_225/outT2cc_ISRRW13_100_90_anaPlots.root"%inDir, 100.],
-            "T2cc_ISRRW_mSt175_mL95"    :["%sanaPlots_225/outT2cc_ISRRW13_175_95_anaPlots.root"%inDir, 100.],
+            "T2cc_ISRRW_mSt175_mL95"    :["%sanaPlots_v3/outT2cc_ISRRW13_175_95_anaPlots.root"%inDir, 100.],
             "T2cc_ISRRW_mSt175_mL135"   :["%sanaPlots_225/outT2cc_ISRRW13_175_135_anaPlots.root"%inDir, 100.],
             "T2cc_ISRRW_mSt175_mL165"   :["%sanaPlots_225/outT2cc_ISRRW13_175_165_anaPlots.root"%inDir, 100.],            
             "T2cc_ISRRW_mSt100"         :["%sanaPlots_225/outT2cc_ISRRW13_Stop100_anaPlots.root"%inDir, 100.],
@@ -118,12 +125,27 @@ def sigFile():
             "T2cc_ISRRW_mSt100_Vect100" :["%sanaPlots_225/outT2cc_ISRRW13_Stop100_Vect100_anaPlots.root"%inDir, 100.],
             "T2cc_ISRRW_mSt175_Vect100" :["%sanaPlots_225/outT2cc_ISRRW13_Stop175_Vect100_anaPlots.root"%inDir, 100.],
             "T2cc_ISRRW_mSt250_Vect100" :["%sanaPlots_225/outT2cc_ISRRW13_Stop250_Vect100_anaPlots.root"%inDir, 100.],
+            "T1ttcc"                    :["%sanaPlots_v3/outT1ttcc_300_anaPlots.root"%inDir, 100.],
+            "HT_2012_PSRW"              :["%sanaPlots_v3/outHT_2012_PSRW_anaPlots.root"%inDir, 100.],
+            "HT_2012"                   :["%sanaPlots_v3/outHT_2012_anaPlots.root"%inDir, 100.],
+            "HT_Parked"                 :["%sanaPlots_v3/outParkedHT_anaPlots.root"%inDir, 100.],
+            "HT_Parked_isoTrack"        :["%sanaPlots_v3/outParked_isoTrackTest_anaPlots.root"%inDir, 100.],
+            "TTbar_isoTrack"            :["%sisoTrackPlots/outTTbar_isoTrackPlots.root"%inDir, 100.],
+            "WJets_isoTrack"            :["%sisoTrackPlots/outWJets_isoTrackPlots.root"%inDir, 100.],
+            "ZJets_isoTrack"            :["%sisoTrackPlots/outZJets_isoTrackPlots.root"%inDir, 100.],
+            "T2tt_isoTrack"             :["%sisoTrackPlots/outT2tt_isoTrackPlots.root"%inDir, 100.],
+            "T2cc_isoTrack"             :["%sisoTrackPlots/outT2cc_isoTrackPlots.root"%inDir, 100.],
+            "T1tttt_isoTrack"           :["%sisoTrackPlots/outT1tttt_isoTrackPlots.root"%inDir, 100.],
+            "T2cc_175_165_isoTrack"     :["%sanaPlots_v3/outT2cc_175_165_isoTrackTest_anaPlots.root"%inDir, 100.],
+            "T2cc_175_95_isoTrack"      :["%sanaPlots_v3/outT2cc_175_95_isoTrackTest_anaPlots.root"%inDir, 100.],
+
     }
   elif mode()=="bTagEff":
     sigFile={
           "T2cc_ISRRW"          :["%sbTagEff_v2/outT2cc_ISRRW13_bTagEff.root"%inDir],
           "T2cc_ISRRW_175_95"   :["%sbTagEff_v2/outT2cc_ISRRW13_175_95_bTagEff.root"%inDir],
           "T2cc_ISRRW_175_165"  :["%sbTagEff_v2/outT2cc_ISRRW13_175_165_bTagEff.root"%inDir],
+          "T2cc_ISRRW_175_145"  :["%sbTagEff_v2/outT2cc_ISRRW13_175_145_bTagEff.root"%inDir],
     } 
   elif mode()=="ISRSystem":
     sigFile={
@@ -140,7 +162,9 @@ def sigFile():
 
 def inDirs():
 
+  HTdirs = ["175_275", "275_325", "325_375", "375_475", "475_575", "575_675", "675_775", "775_875", "875"]
   HTdirs = ["275_325", "325_375", "375_475", "475_575", "575_675", "675_775", "775_875", "875"]
+
 
   if switches()["HTcuts"]=="parkedHT":
     HTdirs.insert(0, "225_275")
@@ -152,8 +176,11 @@ def inDirs():
     for d in HTdirs:
       if switches()["jetMulti"]=="le3j": dirs.append("le3j_"+d)
       if switches()["jetMulti"]=="ge4j": dirs.append("ge4j_"+d)
+      # if switches()["jetMulti"]=="inc":  dirs.append("inc_noMhtMet_"+d)
       if switches()["jetMulti"]=="inc":  dirs.append("inc_"+d)
-  
+      if switches()["jetMulti"]=="after":  dirs.append("after"+d)
+      if switches()["jetMulti"]=="before":  dirs.append("before"+d)
+
   elif switches()["HTcuts"]=="highHT":
     for d in HTdirs[2:]:
       if switches()["jetMulti"]=="le3j": dirs.append("le3j_"+d)
@@ -173,11 +200,12 @@ def inDirs():
 def sinHists():
   if mode()=="anaPlots":
     singleHists={
-        # "n_Events_1"           :plotDetails(),
+        "n_Events_1"           :plotDetails(),
         "n_Jets"               :plotDetails(xRange=[0.,8.]),
+        # "n_evWeight"         :plotDetails(xRange=[0.,10.]), 
         # "n_Jets_charm"               :plotDetails(xRange=[0.,8.]),
         # "n_Jets_ISR"               :plotDetails(xRange=[0.,8.]),
-        # "n_BTagged_Jets_all"   :plotDetails(xRange=[0.,6.]),
+        "n_BTagged_Jets_all"   :plotDetails(xRange=[0.,6.]),
     }
   elif mode()=="bTagEff":
     singleHists={
@@ -203,38 +231,65 @@ def anaHists():
   
   if mode()=="anaPlots":
     hists={
-      # "MET"                   :plotDetails(xRange=[0.,900.], rebX=2),
-      # "MHT"                   :plotDetails(xRange=[0.,900.],rebX=2),
-      "commHT"                :plotDetails(xRange=[0.,850.], rebX=2),
-      # "HT_charm"                :plotDetails(xRange=[0.,1000.], rebX=2),
-      # "HT_ISR"                :plotDetails(xRange=[0.,1000.], rebX=2),
-      # "hadronicAlphaTZoom"    :plotDetails(xRange=[0.3, 1.5], rebX=2),
+      "MET"                   :plotDetails(xRange=[0.,900.], rebX=2),
+      "MHT"                   :plotDetails(xRange=[0.,900.],rebX=2),
+      "commHT"                :plotDetails(xRange=[0.,1200.], rebX=2),
+      # # "HT_charm"                :plotDetails(xRange=[0.,1000.], rebX=2),
+      # # "HT_ISR"                :plotDetails(xRange=[0.,1000.], rebX=2),
+      "hadronicAlphaTZoom"    :plotDetails(xRange=[0.3, 1.5], rebX=2),
       # "leadJetdelPhi"        :plotDetails(xRange=[0.,3.2], rebX=2),
-      # "MHToverMET"            :plotDetails(xRange=[0.,2.], rebX=1),
-      # "MHToverHT"            :plotDetails(xRange=[0.,2.], rebX=1),
-      # "jetPt"                 :plotDetails(xRange=[0.,500.], rebX=1),
-      # "leadJetPt"             :plotDetails(xRange=[0.,500.], rebX=1),
-      # "subLeadJetPt"          :plotDetails(xRange=[0.,500.], rebX=1),
-      # "thirdJetPt"            :plotDetails(xRange=[0., 300.], rebX=1),
+      "MHToverMET"            :plotDetails(xRange=[0.,2.], rebX=1),
+      # # "MHToverHT"            :plotDetails(xRange=[0.,2.], rebX=1),
+      "jetPt"                 :plotDetails(xRange=[0.,800.], rebX=1),
+      "leadJetPt"             :plotDetails(xRange=[0.,800.], rebX=1),
+      "subLeadJetPt"          :plotDetails(xRange=[0.,800.], rebX=1),
+      "thirdJetPt"            :plotDetails(xRange=[0., 300.], rebX=1),
       # "leadISRJetPt"            :plotDetails(xRange=[0., 300.], rebX=1),
       # "subLeadISRJetPt"            :plotDetails(xRange=[0., 300.], rebX=1),
-      # "fourthJetPt"           :plotDetails(xRange=[0., 200.], rebX=1),
+      "fourthJetPt"           :plotDetails(xRange=[0., 200.], rebX=1),
       # "fivePlusJetPt"           :plotDetails(xRange=[0., 200.], rebX=1),
-      # "alphaT_vs_HT"          :plotDetails(xRange=[0.,1.6], yRange=[0.,600.], rebX=2, rebY=2),
-      # "leadTwoJetsPt"         :plotDetails(xRange=[0.,300.], rebX=2),
-      # "stopGenPtScal"         :plotDetails(xRange=[0.,1000.], rebX=2),
-      # "stopGenPtVect"         :plotDetails(xRange=[0.,600.], rebX=2),
+      # "alphaT_vs_HT"          :plotDetails(xRange=[175.,875.], yRange=[.5,.8], rebX=1, rebY=1),
+      "leadTwoJetsPt"         :plotDetails(xRange=[0.,800.], rebX=2),
+      "stopGenPtScal"         :plotDetails(xRange=[0.,1000.], rebX=2),
+      "stopGenPtVect"         :plotDetails(xRange=[0.,600.], rebX=2),
       # "delPhi_vs_scalGenPt"   :plotDetails(xRange=[0., 900.], yRange=[0., 3.2], rebX=5), 
       # "dPhiStopCharm"         :plotDetails(xRange=[0.,3.2], rebX=1),
       # "dPhiStopStop"          :plotDetails(xRange=[0.,3.2], rebX=1),
       # "dPhiNeutCharm"         :plotDetails(xRange=[0.,3.2], rebX=1),
       # "dPhiCharmCharm"        :plotDetails(xRange=[0.,3.2], rebX=1),
       # "dPhiStopNeut"          :plotDetails(xRange=[0.,3.2], rebX=2),
-      # "dPhiLeadJetMHT"        :plotDetails(xRange=[0.,3.2], rebX=1),
-      # "leadJetdelPhi"         :plotDetails(xRange=[0.,3.2], rebX=1),
-      # "dPhiSubLeadJetMHT"        :plotDetails(xRange=[0.,3.2], rebX=1),
+      "dPhiLeadJetMHT"        :plotDetails(xRange=[0.,3.2], rebX=1),
+      "leadJetdelPhi"         :plotDetails(xRange=[0.,3.2], rebX=1),
+      "dPhiSubLeadJetMHT"        :plotDetails(xRange=[0.,3.2], rebX=1),
       # "charmJetPt_0"          :plotDetails(xRange=[0., 350.], rebX=1),
       # "charmJetPt_1"          :plotDetails(xRange=[0., 350.], rebX=1),
+
+      # >>> isoTrackTings
+      # "genElePt"    :plotDetails(xRange=[0., 200.], rebX=1),
+      # "genMuPt"    :plotDetails(xRange=[0., 200.], rebX=1),
+      # "genTauPt"    :plotDetails(xRange=[0., 200.], rebX=1),
+      # "nIsoTrack"   :plotDetails(),
+      # "genElePt"   :plotDetails(),
+      # "genMuPt"    :plotDetails(),
+      # "genTauPt"   :plotDetails(),
+      # "delR_eleIT"   :plotDetails(),
+      # "delR_muIT"    :plotDetails(),
+      # "delR_tauIT"   :plotDetails(),
+      # "delR_TauEleIT"    :plotDetails(),
+      # "delR_TauMuIT"   :plotDetails(),
+      # "delR_TauHadIT"    :plotDetails(),
+      # "delR_VEleIT"    :plotDetails(),
+      # "delR_VMuIT"   :plotDetails(),
+      # "genPtTauEle"    :plotDetails(),
+      # "genPtTauMu"   :plotDetails(),
+      # "genPtTauHad"    :plotDetails(),
+      # "genPtVEle"    :plotDetails(),
+      # "genPtVMu"   :plotDetails(),
+      # "genEtaTauEle"   :plotDetails(),
+      # "genEtaTauMu"    :plotDetails(),
+      # "genEtaTauHad"   :plotDetails(),
+      # "genEtaVEle"   :plotDetails(),
+      # "genEtaVMu"    :plotDetails(),
     }
   elif mode()=="bTagEff":
     hists={}
@@ -316,3 +371,4 @@ def getXSec():
 
 
 
+# 
