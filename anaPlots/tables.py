@@ -39,7 +39,7 @@ def getbMultis(bM=""):
 def getSMPred(bM="inc", jM="inc"):
 
   zerobtagDict = {
-      "225-275": [0., 0., 0., 0.],
+      "175-275": [0., 0., 0., 0.],
       "275-325": [6235., 100., 1010., 34.],
       "325-375": [2900., 60., 447., 19.],
       "375-475": [1955., 34., 390., 19.],
@@ -51,7 +51,7 @@ def getSMPred(bM="inc", jM="inc"):
   }
 
   onebtagDict = {
-      "225-275": [0., 0., 0., 0.],
+      "175-275": [0., 0., 0., 0.],
       "275-325": [1162, 37., 521., 25.],
       "325-375": [481., 18., 232., 15.],
       "375-475": [341., 15., 188., 12.],
@@ -62,7 +62,7 @@ def getSMPred(bM="inc", jM="inc"):
       "875-inf": [2.1, 0.5, 6.8, 1.2],
   }
   twobtagDict = {
-      "225-275": [0., 0., 0., 0.],
+      "175-275": [0., 0., 0., 0.],
       "275-325": [224., 15., 208., 17.],
       "325-375": [98.2, 8.4, 103., 9.],
       "375-475": [59., 5.2, 85.9, 7.2],
@@ -73,7 +73,7 @@ def getSMPred(bM="inc", jM="inc"):
       "875-inf": [0.1, 0., 1.3, 0.4],
   }
   threebtagDict = {
-      "225-275": [0., 0., 0., 0.],
+      "175-275": [0., 0., 0., 0.],
       "275-325": [0., 0., 25.3, 5.],
       "325-375": [0., 0., 11.7, 1.7],
       "375-475": [0., 0., 6.7, 1.4],
@@ -84,7 +84,7 @@ def getSMPred(bM="inc", jM="inc"):
       "875-inf": [0., 0., 0.1, 0.1],
   }
   fourbtagDict = {
-      "225-275": [0., 0., 0., 0.],
+      "175-275": [0., 0., 0., 0.],
       "275-325": [0., 0., 0.9, 0.4],
       "325-375": [0., 0., 0.3, 0.2],
       "375-475": [0., 0., 0.6, 0.3],
@@ -95,7 +95,7 @@ def getSMPred(bM="inc", jM="inc"):
       "875-inf": [0., 0., 0., 0.],
   }
   inclbtagDict = {
-      "225-275": [0., 0., 0., 0.],
+      "175-275": [0., 0., 0., 0.],
       "275-325": [0., 0., 0., 0.],
       "325-375": [0., 0., 0., 0.],
       "375-475": [0., 0., 0., 0.],
@@ -107,7 +107,7 @@ def getSMPred(bM="inc", jM="inc"):
   }
 
   HTbins = [
-      "225-275",
+      "175-275",
       "275-325",
       "325-375",
       "375-475",
@@ -164,7 +164,7 @@ def getSMPred(bM="inc", jM="inc"):
 ###-------------------------------------------------------------------###
 
 
-def getDataYields(bM="inc", debug=False):
+def getDataYields(bM="inc", hist="commHT", debug=False):
 
   dirs        = conf.inDirs()
   sigSamp     = conf.switches()["signalSample"]
@@ -176,38 +176,48 @@ def getDataYields(bM="inc", debug=False):
 
   yieldDict = {}
 
-  # maybe put in config file?
-  targetLumi = 11700.
+  Log.info("Yields take from %s histogram.\n" % hist)
 
-  # do regex matching for particle masses
-  regex = re.compile(r"._mSt(\d*)_mL(\d*)")
-  result = regex.findall(sigSamp)
+  # # maybe put in config file?
+  # targetLumi = 11700.
 
-  masses = result[0] if len(result) > 0 else []
+  # # do regex matching for particle masses
+  # regex = re.compile(r"._mSt(\d*)_mL(\d*)")
+  # result = regex.findall(sigSamp)
 
-  # enter loop if both mStop and mLSP are matched
-  # note: eventually make possible for single mass scenario (i.e. an sms strip)
-  if len(masses) > 1:
+  # masses = result[0] if len(result) > 0 else []
 
-    # get stop mass
-    # note: eventually change to lookup table
-    if masses[0] == "200":
-      xSec = 18.5245
+  # # enter loop if both mStop and mLSP are matched
+  # # note: eventually make possible for single mass scenario (i.e. an sms strip)
+  # if len(masses) > 1:
 
-      # get nEvents
-      # note: eventually change to lookup search
-      if masses[1] == "120":
-        nSource = 630563.
-      elif masses[1] == "190":
-        nSource = 630587.
+  #   # get stop mass
+  #   # note: eventually change to lookup table
+  #   if masses[0] == "200":
+  #     xSec = 18.5245
 
-    else:
-      xSec = 1.
+  #     # get nEvents
+  #     # note: eventually change to lookup search
+  #     if masses[1] == "120":
+  #       nSource = 630563.
+  #     elif masses[1] == "190":
+  #       nSource = 630587.
 
-    scale = targetLumi*xSec/nSource
+  #   else:
+  #     xSec = 1.
 
-  else:
-    scale = 1
+  # targetLumi = 11700.
+  # xSec = 
+  # scale = targetLumi*xSec/nSource
+
+  # else:
+  #   scale = 1
+
+  scale = 1.
+
+  if "WJets" in sigSamp or "QCD" in sigSamp or "TTbar" in sigSamp:
+    if conf.switches()["norm"] == "lumi":
+      scale = conf.switches()["lumiNorm"]
 
   Log.warning("Tables filled with scale factor %f" % scale)
 
@@ -217,8 +227,8 @@ def getDataYields(bM="inc", debug=False):
     if d == "inc_875": dirTitle = "875-inf"
 
     for suf in getbMultis(bM):
-      if debug: Log.debug("Getting %s/commHT%s" % (d, suf))
-      h = sFile.Get("%s/commHT%s" % (d, suf))
+      if debug: Log.debug("Getting %s/%s%s" % (d, hist, suf))
+      h = sFile.Get("%s/%s%s" % (d, hist, suf))
       ent += h.GetEntries()
       if debug: Log.debug(str(ent))
     ent *= scale
@@ -247,6 +257,10 @@ def printCaption(bM, jM):
     label = "$N_{jet} \\leq 3$"
   elif jM == "ge4j":
     label = "$N_{jet} \\leq 3$"
+  elif jM == "after":
+    label = "$N_{jet} \\geq 2$, %s" % jM
+  elif jM == "before":
+    label = "$N_{jet} \\geq 2$, %s" % jM
   else:
     label = "all jets"
 
@@ -275,7 +289,7 @@ def printHT():
 
   bins = conf.switches()["HTcuts"]
 
-  HTline = " HT Bins (GeV) & 275-325 & 325-375 & 375-475 & 475-575 & 575-675 & 675-775 & 775-875 & 875-$\\inf$ \\\\ \n"
+  HTline = " HT Bins (GeV) & 175-275 & 275-325 & 325-375 & 375-475 & 475-575 & 575-675 & 675-775 & 775-875 & 875-$\\inf$ \\\\ \n"
 
   if "parked" in bins:
     split = HTline.split("&")
@@ -287,15 +301,29 @@ def printHT():
 ###-------------------------------------------------------------------###
 
 
+def formatLabel(label=""):
+
+  label = label.replace("TauEle", r"$\tau \to e \nu$")
+  label = label.replace("TauMu", r"$\tau \to \mu \nu$")
+  label = label.replace("TauHad", r"$\tau \to had$")
+  label = label.replace("VEle", r"$W/Z \to e \nu$")
+  label = label.replace("VMu", r"$W/Z \to \mu \nu$")
+  label = label.replace("isoTrack ", "")
+
+  return label
+
+###-------------------------------------------------------------------###
+
+
 def makeTable(bM="inc", debug=False):
 
   sigSamp  = conf.switches()["signalSample"]
   jM       = conf.switches()["jetMulti"]
 
-  Log.info("\tBin: %s %s\n" % (bM, jM))
+  Log.info("Bin: %s %s" % (bM, jM))
 
   smPred = getSMPred(bM, jM)
-  dYield, scale = getDataYields(bM, debug=debug)
+  dYield, scale = getDataYields(bM=bM, debug=debug)
 
   if debug: Log.debug("Opening: tableDump/yieldTable_%s_%s_%s.tex"%(sigSamp, jM, bM))
 
@@ -313,7 +341,7 @@ def makeTable(bM="inc", debug=False):
 
   print "\n*** SM BG Pred ***"
 
-  outTxt += " SM BG Pred "
+  # outTxt += " SM BG Pred "
 
   for key, val in smPred.iteritems():
     if "parked" not in conf.switches()["HTcuts"] and "225" in key:
@@ -321,16 +349,34 @@ def makeTable(bM="inc", debug=False):
     print "%s\t%f \\pm %f" % (key, val[0], val[1])
     outTxt += "& %.1f $^{\pm %.1f }$ " % (val[0], val[1])
 
-  outTxt += " \\\\"
+  # outTxt += " \\\\"
 
   print "\n*** %s Yields" % (sigSamp)
-  outTxt += "\n\n%s " % sigSamp.replace("_", " ")
+  outTxt += formatLabel("\n\n%s " % sigSamp.replace("_", " "))
 
   totYield = 0
   for key, val in dYield.iteritems():
     print "%s\t%f \\pm %f" % (key[1:], val[0], val[1])
     outTxt += "& %.1f $^{\pm %.1f }$ " % (val[0], val[1])
     totYield += val[0]
+
+  outTxt += "\\\\"
+
+  if conf.switches()["BGcomp"]:
+    hNames = ["TauEle", "TauMu", "TauHad", "VEle", "VMu"]
+    for hN in hNames:
+      thisYield, tmp = getDataYields(bM=bM, hist="n_Events%s" % hN, debug=debug)
+      thisTot = 0
+      outTxt += formatLabel("\n\n%s %s " % (sigSamp.replace("_", " "), hN))
+      
+      for key, val in thisYield.iteritems():
+        # print "%s\t%f \\pm %f" % (key[1:], val[0], val[1])
+        outTxt += "& %.1f $^{\pm %.1f }$ " % (val[0], val[1])
+        thisTot += val[0]
+      
+      outTxt += "\\\\"
+      print "Total events for %s: %d" % (hN, thisTot)
+
 
   print "\n*** Total Yield for %s: %d ***\n" % (sigSamp, totYield)
   outTxt += " \\\\"
