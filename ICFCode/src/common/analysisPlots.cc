@@ -24,6 +24,7 @@ analysisPlots::analysisPlots( const Utils::ParameterSet& ps ) :
    dirName_( ps.Get<std::string>("DirName") ),
    nMin_( ps.Get<int>("MinObjects") ),
    nMax_( ps.Get<int>("MaxObjects") ),
+   isData_( ps.Get<bool>("isData") ),
    bTagAlgo_( ps.Get<int>("BTagAlgo") ),
    bTagAlgoCut_( ps.Get<double>("BTagAlgoCut") ),
    minDR_( ps.Get<double>("minDR") ),
@@ -442,6 +443,7 @@ bool analysisPlots::StandardPlots( Event::Data& ev ) {
       // count number of btagged jets
       if( ev.GetBTagResponse(jet->GetIndex(), bTagAlgo_) > bTagAlgoCut_ ) nbjet++;
       
+
       // fill jet subcategories
       if (fabs(ev.GetBtagJetFlavour(jet->GetIndex())) == 4){
          charmjets.push_back( jet );
