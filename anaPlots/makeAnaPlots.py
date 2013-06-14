@@ -155,8 +155,8 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
       histList = []
       for d in dirs:
         for suf in getbMultis(b):
-          if debug: Log.debug("%s/%s%s"%(d, hT, suf))
           h = rFile.Get("%s/%s%s"%(d, hT, suf))
+          if debug: Log.debug("%s/%s%s"%(d, hT, suf) + str(h))
           histList.append(h)
       
       aPlot = anaPlot(histList, "%s_%s"%(hT, b))
@@ -173,9 +173,7 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
       yTitle_ = hTot.GetYaxis().GetTitle()
       hTot.GetYaxis().SetTitle(yTitle_+" / %.1f"%width_)
 
-    outHists.append(hTot)    
-  
-  Log.error("CHRIS IS AWESOME")
+    outHists.append(hTot)
 
   #plot single plots
   for hT, pDet in sinHists.iteritems():
@@ -193,10 +191,10 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
     del aPlot
     
     doRanges(hTot, pDet)
-
-    width_ = hTot.GetBinWidth(1)
-    yTitle_ = hTot.GetYaxis().GetTitle()
-    hTot.GetYaxis().SetTitle(yTitle_+"/"+str(width_))
+    if "TH1" in str(type(hTot)):
+      width_ = hTot.GetBinWidth(1)
+      yTitle_ = hTot.GetYaxis().GetTitle()
+      hTot.GetYaxis().SetTitle(yTitle_+"/"+str(width_))
 
     outHists.append(hTot)
 
