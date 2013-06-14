@@ -9,6 +9,7 @@ slides/
 
 ### file types ###
 
+in*txt
 *.pdf
 *.png
 *.pyc
