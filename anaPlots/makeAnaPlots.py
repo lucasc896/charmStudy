@@ -168,6 +168,7 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
       del aPlot
       
       doRanges(hTot, pDet)
+
     if "TH1" in str(type(hTot)):
       width_ = hTot.GetBinWidth(1)
       yTitle_ = hTot.GetYaxis().GetTitle()
