@@ -142,7 +142,7 @@ skim = SkimOp(skim_ps.ps())
 #Plot the common plots!
 
 genericPSet_mc = PSet(
-DirName       = "275_325Gev",
+DirName       = "200_275Gev",
 MinObjects    = 2,
 MaxObjects    = 15,
 isData        = False,
@@ -156,7 +156,7 @@ Debug         = False,
 )
 
 genericPSet_data = PSet(
-DirName       = "175_225Gev",
+DirName       = "200_275Gev",
 MinObjects    = 2,
 MaxObjects    = 15,
 isData        = True,
@@ -199,7 +199,6 @@ def AddBinedHist(cutTree = None, OP = (), cut = None, htBins = [],TriggerDict = 
         if int(lower) == 325 and upper is None: continue
         if int(lower) == 375 and upper is None : continue
         if int(lower) == 675 and upper is None : continue
-        # print "continue should have happened now"
         lowerCutVal=""
         if Muon!=None:
             lowerCutVal=("RECO_CommonHTTakeMuCut(%d)"%lower)
@@ -245,12 +244,10 @@ def AddBinedHist(cutTree = None, OP = (), cut = None, htBins = [],TriggerDict = 
   else:
     ## MC
       for lower,upper in zip(htBins,htBins[1:]+[None]):
-        # print lower, upper
         if int(lower) == 275 and upper is None: continue
         if int(lower) == 325 and upper is None: continue
         if int(lower) == 375 and upper is None: continue
         if int(lower) == 675 and upper is None : continue
-        # print "  ", lower, upper
         lowerCutVal=""
         if Muon!=None:
             lowerCutVal=("RECO_CommonHTTakeMuCut(%d)"%lower)
@@ -351,29 +348,29 @@ jet_g4_du = OP_NumComJets(">",4)
 VertexPtOverHT = OP_SumVertexPtOverHT(0.1)
 
 ht_triggers = {
-    "175_275":["HLT_HT200_v1", "HLT_HT200_v2", "HLT_HT200_v3", "HLT_HT200_v4", "HLT_HT200_v6", ],
-    "275_325":["HLT_HT250_v1", "HLT_HT250_v2", "HLT_HT250_v3", "HLT_HT250_v4", "HLT_HT250_v5", "HLT_HT250_v7", ],
-    "325_375":["HLT_HT300_v1", "HLT_HT300_v2", "HLT_HT300_v3", "HLT_HT300_v4", "HLT_H300_v5", "HLT_HT300_v7", ],
-    "375_475":["HLT_HT350_v1", "HLT_HT350_v2", "HLT_HT350_v3", "HLT_HT350_v4", "HLT_HT350_v5", "HLT_HT350_v7", ],
-    "475_575":["HLT_HT450_v1", "HLT_HT450_v2", "HLT_HT450_v3", "HLT_HT450_v4", "HLT_HT450_v5", "HLT_HT450_v7", ],
-    "575_675":["HLT_HT450_v1", "HLT_HT450_v2", "HLT_HT450_v3", "HLT_HT450_v4", "HLT_HT450_v5", "HLT_HT450_v7", ],
-    "675_775":["HLT_HT450_v1", "HLT_HT450_v2", "HLT_HT450_v3", "HLT_HT450_v4", "HLT_HT450_v5", "HLT_HT450_v7", ],
-    "775_875":["HLT_HT450_v1", "HLT_HT450_v2", "HLT_HT450_v3", "HLT_HT450_v4", "HLT_HT450_v5", "HLT_HT450_v7", ],
-    "875":["HLT_HT450_v1", "HLT_HT450_v2", "HLT_HT450_v3", "HLT_HT450_v4", "HLT_HT450_v5", "HLT_HT450_v7", ],
+    "200_275" :["HLT_HT200_v1", "HLT_HT200_v2", "HLT_HT200_v3", "HLT_HT200_v4", "HLT_HT200_v6", ],
+    "275_325" :["HLT_HT250_v1", "HLT_HT250_v2", "HLT_HT250_v3", "HLT_HT250_v4", "HLT_HT250_v5", "HLT_HT250_v7", ],
+    "325_375" :["HLT_HT300_v1", "HLT_HT300_v2", "HLT_HT300_v3", "HLT_HT300_v4", "HLT_H300_v5", "HLT_HT300_v7", ],
+    "375_475" :["HLT_HT350_v1", "HLT_HT350_v2", "HLT_HT350_v3", "HLT_HT350_v4", "HLT_HT350_v5", "HLT_HT350_v7", ],
+    "475_575" :["HLT_HT450_v1", "HLT_HT450_v2", "HLT_HT450_v3", "HLT_HT450_v4", "HLT_HT450_v5", "HLT_HT450_v7", ],
+    "575_675" :["HLT_HT450_v1", "HLT_HT450_v2", "HLT_HT450_v3", "HLT_HT450_v4", "HLT_HT450_v5", "HLT_HT450_v7", ],
+    "675_775" :["HLT_HT450_v1", "HLT_HT450_v2", "HLT_HT450_v3", "HLT_HT450_v4", "HLT_HT450_v5", "HLT_HT450_v7", ],
+    "775_875" :["HLT_HT450_v1", "HLT_HT450_v2", "HLT_HT450_v3", "HLT_HT450_v4", "HLT_HT450_v5", "HLT_HT450_v7", ],
+    "875_975" :["HLT_HT450_v1", "HLT_HT450_v2", "HLT_HT450_v3", "HLT_HT450_v4", "HLT_HT450_v5", "HLT_HT450_v7", ],
+    "975"     :["HLT_HT450_v1", "HLT_HT450_v2", "HLT_HT450_v3", "HLT_HT450_v4", "HLT_HT450_v5", "HLT_HT450_v7", ],
 }
 
 triggers = {
-    # "175_275":["HLT_HT200_AlphaT0p57_v*", ],
-    "200_225":["HLT_HT200_AlphaT0p57_v*", ],
-    "225_275":["HLT_HT200_AlphaT0p57_v*", ],
-    "275_325":["HLT_HT250_AlphaT0p55_v*", ],
-    "325_375":["HLT_HT300_AlphaT0p53_v*", ],
-    "375_475":["HLT_HT350_AlphaT0p52_v*", ],
-    "475_575":["HLT_HT400_AlphaT0p51_v*", ],
-    "575_675":["HLT_HT400_AlphaT0p51_v*", ],
-    "675_775":["HLT_HT400_AlphaT0p51_v*", ],
-    "775_875":["HLT_HT400_AlphaT0p51_v*", ],
-    "875":["HLT_HT400_AlphaT0p51_v*", ],
+    "200_275" :["HLT_HT200_AlphaT0p57_v*", ],
+    "275_325" :["HLT_HT250_AlphaT0p55_v*", ],
+    "325_375" :["HLT_HT300_AlphaT0p53_v*", ],
+    "375_475" :["HLT_HT350_AlphaT0p52_v*", ],
+    "475_575" :["HLT_HT400_AlphaT0p51_v*", ],
+    "575_675" :["HLT_HT400_AlphaT0p51_v*", ],
+    "675_775" :["HLT_HT400_AlphaT0p51_v*", ],
+    "775_875" :["HLT_HT400_AlphaT0p51_v*", ],
+    "875_975" :["HLT_HT400_AlphaT0p51_v*", ],
+    "975"     :["HLT_HT400_AlphaT0p51_v*", ],
     }
 
 json_output = JSONOutput("filtered")
@@ -430,7 +427,6 @@ stopVectPt_le100 = OP_StopGenVectPtSumCut(100.)
 
 
 # test definition of isoTrackVeto
-
 isoTrackPset = PSet(
             PtCut = 10., 
             MaxEta = 2.2,
@@ -707,16 +703,16 @@ mu_2012_mu = PSet(
               )
 
 mu_2012_had = PSet(
-    MuID = "Tight",
-    MinPt = 10.,
-    MaxEta = 2.5,
-    MaxIsolation = 0.12,
-    GlobalChi2 = 10,
-    MaxGlbTrkDxy = 0.2,
-    MinNumTrkLayers = 6,
-    Match2GlbMu = 1,
-    NumPixelHits = 1,
-    MaxInrTrkDz = 0.5
+        MuID = "Tight",
+        MinPt = 10.,
+        MaxEta = 2.5,
+        MaxIsolation = 0.12,
+        GlobalChi2 = 10,
+        MaxGlbTrkDxy = 0.2,
+        MinNumTrkLayers = 6,
+        Match2GlbMu = 1,
+        NumPixelHits = 1,
+        MaxInrTrkDz = 0.5
 )
 
 # Define the custom eleID (taken from RA4)
