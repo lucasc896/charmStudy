@@ -30,8 +30,9 @@ analysisPlots::analysisPlots( const Utils::ParameterSet& ps ) :
    minDR_( ps.Get<double>("minDR") ),
    StandardPlots_( ps.Get<bool>("StandardPlots") ),
    threshold_( ps.Get<double>("threshold") ),
-   NoCuts_( ps.Get<bool>("NoCutsMode") )
-
+   NoCuts_( ps.Get<bool>("NoCutsMode") ),
+   Debug_( ps.Get<bool>("Debug") )
+   
    { 
    }
 
@@ -75,26 +76,14 @@ void analysisPlots::StandardPlots() {
    BookHistArray(h_evWeight,
       "n_evWeight",
       ";;# count",
-      50, 0., 2.,
+      50, 0., 100.,
       1, 0, 1, false);
 
    BookHistArray(h_nJets,
       "n_Jets",
       ";nJets;# count",
       10, 0., 10.,
-      1, 0, 1, true);
-
-   BookHistArray(h_nJets_charm,
-      "n_Jets_charm",
-      ";nJets charm;# count",
-      5, 0., 5.,
-      1, 0, 1, true);
-
-   BookHistArray(h_nJets_ISR,
-      "n_Jets_ISR",
-      ";nJets ISR;# count",
-      10, 0., 10.,
-      1, 0, 1, true);         
+      1, 0, 1, true);       
 
    BookHistArray(h_nBTagJets,
       "n_BTagged_Jets",
@@ -138,34 +127,10 @@ void analysisPlots::StandardPlots() {
       80, 0., 1000.,
       6, 0, 1, false);  
 
-   BookHistArray(h_leadISRJetPt,
-      "leadISRJetPt",
-      ";lead ISR jet p_{T} (GeV);# count",
-      80, 0., 1000.,
-      6, 0, 1, false);
-
-   BookHistArray(h_subLeadISRJetPt,
-      "subLeadISRJetPt",
-      ";sublead ISR jet p_{T} (GeV);# count",
-      80, 0., 1000.,
-      6, 0, 1, false); 
-
    BookHistArray(h_commHT,
       "commHT",
       ";HT (GeV);# count",
-      50, 0., 1000.,
-      6, 0, 1, false);
-
-   BookHistArray(h_HT_charm,
-      "HT_charm",
-      ";HT_charm (GeV);# count",
-      50, 0., 1000.,
-      6, 0, 1, false);
-   
-   BookHistArray(h_HT_ISR,
-      "HT_ISR",
-      ";HT_ISR (GeV);# count",
-      50, 0., 1000.,
+      75, 0., 1500.,
       6, 0, 1, false);
 
    BookHistArray(h_MET,
@@ -196,6 +161,12 @@ void analysisPlots::StandardPlots() {
       "hadronicAlphaTZoom",
       ";alphaT;# count",
       50, 0., 1.5,
+      6, 0, 1, false);
+
+   BookHistArray(h_genPartonHT,
+      "genPartonHT",
+      ";Gen Parton H_T;# count",
+      300, 0., 1500.,
       6, 0, 1, false);
 
    BookHistArray(h_leadJetdelPhi,
@@ -275,84 +246,14 @@ void analysisPlots::StandardPlots() {
       ";mSQ (GeV); mLSP (GeV)",
       80, 0., 400., 
       80, 0., 400.,
-      6, 0, 1, false);
+      6, 0, 1, false); 
 
-   //BookHistArray(h_SMSvectGenPt,
-   //   "SMSvectGenPt",
-   //   ";mSQ (GeV); mLSP (GeV)",
-   //   80, 0., 400.,
-   //   80, 0., 400., 
-   //   1, 0, 1, false);
-//
-   //BookHistArray(h_SMSscalGenPt,
-   //   "SMSscalGenPt",
-   //   ";mSQ (GeV); mLSP (GeV)",
-   //   80, 0., 400.,
-   //   80, 0., 400., 
-   //   1, 0, 1, false);
-
-   //BookHistArray(h_SMSdPhiLeadJetsGenPt,
-   //   "SMSdPhiLeadJetsGenPt",
-   //   ";mSQ (GeV); mLSP (GeV)",
-   //   80, 0., 400.,
-   //   80, 0., 400., 
-   //   1, 0, 1, false);   
-   //  
-   //BookHistArray(h_SMSAlphaT,
-   //   "SMSAlphaT",
-   //   ";mSQ (GeV); mLSP (GeV)",
-   //   80, 0., 400.,
-   //   80, 0., 400., 
-   //   1, 0, 1, false);   
-
-   //BookHistArray(h_alphaT_vs_HT,
-   // "alphaT_vs_HT",
-   // ";alphaT;HT (GeV)",
-   // 200,0., 2.,
-   // 100, 0., 1000.,
-   // 6, 0, 1, false);
-//
-   //BookHistArray(h_leadJetPt_vs_HT,
-   // "leadJetPt_vs_HT",
-   // ";lead jet pT (GeV); HT (GeV)",
-   // 100, 0., 1000.,
-   // 100, 0., 1000.,
-   // 6, 0, 1, false);
-//
-   //BookHistArray(h_leadminsubJetPt_vs_HT,
-   // "leadminsubJetPt_vs_HT",
-   // ";(lead-sub) jet pT (GeV); HT (GeV)",
-   // 100, 0., 1000.,
-   // 100, 0., 1000.,
-   // 6, 0, 1, false);
-
-   //BookHistArray(h_delPhi_vs_scalGenPt,
-   //   "delPhi_vs_scalGenPt",
-   //   ";scalar gen p_T stop pair (GeV);#delta #phi (lead jet pair);",
-   //   200, 0., 1000.,
-   //   20, 0., 3.2,
-   //   1, 0, 1, false);
-//
-   //BookHistArray(h_delPhi_vs_vectGenPt,
-   //   "delPhi_vs_vectGenPt",
-   //   ";vectorial gen p_T stop pair (GeV);#delta #phi (lead jet pair);",
-   //   100, 0., 600.,
-   //   20, 0., 3.2,
-   //   1, 0, 1, false);
-
-   BookHistArray(h_genPtLeadCharm_vs_MHT,
-      "genPtLeadCharm_vs_MHT",
-      ";leading charm genPt (GeV); MHT (GeV);",
-      32, 0., 400.,
-      45, 0., 900.,
-      1, 0, 1, false);
-
-   BookHistArray(h_delPhiLeadJetMHT_vs_MHT,
-      "delPhiLeadJetMHT_vs_MHT",
-      ";#delta #phi (leadJet-MHT); MHT (GeV);",
-      25, 0, 3.2,
-      50, 0., 1000.,
-      1, 0, 1, false);
+   BookHistArray(h_alphaT_vs_HT,
+   "alphaT_vs_HT",
+   ";HT (GeV);alphaT",
+   140, 175., 875.,
+   250,0.5, 3.,
+   6, 0, 1, false);
 
    BookHistArray(h_vectGenPt_vs_scalGenPt,
       "vectGenPt_vs_scalGenPt",
@@ -364,35 +265,50 @@ void analysisPlots::StandardPlots() {
    BookHistArray(h_leadTwoJetsPt,
       "leadTwoJetsPt",
       ";two lead jets p_{T} (GeV);# count",
-      32, 0., 400.,
-      6, 0, 1, false);
-
-   BookHistArray(h_commHT_vs_nVtx,
-      "commHT_vs_nVtx",
-      ";HT (GeV); nVertices;# count",
-      50, 0., 1000.,
-      40, 0., 40.,
-      6, 0, 1, false);
-
-   BookHistArray(h_MHT_vs_nVtx,
-      "MHT_vs_nVtx",
-      ";MHT (GeV); nVertices;# count",
-      50, 0., 1000.,
-      40, 0., 40.,
-      6, 0, 1, false);
-
-   BookHistArray(h_jetPt_vs_nVtx,
-      "jetPt_vs_nVtx",
-      ";jet p_{T} (GeV); nVertices;# count",
-      80, 0., 1000.,
-      40, 0., 40.,
+      80 , 0., 1000.,
       6, 0, 1, false);
 
    BookHistArray(h_nVertex,
       "nVertex",
       ";nVertices;# count",
-      40., 0., 40.,
+      40, 0., 40.,
       6, 0, 1, false);
+
+   BookHistArray(h_nIsoTrack,
+      "nIsoTrack",
+      ";nIsoTrack;# count",
+      10, 0., 10.,
+      6, 0, 1, false);
+
+   BookHistArray(h_pfCandsPtDiff,
+      "pfCandsPtDiff",
+      ";P4.Pt() - Pt;# count",
+      100, -20., 20.,
+      2, 0, 1, false);
+
+   BookHistArray(h_pfCandsPt,
+      "pfCandsPt",
+      ";Pt;# count",
+      100, 0., 100.,
+      2, 0, 1, false);
+
+   BookHistArray(h_pfCandsEta,
+      "pfCandsEta",
+      ";Eta;# count",
+      100, -3., 3.,
+      2, 0, 1, false);
+
+   BookHistArray(h_pfCandsDzPV,
+      "pfCandsDzPV",
+      ";Pt;# count",
+      100, 0., 2.,
+      2, 0, 1, false);
+
+   BookHistArray(h_pfCandsDunno,
+      "pfCandsDunno",
+      ";Pt;# count",
+      100, 0., 10.,
+      2, 0, 1, false);
 
 }
 
@@ -426,86 +342,86 @@ bool analysisPlots::StandardPlots( Event::Data& ev ) {
 
    h_nEvents[1]->Fill( .5, evWeight );
 
-   // get generic event variables
-   double evHT                = ev.CommonHT();
-   double hadronicAlphaT      = ev.HadronicAlphaT();
-   double mht                 = ev.CommonMHT().Pt();
-   int nCommJet               = ev.JD_CommonJets().accepted.size();
-   vector<double> v_MHTMET    = getMHTandMET( ev );
-   vector<double> v_StopGenPt = getStopGenPt( ev );
-   int nbjet = 0, plotIndex = 0;
+   // fill some isoTrack variables
+   int j=0;
+   for(unsigned int i=0; i<ev.pfCandsPt()->size(); i++){
+      
+      // simulate 5GeV pt cut form SusyCAF
+      if (ev.pfCandsPt()->at(i) < 5.) continue;
+      
+      // stop out of range access
+      if (j>=ev.pfCandsP4()->size()) break;
 
-   // define two jet subcategories
-   std::vector< Event::Jet const * > ISRjets;   
-   std::vector< Event::Jet const * > charmjets;
+      h_pfCandsPt[0]->Fill(ev.pfCandsPt()->at(i), evWeight);
+      h_pfCandsEta[0]->Fill(ev.pfCandsP4()->at(j).Eta(), evWeight);
+      h_pfCandsDzPV[0]->Fill(ev.pfCandsDzPV()->at(i), evWeight);
+      h_pfCandsDunno[0]->Fill((ev.pfCandsTrkIso()->at(i)/ev.pfCandsPt()->at(i)), evWeight);
+
+      if ((ev.pfCandsPt()->at(i) > 10.) &&
+         (ev.pfCandsP4()->at(j).Eta() < 2.2) &&
+         (ev.pfCandsDzPV()->at(i) < 0.05)){
+         if ((ev.pfCandsTrkIso()->at(i)/ev.pfCandsPt()->at(i))>0.1){
+            // std::cout << "Veto hasn't worked..." << std::endl;
+            // std::cout << ev.pfCandsPt()->at(i) << " " << ev.pfCandsP4()->at(j).Eta() << " " << ev.pfCandsDzPV()->at(i) << " " << (ev.pfCandsTrkIso()->at(i)/ev.pfCandsPt()->at(i)) << std::endl;
+            h_pfCandsPt[1]->Fill(ev.pfCandsPt()->at(i), evWeight);
+            h_pfCandsEta[1]->Fill(ev.pfCandsP4()->at(j).Eta(), evWeight);
+            h_pfCandsDzPV[1]->Fill(ev.pfCandsDzPV()->at(i), evWeight);
+            h_pfCandsDunno[1]->Fill((ev.pfCandsTrkIso()->at(i)/ev.pfCandsPt()->at(i)), evWeight);
+         }
+      }
+   }
+
+   if(Debug_) std::cout << "generic event variables" << std::endl;
+   // get generic event variables
+   double evHT             = ev.CommonHT();
+   double hadronicAlphaT   = ev.HadronicAlphaT();
+   double mht              = ev.CommonMHT().Pt();
+   int nCommJet            = ev.JD_CommonJets().accepted.size();
+   vector<double> v_MHTMET = getMHTandMET( ev );
+   int nbjet = 0;
+   vector<double> v_StopGenPt;
+
+   if (!isData_) v_StopGenPt = getStopGenPt( ev );
 
    for(auto jet: ev.JD_CommonJets().accepted){
       // count number of btagged jets
       if( ev.GetBTagResponse(jet->GetIndex(), bTagAlgo_) > bTagAlgoCut_ ) nbjet++;
-      
-
-      // fill jet subcategories
-      if (fabs(ev.GetBtagJetFlavour(jet->GetIndex())) == 4){
-         charmjets.push_back( jet );
-      }
-      else{
-         ISRjets.push_back( jet );
-      }
    }
 
-   // do all jet multiplicities
-   int nCharmJets = charmjets.size();
-   int nISRJets = ISRjets.size();
-
-   h_nJets[0]        ->Fill( nCommJet, evWeight );
-   h_nJets_charm[0]  ->Fill( nCharmJets, evWeight );
-   h_nJets_ISR[0]    ->Fill( nISRJets, evWeight );
-   h_nBTagJets[0]    ->Fill( nbjet, evWeight );
+   h_nJets[0]     ->Fill( nCommJet, evWeight );
+   h_nBTagJets[0] ->Fill( nbjet, evWeight );
 
    // get nVertices
+   if(Debug_) std::cout << "nvertices" << std::endl;
    int nVertex = verticesN( ev );
+   int plotIndex              = (nbjet>4) ? 5 : nbjet;
 
-   // get plot index
-   plotIndex = getPlotIndex( nbjet );
-
-   h_nVertex[plotIndex]->Fill(nVertex, evWeight);
+   h_nVertex[plotIndex]    ->Fill( nVertex, evWeight );
+   h_nIsoTrack[plotIndex]  ->Fill( getNIsoTrack( ev ), evWeight );
 
    for(auto jet: ev.JD_CommonJets().accepted){
       h_jetPt[plotIndex]         ->Fill( jet->Pt(), evWeight );
-      h_jetPt_vs_nVtx[plotIndex] ->Fill( jet->Pt(), nVertex, evWeight );
+      // h_jetPt_vs_nVtx[plotIndex] ->Fill( jet->Pt(), nVertex, evWeight );
    }
-
-   if( nCharmJets > 0 ){
-      h_charmJetPt_0[plotIndex]->Fill( charmjets.at(0)->Pt(), evWeight );
-   }
-   if( nCharmJets > 1 ) h_charmJetPt_1[plotIndex]->Fill( charmjets.at(1)->Pt(), evWeight );
-
-   if( nISRJets > 0 ) h_leadISRJetPt[plotIndex]    ->Fill( ISRjets.at(0)->Pt(), evWeight );
-   if( nISRJets > 1 ) h_subLeadISRJetPt[plotIndex] ->Fill( ISRjets.at(1)->Pt(), evWeight );
-
-   double charmHT = 0.;
-   double isrHT = 0.;
-   for(auto cJet: charmjets){
-      charmHT += cJet->Pt();
-   }
-   isrHT = evHT - charmHT;
 
    h_nBTagJets[plotIndex+1]            ->Fill( nbjet );
    h_commHT[plotIndex]                 ->Fill( evHT, evWeight );
-   h_commHT_vs_nVtx[plotIndex]         ->Fill( evHT, nVertex, evWeight );
-   h_HT_charm[plotIndex]               ->Fill( charmHT, evWeight );
-   h_HT_ISR[plotIndex]                 ->Fill( isrHT, evWeight );
-   //h_hadronicAlphaT[plotIndex]         ->Fill( hadronicAlphaT, evWeight );
+   // h_commHT_vs_nVtx[plotIndex]         ->Fill( evHT, nVertex, evWeight );
    h_hadronicAlphaTZoom[plotIndex]     ->Fill( hadronicAlphaT, evWeight );
    h_MHT[plotIndex]                    ->Fill( mht, evWeight );
-   h_MHT_vs_nVtx[plotIndex]            ->Fill( mht, nVertex, evWeight);
+   // h_MHT_vs_nVtx[plotIndex]            ->Fill( mht, nVertex, evWeight);
    h_MET[plotIndex]                    ->Fill( v_MHTMET[1], evWeight );
    h_MHToverMET[plotIndex]             ->Fill( v_MHTMET[2], evWeight );
-   h_stopGenPtVect[plotIndex]          ->Fill( v_StopGenPt.at(0), evWeight );
-   h_stopGenPtScal[plotIndex]          ->Fill( v_StopGenPt.at(1), evWeight );
-   //h_alphaT_vs_HT[plotIndex]           ->Fill( hadronicAlphaT, evHT, evWeight );
+   h_alphaT_vs_HT[plotIndex]           ->Fill( evHT, hadronicAlphaT, evWeight );
    h_MHToverHT[plotIndex]              ->Fill( mht/evHT, evWeight );
-   h_vectGenPt_vs_scalGenPt[0]         ->Fill( v_StopGenPt.at(0), v_StopGenPt.at(1), evWeight );
+
+   if (!isData_){
+      h_stopGenPtVect[plotIndex]          ->Fill( v_StopGenPt.at(0), evWeight );
+      h_stopGenPtScal[plotIndex]          ->Fill( v_StopGenPt.at(1), evWeight );
+      h_vectGenPt_vs_scalGenPt[0]         ->Fill( v_StopGenPt.at(0), v_StopGenPt.at(1), evWeight );
+   }
+
+   if(Debug_) std::cout << "Pre jet filling" << std::endl;
 
    double leadJetMHTdPhi = 0.;
    if (ev.JD_CommonJets().accepted.size()>0){
@@ -541,7 +457,6 @@ bool analysisPlots::StandardPlots( Event::Data& ev ) {
 
    h_dPhiLeadJetMHT[plotIndex]->Fill( leadJetMHTdPhi, evWeight );
    h_dPhiSubLeadJetMHT[plotIndex]->Fill( subLeadJetMHTdPhi, evWeight );
-   h_delPhiLeadJetMHT_vs_MHT[0]->Fill( leadJetMHTdPhi, mht, evWeight );
 
    if (ev.JD_CommonJets().accepted.size()>2) h_thirdJetPt[plotIndex]->Fill(ev.JD_CommonJets().accepted.at(2)->Pt(), evWeight);
    if (ev.JD_CommonJets().accepted.size()>3) h_fourthJetPt[plotIndex]->Fill(ev.JD_CommonJets().accepted.at(3)->Pt(), evWeight);
@@ -550,67 +465,61 @@ bool analysisPlots::StandardPlots( Event::Data& ev ) {
       if (i>3) h_fivePlusJetPt[plotIndex]->Fill(ev.JD_CommonJets().accepted.at(i)->Pt(), evWeight);
    }
 
+   if (!isData_){
+      if(Debug_) std::cout << "!isData_" << std::endl;
 
-   // do some gen matching
-   Event::GenObject *gStop1=NULL;
-   Event::GenObject *gStop2=NULL;
-   Event::GenObject *gCharm1=NULL;
-   Event::GenObject *gCharm2=NULL;
-   Event::GenObject *gNeut1=NULL;
-   Event::GenObject *gNeut2=NULL;
+      // do some gen matching
+      Event::GenObject *gStop1=NULL;
+      Event::GenObject *gStop2=NULL;
+      Event::GenObject *gCharm1=NULL;
+      Event::GenObject *gCharm2=NULL;
+      Event::GenObject *gNeut1=NULL;
+      Event::GenObject *gNeut2=NULL;
 
-   for(auto igen: ev.GenParticles()){
-      if( igen.GetStatus() == 3 ){
-         if( igen.GetID() == 1000006 )                                              gStop1   = &igen; 
-         if( igen.GetID() == -1000006 )                                             gStop2   = &igen; 
-         if( (fabs(igen.GetID()) == 4) && (igen.GetMotherID() == 1000006) )         gCharm1  = &igen;
-         if( (fabs(igen.GetID()) == 4) && (igen.GetMotherID() == -1000006) )        gCharm2  = &igen;
-         if( (fabs(igen.GetID()) == 1000022) && (igen.GetMotherID() == 1000006) )   gNeut1   = &igen; 
-         if( (fabs(igen.GetID()) == 1000022) && (igen.GetMotherID() == -1000006) )  gNeut2   = &igen; 
+      for(auto igen: ev.GenParticles()){
+         if( igen.GetStatus() == 3 ){
+            if( igen.GetID() == 1000006 )                                              gStop1   = &igen; 
+            if( igen.GetID() == -1000006 )                                             gStop2   = &igen; 
+            if( (fabs(igen.GetID()) == 4) && (igen.GetMotherID() == 1000006) )         gCharm1  = &igen;
+            if( (fabs(igen.GetID()) == 4) && (igen.GetMotherID() == -1000006) )        gCharm2  = &igen;
+            if( (fabs(igen.GetID()) == 1000022) && (igen.GetMotherID() == 1000006) )   gNeut1   = &igen; 
+            if( (fabs(igen.GetID()) == 1000022) && (igen.GetMotherID() == -1000006) )  gNeut2   = &igen; 
+         }
+
       }
 
-   }
-
-   if (gCharm1 && gCharm2){
-      if ( gCharm1->Pt() >= gCharm2->Pt() ){
-         h_genPtLeadCharm_vs_MHT[0]->Fill( gCharm1->Pt(), mht, evWeight );
+      // fill gen-level dPhi distros
+      if( gStop1 && gStop2 && gCharm1 && gCharm2 && gNeut1 && gNeut2 ){
+         h_dPhiStopCharm[plotIndex]  ->Fill( getGenDeltaPhi(*gStop1, *gCharm1), evWeight );
+         h_dPhiStopCharm[plotIndex]  ->Fill( getGenDeltaPhi(*gStop2, *gCharm2), evWeight );
+         h_dPhiNeutCharm[plotIndex]  ->Fill( getGenDeltaPhi(*gNeut1, *gCharm1), evWeight );
+         h_dPhiNeutCharm[plotIndex]  ->Fill( getGenDeltaPhi(*gNeut2, *gCharm2), evWeight );
+         h_dPhiStopNeut[plotIndex]   ->Fill( getGenDeltaPhi(*gStop1, *gNeut1), evWeight );
+         h_dPhiStopNeut[plotIndex]   ->Fill( getGenDeltaPhi(*gStop2, *gNeut2), evWeight );
+         h_dPhiStopStop[plotIndex]   ->Fill( getGenDeltaPhi(*gStop1, *gStop2), evWeight );
+         h_dPhiCharmCharm[plotIndex] ->Fill( getGenDeltaPhi(*gCharm1, *gCharm2), evWeight );
       }
-      else{
-         h_genPtLeadCharm_vs_MHT[0]->Fill( gCharm2->Pt(), mht, evWeight );
-      }
-   }
 
-   // fill gen-level dPhi distros
-   if( gStop1 && gStop2 && gCharm1 && gCharm2 && gNeut1 && gNeut2 ){
-      h_dPhiStopCharm[plotIndex]  ->Fill( getGenDeltaPhi(*gStop1, *gCharm1), evWeight );
-      h_dPhiStopCharm[plotIndex]  ->Fill( getGenDeltaPhi(*gStop2, *gCharm2), evWeight );
-      h_dPhiNeutCharm[plotIndex]  ->Fill( getGenDeltaPhi(*gNeut1, *gCharm1), evWeight );
-      h_dPhiNeutCharm[plotIndex]  ->Fill( getGenDeltaPhi(*gNeut2, *gCharm2), evWeight );
-      h_dPhiStopNeut[plotIndex]   ->Fill( getGenDeltaPhi(*gStop1, *gNeut1), evWeight );
-      h_dPhiStopNeut[plotIndex]   ->Fill( getGenDeltaPhi(*gStop2, *gNeut2), evWeight );
-      h_dPhiStopStop[plotIndex]   ->Fill( getGenDeltaPhi(*gStop1, *gStop2), evWeight );
-      h_dPhiCharmCharm[plotIndex] ->Fill( getGenDeltaPhi(*gCharm1, *gCharm2), evWeight );
-   }
+      // get out SMS variables
+      double M0 = 0.;
+      double M12 = 0.;
 
-   // get out SMS variables
-   double M0 = 0.;
-   double M12 = 0.;
+      if(ev.M0.enabled())     M0 = ev.M0();
+      if(ev.MG.enabled())     M0 = ev.MG();
+      if(ev.MLSP.enabled())   M12 = ev.MLSP();
+      if(ev.M12.enabled())    M12 = ev.M12();
 
-   if(ev.M0.enabled())     M0 = ev.M0();
-   if(ev.MG.enabled())     M0 = ev.MG();
-   if(ev.MLSP.enabled())   M12 = ev.MLSP();
-   if(ev.M12.enabled())    M12 = ev.M12();
+      h_susyScanPlane[plotIndex]->Fill( M0, M12, evWeight );
 
-   h_susyScanPlane[plotIndex]->Fill( M0, M12, evWeight );
+      // h_SMSscalGenPt[0]->Fill( M0, M12, v_StopGenPt.at(1*evWeight) );
+      // h_SMSvectGenPt[0]->Fill( M0, M12, v_StopGenPt.at(0)*evWeight );
+      // h_SMSdPhiLeadJetsGenPt[0]->Fill( M0, M12, jetDeltaPhi*evWeight );
+      // h_SMSAlphaT[0]   ->Fill( M0, M12, hadronicAlphaT*evWeight );
 
-   // h_SMSscalGenPt[0]->Fill( M0, M12, v_StopGenPt.at(1*evWeight) );
-   // h_SMSvectGenPt[0]->Fill( M0, M12, v_StopGenPt.at(0)*evWeight );
-   // h_SMSdPhiLeadJetsGenPt[0]->Fill( M0, M12, jetDeltaPhi*evWeight );
-   // h_SMSAlphaT[0]   ->Fill( M0, M12, hadronicAlphaT*evWeight );
+      h_genPartonHT[plotIndex]->Fill( ev.GetPartonHT(), evWeight );
 
-   // double run_time = omp_get_wtime() - start_time;
 
-   // std::cout << "Code executed in " << run_time << std::endl;
+   } // !isData_
 
    return true;
 
@@ -728,4 +637,42 @@ int analysisPlots::verticesN( Event::Data& ev ){
     }
   }
   return nVertex;
+}
+
+
+// -----------------------------------------------------------------------------
+// Module to get the number of isolated tracks (connected to SITV)
+int analysisPlots::getNIsoTrack( Event::Data& ev ){
+       
+   // if one branch isn't enabled, return true - no pfCands in event
+   if (!ev.pfCandsPt.enabled()) return 0;
+
+   /*
+    Note: double loop is used due to bad placement of 5GeV pT cut in SusyCAF code.
+    P4 and Pt vectors are different lengths.
+   */
+
+   int nIso = 0;
+   // loop over all pfCands
+   
+   int j=0;
+   for(unsigned int i=0; i<ev.pfCandsPt()->size(); i++){
+
+      // simulate 5GeV pt cut form SusyCAF
+      if (ev.pfCandsPt()->at(i) < 5.) continue;
+      // stop out of range access
+      if (j>=ev.pfCandsP4()->size()) break;
+      // return false if any candidate meets isoTrack reqs
+      if ((ev.pfCandsPt()->at(i) > 10.) &&
+         // (ev.pfCandsP4()->at(j).Eta() < mMaxEta_) &&
+         (ev.pfCandsCharge()->at(i) != 0) &&
+         (ev.pfCandsDzPV()->at(i) < 0.05)){
+            if ((ev.pfCandsTrkIso()->at(i)/ev.pfCandsPt()->at(i)) < 0.1){
+               nIso++;
+            }
+      }
+      j++;
+   } //pfCands for loop
+
+    return nIso;
 }
