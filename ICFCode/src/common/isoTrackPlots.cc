@@ -16,8 +16,16 @@
 #include "Compute_Variable.hh"
 #include "MCOps.hh"
 #include <typeinfo>
+#include <algorithm>
 
 using namespace Operation;
+
+//struct to order on the second entry (dR) in a vector of pairs
+struct order_dr_pairs : public std::binary_function<pair<Event::Lepton const*, float>, pair<Event::Lepton const*, float>, bool> {
+  bool operator()(const pair<Event::Lepton const*, float>& x, const pair<Event::Lepton const*, float>& y) {
+    return ( x.second > y.second ) ;
+  }
+};
 
 // -----------------------------------------------------------------------------
 isoTrackPlots::isoTrackPlots( const Utils::ParameterSet& ps ) :
@@ -71,79 +79,7 @@ void isoTrackPlots::StandardPlots() {
       "n_Events",
       ";;# count",
       1, 0., 1.,
-      2, 0, 1, false);
-
-   BookHistArray(h_nEventsTauEle,
-      "n_EventsTauEle",
-      ";;# count",
-      1, 0., 1.,
-      6, 0, 1, false);
-
-   BookHistArray(h_nEventsTauMu,
-      "n_EventsTauMu",
-      ";;# count",
-      1, 0., 1.,
-      6, 0, 1, false);
-
-   BookHistArray(h_nEventsTauHad,
-      "n_EventsTauHad",
-      ";;# count",
-      1, 0., 1.,
-      6, 0, 1, false);
-
-   BookHistArray(h_nEventsVEle,
-      "n_EventsVEle",
-      ";;# count",
-      1, 0., 1.,
-      6, 0, 1, false);
-
-   BookHistArray(h_nEventsVMu,
-      "n_EventsVMu",
-      ";;# count",
-      1, 0., 1.,
-      6, 0, 1, false);
-
-   BookHistArray(h_nEventsOther,
-      "n_EventsOther",
-      ";;# count",
-      1, 0., 1.,
-      6, 0, 1, false);
-
-   BookHistArray(h_nEventsTauEleITMatched,
-      "n_EventsTauEleITMatched",
-      ";;# count",
-      1, 0., 1.,
-      6, 0, 1, false);
-
-   BookHistArray(h_nEventsTauMuITMatched,
-      "n_EventsTauMuITMatched",
-      ";;# count",
-      1, 0., 1.,
-      6, 0, 1, false);
-
-   BookHistArray(h_nEventsTauHadITMatched,
-      "n_EventsTauHadITMatched",
-      ";;# count",
-      1, 0., 1.,
-      6, 0, 1, false);
-
-   BookHistArray(h_nEventsVEleITMatched,
-      "n_EventsVEleITMatched",
-      ";;# count",
-      1, 0., 1.,
-      6, 0, 1, false);
-
-   BookHistArray(h_nEventsVMuITMatched,
-      "n_EventsVMuITMatched",
-      ";;# count",
-      1, 0., 1.,
-      6, 0, 1, false);
-
-   BookHistArray(h_nEventsOtherITMatched,
-      "n_EventsOtherITMatched",
-      ";;# count",
-      1, 0., 1.,
-      6, 0, 1, false);   
+      2, 0, 1, false); 
 
    BookHistArray(h_evWeight,
       "n_evWeight",
@@ -211,179 +147,161 @@ void isoTrackPlots::StandardPlots() {
       3, -1., 2.,
       1, 0, 1, false);
 
-   BookHistArray(h_SIT_recoMu_pt,
-      "h_SIT_recoMu_pt",
-      ";SIT matched recoMuon pT;# count",
-      100, 0., 100.,
-      6, 0, 1, false);
-
-   BookHistArray(h_SIT_recoMu_eta,
-      "h_SIT_recoMu_eta",
-      ";SIT matched recoMuon eta;# count",
-      100, -3.2, 3.2,
-      6, 0, 1, false);
-
-   BookHistArray(h_SIT_recoMu_combIso,
-      "h_SIT_recoMu_combIso",
-      ";SIT matched recoMuon combIso;# count",
-      100, 0., 5.,
-      6, 0, 1, false);
-
-   BookHistArray(h_SIT_recoMu_dR,
-      "h_SIT_recoMu_dR",
-      ";SIT matched recoMuon dR;# count",
-      100, 0., 5.,
+   BookHistArray(h_GenEleN,
+      "GenEleN",
+      ";GenEle N;# count",
+      1, 0., 1.,
       6, 0, 1, false);   
 
-   BookHistArray(h_SIT_recoEle_pt,
-      "h_SIT_recoEle_pt",
-      ";SIT matched recoEle pT;# count",
-      100, 0., 100.,
+   BookHistArray(h_GenMuN,
+      "GenMuN",
+      ";GenMu N;# count",
+      1, 0., 1.,
       6, 0, 1, false);
 
-   BookHistArray(h_SIT_recoEle_eta,
-      "h_SIT_recoEle_eta",
-      ";SIT matched recoEle eta;# count",
-      100, -3.2, 3.2,
-      6, 0, 1, false);
-
-   BookHistArray(h_SIT_recoEle_combIso,
-      "h_SIT_recoEle_combIso",
-      ";SIT matched recoEle combIso;# count",
-      100, 0., 5.,
-      6, 0, 1, false);
-
-   BookHistArray(h_SIT_recoEle_dR,
-      "h_SIT_recoEle_dR",
-      ";SIT matched recoEle dR;# count",
-      100, 0., 5.,
+   BookHistArray(h_GenTauHadN,
+      "GenTauHadN",
+      ";GenTauHad N;# count",
+      1, 0., 1.,
       6, 0, 1, false);   
 
-   BookHistArray(h_genElePt,
-      "genElePt",
-      ";genElectron Pt;# count",
+   BookHistArray(h_GenOtherN,
+      "GenOtherN",
+      ";GenOther N;# count",
+      1, 0., 1.,
+      6, 0, 1, false); 
+
+   BookHistArray(h_GenEleNoMatchN,
+      "GenEleNoMatchN",
+      ";GenEle NoMatching N;# count",
+      1, 0., 1.,
+      6, 0, 1, false);   
+
+   BookHistArray(h_GenMuNoMatchN,
+      "GenMuNoMatchN",
+      ";GenMu NoMatching N;# count",
+      1, 0., 1.,
+      6, 0, 1, false);
+
+   BookHistArray(h_GenTauHadNoMatchN,
+      "GenTauHadNoMatchN",
+      ";GenTauHad NoMatching N;# count",
+      1, 0., 1.,
+      6, 0, 1, false);   
+
+   BookHistArray(h_GenOtherNoMatchN,
+      "GenOtherNoMatchN",
+      ";GenOther NoMatching N;# count",
+      1, 0., 1.,
+      6, 0, 1, false); 
+
+   BookHistArray(h_ITGenEleN,
+      "ITGenEleN",
+      ";IT Matched GenEle N;# count",
+      1, 0., 1.,
+      6, 0, 1, false);
+
+   BookHistArray(h_ITGenElePt,
+      "ITGenElePt",
+      ";IT Matched GenEle Pt;# count",
       100., 0., 200.,
       6, 0, 1, false);
 
-   BookHistArray(h_genMuPt,
-      "genMuPt",
-      ";genMuon Pt;# count",
+   BookHistArray(h_ITGenEleEta,
+      "ITGenEleEta",
+      ";IT Matched GenEle Eta;# count",
+      100., -3., 3.,
+      6, 0, 1, false);
+
+   BookHistArray(h_ITGenMuN,
+      "ITGenMuN",
+      ";IT Matched GenMu N;# count",
+      1, 0., 1.,
+      6, 0, 1, false);
+
+   BookHistArray(h_ITGenMuPt,
+      "ITGenMuPt",
+      ";IT Matched GenMu Pt;# count",
       100., 0., 200.,
       6, 0, 1, false);
 
-   BookHistArray(h_genTauPt,
-      "genTauPt",
-      ";genTau Pt;# count",
+   BookHistArray(h_ITGenMuEta,
+      "ITGenMuEta",
+      ";IT Matched GenMu Eta;# count",
+      100., -3., 3.,
+      6, 0, 1, false);
+
+   BookHistArray(h_ITGenHadTauN,
+      "ITGenHadTauN",
+      ";IT Matched GenHadTau N;# count",
+      1, 0., 1.,
+      6, 0, 1, false);
+
+   BookHistArray(h_ITGenHadTauPt,
+      "ITGenHadTauPt",
+      ";IT Matched GenHadTau Pt;# count",
       100., 0., 200.,
       6, 0, 1, false);
 
-   BookHistArray(h_delR_eleIT,
-      "delR_eleIT",
-      ";deltaR(genEle, isoTrack);# count",
-      100, 0., 10.,
+   BookHistArray(h_ITGenHadTauEta,
+      "ITGenHadTauEta",
+      ";IT Matched GenHadTau Eta;# count",
+      100., -3., 3.,
       6, 0, 1, false);
 
-   BookHistArray(h_delR_muIT,
-      "delR_muIT",
-      ";deltaR(genMu, isoTrack);# count",
-      100, 0., 10.,
+   BookHistArray(h_ITGenHadTauPtDiff,
+      "ITGenHadTauPtDiff",
+      ";IT Matched GenHadTau PtDiff;# count",
+      60., -30., 30.,
       6, 0, 1, false);
 
-   BookHistArray(h_delR_tauIT,
-      "delR_tauIT",
-      ";deltaR(genTau, isoTrack);# count",
-      100, 0., 10.,
-      6, 0, 1, false);   
-
-   BookHistArray(h_delR_TauEleIT,
-      "delR_TauEleIT",
-      ";deltaR(genTauEle, isoTrack);# count",
-      100, 0., 10.,
+   BookHistArray(h_ITGenOtherN,
+      "ITGenOtherN",
+      ";IT Matched GenOther N;# count",
+      1, 0., 1.,
       6, 0, 1, false);
 
-   BookHistArray(h_delR_TauMuIT,
-      "delR_TauMuIT",
-      ";deltaR(genTauMu, isoTrack);# count",
-      100, 0., 10.,
+   BookHistArray(h_ITGenOtherPt,
+      "ITGenOtherPt",
+      ";IT Matched GenOther Pt;# count",
+      100., 0., 200.,
       6, 0, 1, false);
 
-   BookHistArray(h_delR_TauHadIT,
-      "delR_TauHadIT",
-      ";deltaR(genTauHad, isoTrack);# count",
-      100, 0., 10.,
+   BookHistArray(h_ITGenOtherEta,
+      "ITGenOtherEta",
+      ";IT Matched GenOther Eta;# count",
+      100., -3., 3.,
       6, 0, 1, false);
 
-   BookHistArray(h_delR_VEleIT,
-      "delR_VEleIT",
-      ";deltaR(genVEle, isoTrack);# count",
-      100, 0., 10.,
+   BookHistArray(h_ITNoMatchN,
+      "ITNoMatchN",
+      ";IT No Match N;# count",
+      1, 0., 1.,
       6, 0, 1, false);
 
-   BookHistArray(h_delR_VMuIT,
-      "delR_VMuIT",
-      ";deltaR(genVMu, isoTrack);# count",
-      100, 0., 10.,
+   BookHistArray(h_ITNoMatchPt,
+      "ITNoMatchPt",
+      ";IT NoMatch Pt;# count",
+      100., 0., 200.,
       6, 0, 1, false);
 
-   BookHistArray(h_genPtTauEle,
-      "genPtTauEle",
-      ";genPtTauEle;# count",
-      100, 0., 200.,
+   BookHistArray(h_ITNoMatchEta,
+      "ITNoMatchEta",
+      ";IT NoMatch Eta;# count",
+      100., -3., 3.,
       6, 0, 1, false);
 
-   BookHistArray(h_genPtTauMu,
-      "genPtTauMu",
-      ";genPtTauMu;# count",
-      100, 0., 200.,
-      6, 0, 1, false);
+   // BookHistArray(h_tmpDR,
+   //    "tmpDR",
+   //    ";dR(SIT, anyLepton);# count",
+   //    500., 0., 5,
+   //    1, 0, 1, false);
 
-   BookHistArray(h_genPtTauHad,
-      "genPtTauHad",
-      ";genPtTauHad;# count",
-      100, 0., 200.,
-      6, 0, 1, false);
-
-   BookHistArray(h_genPtVEle,
-      "genPtVEle",
-      ";genPtVEle;# count",
-      100, 0., 200.,
-      6, 0, 1, false);
-
-   BookHistArray(h_genPtVMu,
-      "genPtVMu",
-      ";genPtVMu;# count",
-      100, 0., 200.,
-      6, 0, 1, false);
-
-   BookHistArray(h_genEtaTauEle,
-      "genEtaTauEle",
-      ";genEtaTauEle;# count",
-      100, -3.2, 3.2,
-      6, 0, 1, false);
-
-   BookHistArray(h_genEtaTauMu,
-      "genEtaTauMu",
-      ";genPtTauMu;# count",
-      100, -3.2, 3.2,
-      6, 0, 1, false);
-
-   BookHistArray(h_genEtaTauHad,
-      "genEtaTauHad",
-      ";genEtaTauHad;# count",
-      100, -3.2, 3.2,
-      6, 0, 1, false);
-
-   BookHistArray(h_genEtaVEle,
-      "genEtaVEle",
-      ";genEtaVEle;# count",
-      100, -3.2, 3.2,
-      6, 0, 1, false);
-
-   BookHistArray(h_genEtaVMu,
-      "genEtaVMu",
-      ";genEtaVMu;# count",
-      100, -3.2, 3.2,
-      6, 0, 1, false);
+   BookHistArray(h_matchPtDiff,
+      "matchPtDiff",
+      ";SIT Pt - GenMatch Pt;# count",
+      600, -30., 30.,
+      1, 0, 1, false);
 
 }
 
@@ -441,6 +359,24 @@ bool isoTrackPlots::StandardPlots( Event::Data& ev ) {
    h_nIsoTrack[plotIndex]  ->Fill( getNIsoTrack( ev ), evWeight );
    h_commHT[plotIndex]     ->Fill( evHT, evWeight );
 
+   // count generic event contents (used to calc effs)
+   for(auto igen: ev.GenParticles()){
+      if( igen.GetStatus() != 3 ) continue;
+
+      if(isTrueTauHad(ev, igen)){
+         // In here if gen match is tauhad
+         h_GenTauHadN[plotIndex]->Fill(0.5, evWeight);
+      }else if(isTrueTauEle(ev, igen) ||
+               isTrueVEle(igen)){
+         //In here if gen match if tauele or Vele
+         h_GenEleN[plotIndex]->Fill(0.5, evWeight);
+      }else if(isTrueTauMu(ev, igen) ||
+               isTrueVMu(igen)){
+         h_GenMuN[plotIndex]->Fill(0.5, evWeight);
+      }else{
+         h_GenOtherN[plotIndex]->Fill(0.5, evWeight);
+      }
+   } //igen
 
 // fill some isoTrack variables
    unsigned int j=0;
@@ -463,126 +399,171 @@ bool isoTrackPlots::StandardPlots( Event::Data& ev ) {
          (ev.pfCandsPt()->at(i) > 10.) &&
          // (ev.pfCandsP4()->at(j).Eta() < 2.2) &&
          (ev.pfCandsCharge()->at(i) != 0) &&
-         (ev.pfCandsDzPV()->at(i) < 0.05)
-         ){
-         if ((ev.pfCandsTrkIso()->at(i)/ev.pfCandsPt()->at(i)) < 0.1){
-            // fill if meets isoTrack veto requirements
-            h_pfCandsPt[1]    ->Fill(ev.pfCandsPt()->at(i), evWeight);
-            h_pfCandsEta[1]   ->Fill(ev.pfCandsP4()->at(j).Eta(), evWeight);
-            h_pfCandsDzPV[1]  ->Fill(ev.pfCandsDzPV()->at(i), evWeight);
-            h_pfCandsDunno[1] ->Fill((ev.pfCandsTrkIso()->at(i)/ev.pfCandsPt()->at(i)), evWeight);
+         (ev.pfCandsDzPV()->at(i) < 0.05) &&
+         (ev.pfCandsTrkIso()->at(i)/ev.pfCandsPt()->at(i)) < 0.1){
 
-            SIT.push_back(ev.pfCandsP4()->at(j));
+         /* ##################################### */
+         /* ### IF HERE, AN ISOTRACK BE FOUND ### */
+         /* ##################################### */
 
-            // find any gen electrons/muons and plot dR against found isoTrack
-            if(!isData_){
-               for(auto igen: ev.GenParticles()){
-                  if( igen.GetStatus() == 3 ){
-                     double isoTDelR = ROOT::Math::VectorUtil::DeltaR(igen, ev.pfCandsP4()->at(j));
-                     
-                     if( isTrueEle(igen) ){
-                        h_delR_eleIT[plotIndex]    ->Fill(isoTDelR, evWeight);
-                     }
-                     if( isTrueMu(igen) ){
-                        h_delR_muIT[plotIndex]     ->Fill(isoTDelR, evWeight);
-                     }
-                     if( isTrueTau(igen) ){
-                        h_delR_tauIT[plotIndex]    ->Fill(isoTDelR, evWeight);
-                     }
-                     if( isTrueTauEle(ev, igen) ){
-                        h_delR_TauEleIT[plotIndex]           ->Fill(isoTDelR, evWeight);
-                        if (isoTDelR<0.5) h_nEventsTauEleITMatched[plotIndex]  ->Fill(0.5, evWeight);
-                     }
-                     if( isTrueTauMu(ev, igen) ){
-                        h_delR_TauMuIT[plotIndex]           ->Fill(isoTDelR, evWeight);
-                        if (isoTDelR<0.5) h_nEventsTauMuITMatched[plotIndex]  ->Fill(0.5, evWeight);
-                     }
-                     if( isTrueTauHad(ev, igen) ){
-                        h_delR_TauHadIT[plotIndex]           ->Fill(isoTDelR, evWeight);
-                        if (isoTDelR<0.5) h_nEventsTauHadITMatched[plotIndex]  ->Fill(0.5, evWeight);
-                     }
-                     if( isTrueVEle(igen) ){
-                        h_delR_VEleIT[plotIndex]          ->Fill(isoTDelR, evWeight);
-                        if (isoTDelR<0.5) h_nEventsVEleITMatched[plotIndex] ->Fill(0.5, evWeight);
-                     }
-                     if( isTrueVMu(igen) ){
-                        h_delR_VMuIT[plotIndex]          ->Fill(isoTDelR, evWeight);
-                        if (isoTDelR<0.5) h_nEventsVMuITMatched[plotIndex] ->Fill(0.5, evWeight);
-                     }
 
-                  }
-               } // for igen
-            }// !isData_
+         // fill if meets isoTrack veto requirements
+         h_pfCandsPt[1]    ->Fill(ev.pfCandsPt()->at(i), evWeight);
+         h_pfCandsEta[1]   ->Fill(ev.pfCandsP4()->at(j).Eta(), evWeight);
+         h_pfCandsDzPV[1]  ->Fill(ev.pfCandsDzPV()->at(i), evWeight);
+         h_pfCandsDunno[1] ->Fill((ev.pfCandsTrkIso()->at(i)/ev.pfCandsPt()->at(i)), evWeight);
 
-            // do some gen lepton matching to IT's         
-            // fourMomenta genEle = getGenITMatch(ev, 11, ev.pfCandsP4()->at(j));
-            // fourMomenta genMu = getGenITMatch(ev, 13, ev.pfCandsP4()->at(j));
+         SIT.push_back(ev.pfCandsP4()->at(j));
 
-            // if (genEle.M() != 0){
-            //    // float a, b, d, c;
-            //    // genEle.GetCoordinates(a,b,c,d);
-            //    // std::cout << "Ele: " << a << " " << b << " " << c << " " << d << std::endl;
-               
-            //    if( isTrueVEle(genEle) ){
-                  
+         // find any gen electrons/muons and plot dR against found isoTrack
+         if(!isData_){
+            // bool matchedEle = false;
+            // fourMomenta genITEleP4 = getGenITMatch(ev, 11, ev.pfCandsP4()->at(j));
+            // if (genITEleP4.M()!=0){
+            //    // now have a valid SIT matchedEle to generator electron
+            //    if (!matchedEle) h_ITGenEleN[plotIndex]->Fill( 0.5, evWeight );
+            //    h_ITGenElePt[plotIndex] ->Fill( genITEleP4.Pt(), evWeight );
+            //    h_ITGenEleEta[plotIndex]->Fill( genITEleP4.Eta(), evWeight );
+            //    // h_ITGenEleIso[plotIndex]->Fill( genITEleP4., evWeight );
+            //    matchedEle = true;
+            // }
+
+            // bool matchedMu = false;
+            // fourMomenta genITMuP4 = getGenITMatch(ev, 13, ev.pfCandsP4()->at(j));
+            // if (genITMuP4.M()!=0){
+            //    // now have a valid SIT matched to generator electron
+            //    if (!matchedMu) h_ITGenMuN[plotIndex]->Fill( 0.5, evWeight );
+            //    h_ITGenMuPt[plotIndex]  ->Fill( genITMuP4.Pt(), evWeight );
+            //    h_ITGenMuEta[plotIndex] ->Fill( genITMuP4.Eta(), evWeight );
+            //    matchedMu = true;
+            // }
+            
+
+            // bool matchedTau = false;
+            // fourMomenta genITTauP4 = getGenITMatch(ev, 15, ev.pfCandsP4()->at(j));
+            // if (!matchedEle && !matchedMu){ //check that the event doesn't also contain mu or ele
+            //    if (genITTauP4.M()!=0){
+            //       if (!matchedTau) h_ITGenHadTauN[plotIndex]->Fill( 0.5, evWeight );
+            //       h_ITGenHadTauPt[plotIndex]  ->Fill( genITTauP4.Pt(), evWeight );
+            //       h_ITGenHadTauEta[plotIndex] ->Fill( genITTauP4.Eta(), evWeight );
+            //       matchedTau = true;
             //    }
-
-            // }
-            // if (genMu.M() != 0){
-
             // }
 
-         }
+            // if (!matchedEle && !matchedMu && !matchedTau){
+            //    h_ITNoMatchN[plotIndex]->Fill( 0.5, evWeight);
+            // }
 
-      }
+
+            // std::vector< std::pair<Event::Lepton const*, double> > leptonITdRPairs; 
+
+            // for(auto iele: ev.LD_CommonElectrons().accepted){
+            //    double dR = ROOT::Math::VectorUtil::DeltaR(*iele, ev.pfCandsP4()->at(j));
+            //    if (dR>=0.5) continue; // veto pair if seperation is too large
+            //    // fill vector with the pair of iele and dR
+               
+            //    std::pair<Event::Lepton const*, double> tmpPair(iele, dR);
+            //    leptonITdRPairs.push_back(tmpPair);
+            // }
+            // for(auto imu: ev.LD_CommonMuons().accepted){
+            //    double dR = ROOT::Math::VectorUtil::DeltaR(*imu, ev.pfCandsP4()->at(j));
+            //    if (dR>=0.5) continue; // veto pair if seperation is too large
+            //    // fill vector with the pair of imu and dR
+               
+            //    std::pair<Event::Lepton const*, double> tmpPair(imu, dR);
+            //    leptonITdRPairs.push_back(tmpPair);
+            // }
+
+            // // sort by dR
+            // sort(leptonITdRPairs.begin(), leptonITdRPairs.end(), order_dr_pairs());
+
+            // for(UInt_t i=0; i<3; i++){
+            //    if (i<leptonITdRPairs.size()){
+            //       // std::cout << leptonITdRPairs.at(i).second << std::endl;
+            //    }
+            // }
+            // std::cout << std::endl;
+
+            // std::cout << "Found SIT" << std::endl;
+
+            const Event::GenObject* someMatch = getGenITMatch(ev, ev.pfCandsP4()->at(j));
+            if (someMatch){ // in case someMatch is NULL
+               // std::cout << ">>> Match details: " << someMatch->Pt() << " " << someMatch->GetID() << std::endl;
+               h_matchPtDiff[0]->Fill(ev.pfCandsPt()->at(i) - someMatch->Pt(), evWeight);
+
+               // check if matched gen particle is from tau had
+               if(isTrueTauHad(ev, *someMatch)){
+                  // In here if gen match is tauhad
+
+                  h_ITGenHadTauN[plotIndex]->Fill(0.5, evWeight);
+                  h_ITGenHadTauPt[plotIndex]->Fill(ev.pfCandsPt()->at(i), evWeight);
+                  h_ITGenHadTauEta[plotIndex]->Fill(ev.pfCandsP4()->at(j).Eta(), evWeight);
+                  h_ITGenHadTauPtDiff[plotIndex]->Fill(ev.pfCandsPt()->at(i) - someMatch->Pt(), evWeight);
+
+               }else if(isTrueTauEle(ev, *someMatch) ||
+                        isTrueVEle(*someMatch)){
+                  //In here if gen match if tauele or Vele
+
+                  h_ITGenEleN[plotIndex]->Fill(0.5, evWeight);
+                  h_ITGenElePt[plotIndex]->Fill(ev.pfCandsPt()->at(i), evWeight);
+                  h_ITGenEleEta[plotIndex]->Fill(ev.pfCandsP4()->at(j).Eta(), evWeight);
+
+               }else if(isTrueTauMu(ev, *someMatch) ||
+                        isTrueVMu(*someMatch)){
+                  //In here if gen match is taumu or Vmu
+
+                  h_ITGenMuN[plotIndex]->Fill(0.5, evWeight);
+                  h_ITGenMuPt[plotIndex]->Fill(ev.pfCandsPt()->at(i), evWeight);
+                  h_ITGenMuEta[plotIndex]->Fill(ev.pfCandsP4()->at(j).Eta(), evWeight);
+
+               }else{
+                  //GenMatch but no process definition
+
+                  h_ITGenOtherN[plotIndex]->Fill(0.5, evWeight);
+                  h_ITGenOtherPt[plotIndex]->Fill(ev.pfCandsPt()->at(i), evWeight);
+                  h_ITGenOtherEta[plotIndex]->Fill(ev.pfCandsP4()->at(j).Eta(), evWeight);
+
+               }
+
+            }else{
+               //No gen match to SIT
+               h_ITNoMatchN[0]->Fill(0.5, evWeight);
+            }
+
+            // for(auto igen: ev.GenParticles()){
+            //    if( igen.GetStatus() != 3 ) continue;
+            //    int thisID = fabs( igen.GetID() );
+
+            //    // check for Lepton match
+            //    if(   (thisID == 11) ||
+            //          (thisID == 13) ||
+            //          (thisID == 15) ){
+
+            //       double tmpdR = ROOT::Math::VectorUtil::DeltaR(igen, ev.pfCandsP4()->at(j));
+            //       h_tmpDR[0]->Fill(tmpdR, evWeight);
+            //    }
+            // }
+       
+            for(auto igen: ev.GenParticles()){
+               if( igen.GetStatus() != 3 ) continue;
+
+               if(isTrueTauHad(ev, igen)){
+                  // In here if gen match is tauhad
+                  h_GenTauHadNoMatchN[plotIndex]->Fill(0.5, evWeight);
+               }else if(isTrueTauEle(ev, igen) ||
+                        isTrueVEle(igen)){
+                  //In here if gen match if tauele or Vele
+                  h_GenEleNoMatchN[plotIndex]->Fill(0.5, evWeight);
+               }else if(isTrueTauMu(ev, igen) ||
+                        isTrueVMu(igen)){
+                  h_GenMuNoMatchN[plotIndex]->Fill(0.5, evWeight);
+               }else{
+                  h_GenOtherNoMatchN[plotIndex]->Fill(0.5, evWeight);
+               }
+            }
+         }// !isData_
+      } // end of found isoTrack loop
    } // for pfCands
-
-   if (!isData_){
-
-      // bool counted;
-      // for( auto igen: ev.GenParticles() ) {
-      //    counted = false;
-
-      //    if( isTrueVEle( igen ) ) h_genElePt[plotIndex]->Fill(igen.Pt(), evWeight);
-      //    if( isTrueVMu( igen ) ) h_genMuPt[plotIndex]->Fill(igen.Pt(), evWeight);
-      //    if( isTrueTau( igen) ) h_genTauPt[plotIndex]->Fill(igen.Pt(), evWeight);
-
-      //    if( isTrueTauEle(ev, igen) ){
-      //       h_nEventsTauEle[plotIndex] ->Fill(0.5, evWeight);
-      //       h_genPtTauEle[plotIndex]->Fill(igen.Pt(), evWeight);
-      //       h_genEtaTauEle[plotIndex]->Fill(igen.Eta(), evWeight);
-      //       counted = true;
-      //    }
-      //    if( isTrueTauMu(ev, igen) ){
-      //       h_nEventsTauMu[plotIndex]  ->Fill(0.5, evWeight);
-      //       h_genPtTauMu[plotIndex]->Fill(igen.Pt(), evWeight);
-      //       h_genEtaTauMu[plotIndex]->Fill(igen.Eta(), evWeight);
-      //       counted = true;
-      //    }
-      //    if( isTrueTauHad(ev, igen) ){
-      //       h_nEventsTauHad[plotIndex] ->Fill(0.5, evWeight);
-      //       h_genPtTauHad[plotIndex]->Fill(igen.Pt(), evWeight);
-      //       h_genEtaTauHad[plotIndex]->Fill(igen.Eta(), evWeight);
-      //       counted = true;
-      //    }
-      //    if( isTrueVEle(igen) ){
-      //       h_nEventsVEle[plotIndex]   ->Fill(0.5, evWeight);
-      //       h_genPtVEle[plotIndex]->Fill(igen.Pt(), evWeight);
-      //       h_genEtaVEle[plotIndex]->Fill(igen.Eta(), evWeight);
-      //       counted = true;
-      //    }
-      //    if( isTrueVMu(igen) ){
-      //       h_nEventsVMu[plotIndex]    ->Fill(0.5, evWeight);
-      //       h_genPtVMu[plotIndex]->Fill(igen.Pt(), evWeight);
-      //       h_genEtaVMu[plotIndex]->Fill(igen.Eta(), evWeight);
-      //       counted = true;
-      //    }
-
-      //    if (!counted) h_nEventsOther[plotIndex]->Fill(0.5, evWeight);
-
-      // } // for genParticles
-
-   }
 
    return true;
 
@@ -590,36 +571,34 @@ bool isoTrackPlots::StandardPlots( Event::Data& ev ) {
 
 // -----------------------------------------------------------------------------
 // get generator lepton matched to IT
-fourMomenta isoTrackPlots::getGenITMatch( Event::Data& ev, int pID, fourMomenta p4IT ){
-   
+const Event::GenObject* isoTrackPlots::getGenITMatch( Event::Data& ev, fourMomenta p4IT ){
+   // std::cout << "Checking for match." << std::endl;
    double dR = .2;
-   fourMomenta p4Gen;
-   
-   // for(auto igen: ev.GenParticles()){
+   const Event::GenObject *gMatch=NULL;
 
    for(unsigned int i=0; i<ev.GenParticles().size(); i++){
 
       // if(ev.GenParticles().at(i).Pt()>1.) continue;
-      if(ev.GenParticles().at(i).GetStatus() != 3 ) continue;
-      if(fabs( ev.GenParticles().at(i).GetID() ) != pID ) continue;
+      if( ev.GenParticles().at(i).GetStatus() != 3 ) continue;
+
+      // check for Lepton match
+      int thisID = fabs( ev.GenParticles().at(i).GetID() );
+      if(   (thisID == 11) ||
+            (thisID == 13) ||
+            (thisID == 15) ){
   
-      double tmpdR = ROOT::Math::VectorUtil::DeltaR(ev.GenParticles().at(i), p4IT);
-
-      if ( (tmpdR<dR) && (tmpdR>0.) ){
-         dR = tmpdR;
-         // myMatch = *ev.GenParticles().at(i);
-         // std::cout << typeid(ev.GenParticles().at(i)).name() << std::endl;
-         // p4Gen = ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double> >::GetCoordinates(ev.GenParticles().at(i));
-         // std::cout << typeid(p4Gen).name() << std::endl;
-         
-         float a,b,c,d;
-
-         ev.GenParticles().at(i).GetCoordinates(a,b,c,d);
-         p4Gen.SetCoordinates(a,b,c,d);
+         double tmpdR = ROOT::Math::VectorUtil::DeltaR(ev.GenParticles().at(i), p4IT);
+         if ( (tmpdR<dR) && (tmpdR>0.) ){
+            // found a closer match
+            dR = tmpdR;
+            gMatch = &ev.GenParticles().at(i);
+         }
       }
    } //loop igen
 
    if (dR<0.2){
+
+      // std::cout << "Found match!" << std::endl;
       // std::cout << "DeltaR:   " << dR << std::endl;
       // std::cout << "Ptdiff:   " << p4IT.Pt()-p4Gen.Pt() << std::endl;
       // std::cout << "Etatdiff: " << p4IT.Eta()-p4Gen.Eta() << std::endl;
@@ -627,7 +606,7 @@ fourMomenta isoTrackPlots::getGenITMatch( Event::Data& ev, int pID, fourMomenta 
       // std::cout << std::endl;
    }
 
-   return p4Gen;
+   return gMatch;
 }
 
 // -----------------------------------------------------------------------------
