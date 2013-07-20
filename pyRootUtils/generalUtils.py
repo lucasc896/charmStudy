@@ -17,33 +17,6 @@ import xSec as xS
 from Log import *
 from sys import exit
 
-## r.gROOT.SetStyle("Plain") #To set plain bkgds for slides
-#r.gStyle.SetTitleBorderSize(0)
-#r.gStyle.SetCanvasBorderMode(0)
-#r.gStyle.SetCanvasColor(0)#Sets canvas colour white
-#r.gStyle.SetOptStat(2210)#set no title on Stat box
-#r.gStyle.SetLabelOffset(0.001)
-#r.gStyle.SetLabelSize(0.003)
-#r.gStyle.SetLabelSize(0.005,"Y")#Y axis
-#r.gStyle.SetLabelSize(0.1,"X")#Y axis
-#r.gStyle.SetTitleSize(0.06)
-#r.gStyle.SetTitleW(0.7)
-#r.gStyle.SetTitleH(0.07)
-#r.gStyle.SetOptTitle(1)
-##r.gStyle.SetOptStat(0)
-#r.gStyle.SetOptFit(1)
-#r.gStyle.SetAxisColor(1, "XYZ");
-#r.gStyle.SetStripDecimals(r.kTRUE);
-#r.gStyle.SetTickLength(0.03, "XYZ");
-#r.gStyle.SetNdivisions(510, "XYZ");
-#r.gStyle.SetPadTickX(1);
-#r.gStyle.SetPadTickY(1);
-#r.gStyle.SetLabelColor(1, "XYZ");
-#r.gStyle.SetLabelFont(42, "XYZ");
-#r.gStyle.SetLabelOffset(0.01, "XYZ");
-#r.gStyle.SetLabelSize(0.05, "XYZ");
-#r.gStyle.SetHatchesLineWidth(2)
-#r.gStyle.SetPalette(1)
 
 ###-------------------------------------------------------------------###
 ###-------------------------------------------------------------------###
@@ -122,7 +95,6 @@ class multiPlot(object):
     self.lg = r.TLegend(0.6, 0.68, 0.74, 0.87)
 
     self.lg.SetFillColor(0)
-    #self.lg.SetFillStyle(0)
     self.lg.SetLineColor(0)
     self.lg.SetLineStyle(0)
 
@@ -261,13 +233,23 @@ class anaPlot(object):
   def normHist(self, h, normVal=1.):
     """docstring for normHist"""
     if float(h.GetEntries())==0: return 0
-    
+  
     if self.xSecNorm:
       scaleF = normVal
     else:
-      scaleF = normVal/float(h.GetEntries())
+      ## unit normalisation here ##
+      ent = 0
+      for i in range(h.GetNbinsX()):
+        # if h.GetBinLowEdge(i)>275: # hack line to normalise above certain bin value
+          ent += h.GetBinContent(i)
+      try:
+        scaleF = float(normVal/ent)
+      except ZeroDivisionError:
+        Log.error("Zero entries found in plot when attempting to normalise.")
+        sys.exit()
 
     h.Scale( scaleF )
+
     
 ###-------------------------------------------------------------------###
 ###-------------------------------------------------------------------###
@@ -486,46 +468,6 @@ class stackPlots(object):
 
     return factor
 
-
-
-###-------------------------------------------------------------------###
-
-def comparPlot(h1=None, h2=None, debug=False):
-  
-  Log.error(">>> Shouldn't be running in here!!")
-
-  jM = conf.switches()["jetMulti"]
-  plots = conf.comparFiles()
-  bM = conf.bMulti()
-
-  # surpress the drawing of 2D hists
-  if "TH2" in str( type(h1) ): return
-  if "TH2" in str( type(h2) ): return
-
-  c1 = r.TCanvas()
-  r.gStyle.SetOptStat(0)
-
-  lg = r.TLegend(0.62, 0.72, 0.82, 0.85)
-  lg.SetFillColor(0)
-  lg.SetLineColor(0)
-
-  h1.SetLineColor(r.kBlue)
-  h2.SetLineColor(r.kRed)
-
-  if findMaxHist(h1, h2):
-    h1.Draw("hist")
-    h2.Draw("histsame")
-  else:
-    h2.Draw("hist")
-    h1.Draw("histsame")
-
-  lg.AddEntry(h1, plots[0], "L")
-  lg.AddEntry(h2, plots[1], "L")
-
-  lg.Draw()
-
-  c1.Print("plotDump/compare_%s_%s_%s.png"%(h1.GetName(),bM[0], jM))
-
 ###-------------------------------------------------------------------###
 
 def comparPlots(hList=None, debug=None, doLogy=False):
@@ -567,7 +509,7 @@ def comparPlots(hList=None, debug=None, doLogy=False):
   if len(hList)==2:
     lg = r.TLegend(0.57, 0.70, 0.895, 0.89)
   elif len(hList)==3:
-    lg = r.TLegend(0.42, 0.72, 0.795, 0.89)
+    lg = r.TLegend(0.68, 0.72, 0.94, 0.89)
   elif len(hList)==4:
     lg = r.TLegend(0.64, 0.64, 0.895, 0.89)
   elif len(hList)==5:
@@ -581,6 +523,8 @@ def comparPlots(hList=None, debug=None, doLogy=False):
     pd1.SetBottomMargin(0.005)
     pd1.SetRightMargin(0.05)
     pd1.Draw()
+    if conf.switches()["printLogy"]: pd1.SetLogy(r.kTRUE)
+
 
     pd2 = r.TPad("pd2", "pd2", 0., 0.02, 1., 0.3)
     pd2.SetTopMargin(0.05)
@@ -603,21 +547,17 @@ def comparPlots(hList=None, debug=None, doLogy=False):
     elif "_175_" in entTitle: entTitle = "mStop=%s, mLSP=%s"%(entTitle.split("_")[-2], entTitle.split("_")[-1])
 
     entTitle = entTitle.split("_")
-    #entTitle.remove("Scan")
-    #entTitle.remove("NoFilter")
     entTitle = " ".join(entTitle)
 
     lg.AddEntry(hList[i], entTitle, "L")
 
     if ctr==0:
-      #hList[i].Draw("hist e")
       hList[i].Draw("hist")
     else:
-      #hList[i].Draw("histsame e")
       hList[i].Draw("histsame")
 
     if conf.switches()["printLogy"]:
-      pd1.SetLogy(r.kTRUE)
+      c1.SetLogy(r.kTRUE)
 
     ctr+=1
 
@@ -648,8 +588,12 @@ def comparPlots(hList=None, debug=None, doLogy=False):
     hRatio.SetMarkerSize(.7)
     hRatio.SetLineWidth(1)
     hRatio.SetLineColor(r.kBlack)
-    hRatio.GetYaxis().SetTitle("2Part/3Part")
-    hRatio.GetYaxis().SetRangeUser(0.3,1.7)
+    hRatio.GetYaxis().SetTitle("Ratio")
+
+    # sort ratio ranges
+    ranges = getRatioRanges(hRatio)
+    hRatio.GetYaxis().SetRangeUser(ranges[0],ranges[1])
+    
     hRatio.SetLabelSize(0.12, "X")
     hRatio.SetLabelSize(0.07, "Y")
     hRatio.SetTitleSize(0.13, "X")
@@ -658,11 +602,9 @@ def comparPlots(hList=None, debug=None, doLogy=False):
     hRatio.SetTitleOffset(.9, "X")
     hRatio.Draw("pe1")
 
-    line = r.TLine()
-    
-    line.SetLineColor(16)
-    line.SetLineWidth(2)
-    line.DrawLineNDC(0.1,.605,0.95,.605)
+    fit = r.TF1("fit","pol0", hRatio.GetXaxis().GetBinLowEdge(1), hRatio.GetXaxis().GetBinUpEdge(hRatio.GetNbinsX()))
+    r.gStyle.SetOptFit(1)
+    hRatio.Fit(fit)
 
   if not doLogy:
     c1.Print("plotDump/compare_%s_%s_%s_%s%s.%s"%(hList[0].GetName(),bM[0], jM, sSamp[0].split("_")[0], 
@@ -703,12 +645,12 @@ def getHistOrder(hList=None):
   for i in range(len(tmpMax)):
     for k in range(len(maxVals)):
       if tmpMax[i] == maxVals[k]:
+        print maxVals[k]
         if k in myOrder:
           Log.error("Repeat in order list. Check plots are non-identical.")
           Log.error("Plot: %s"%hList[0].GetName())
           #exit()
         myOrder.append(k)
-
   return myOrder[0:len(hList)]
 
 ###-------------------------------------------------------------------###
@@ -719,8 +661,6 @@ def doRanges(h=None, hD=None):
     if hD["xRange"]:
       ranges=hD["xRange"]
       h.GetXaxis().SetRangeUser(ranges[0], ranges[1])
-    if conf.switches()["printLogy"]:
-      h.SetMinimum(0.001)
   elif "TH2" in str( type(h) ):
     if hD["xRange"]:
       ranges=hD["xRange"]
@@ -730,6 +670,18 @@ def doRanges(h=None, hD=None):
       h.GetYaxis().SetRangeUser(ranges[0], ranges[1])      
 
   pass
+
+###-------------------------------------------------------------------###
+
+def getRatioRanges(h=None):
+
+  min = h.GetMinimum()
+  max = h.GetMaximum()
+
+  # calculate a 10% whitespace for about and below
+  swing = (max-min)*0.1
+
+  return [min-swing, max+swing]
 
 ###-------------------------------------------------------------------###
 
