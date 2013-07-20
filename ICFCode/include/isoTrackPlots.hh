@@ -45,7 +45,7 @@ namespace Operation {
       bool StandardPlots( Event::Data& ev );
 
       // User-defined modules
-      fourMomenta getGenITMatch( Event::Data& ev, int pID, fourMomenta p4IT );
+      const Event::GenObject* getGenITMatch( Event::Data& ev, fourMomenta p4IT );
       vector<double> getMHTandMET( Event::Data& ev );
       double getGenDeltaPhi( const Event::GenObject& gOb1, const Event::GenObject& gOb2 );
       int verticesN( Event::Data& ev );
@@ -63,26 +63,8 @@ namespace Operation {
       bool isTrueTauLep(  Event::Data& ev, const Event::GenObject& gob );
       std::vector<int> theDaughterID( Event::Data * ev, int mID );
 
-      std::vector<TH1D*>  KILL_ele;
-      std::vector<TH1D*>  KILL_mu;
-      std::vector<TH1D*>  ODD_ele;
-      std::vector<TH1D*>  ODD_mu;
-
       // Histos
       std::vector<TH1D*>  h_nEvents;
-      std::vector<TH1D*>  h_nEventsTauEle;
-      std::vector<TH1D*>  h_nEventsTauMu;
-      std::vector<TH1D*>  h_nEventsTauHad;
-      std::vector<TH1D*>  h_nEventsVEle;
-      std::vector<TH1D*>  h_nEventsVMu;
-      std::vector<TH1D*>  h_nEventsOther;
-      std::vector<TH1D*>  h_nEventsTauEleITMatched;
-      std::vector<TH1D*>  h_nEventsTauMuITMatched;
-      std::vector<TH1D*>  h_nEventsTauHadITMatched;
-      std::vector<TH1D*>  h_nEventsVEleITMatched;
-      std::vector<TH1D*>  h_nEventsVMuITMatched;
-      std::vector<TH1D*>  h_nEventsOtherITMatched;
-
       std::vector<TH1D*>  h_evWeight;
       std::vector<TH1D*>  h_nJets;
       std::vector<TH1D*>  h_nBTagJets;
@@ -96,37 +78,34 @@ namespace Operation {
       std::vector<TH1D*>  h_pfCandsDunno;
       std::vector<TH1D*>  h_pfCandsCharge;
 
-      std::vector<TH1D*>  h_SIT_recoMu_pt;
-      std::vector<TH1D*>  h_SIT_recoMu_eta;
-      std::vector<TH1D*>  h_SIT_recoMu_combIso;
-      std::vector<TH1D*>  h_SIT_recoMu_dR;
-      std::vector<TH1D*>  h_SIT_recoEle_pt;
-      std::vector<TH1D*>  h_SIT_recoEle_eta;
-      std::vector<TH1D*>  h_SIT_recoEle_combIso;
-      std::vector<TH1D*>  h_SIT_recoEle_dR;
+      std::vector<TH1D*>  h_GenEleN;
+      std::vector<TH1D*>  h_GenMuN;
+      std::vector<TH1D*>  h_GenTauHadN;
+      std::vector<TH1D*>  h_GenOtherN;
+      std::vector<TH1D*>  h_GenEleNoMatchN;
+      std::vector<TH1D*>  h_GenMuNoMatchN;
+      std::vector<TH1D*>  h_GenTauHadNoMatchN;
+      std::vector<TH1D*>  h_GenOtherNoMatchN;
 
-      std::vector<TH1D*>  h_genElePt;
-      std::vector<TH1D*>  h_genMuPt;
-      std::vector<TH1D*>  h_genTauPt;
-      std::vector<TH1D*>  h_delR_eleIT;
-      std::vector<TH1D*>  h_delR_muIT;
-      std::vector<TH1D*>  h_delR_tauIT;
-      std::vector<TH1D*>  h_delR_TauEleIT;
-      std::vector<TH1D*>  h_delR_TauMuIT;
-      std::vector<TH1D*>  h_delR_TauHadIT;
-      std::vector<TH1D*>  h_delR_VEleIT;
-      std::vector<TH1D*>  h_delR_VMuIT;
-      std::vector<TH1D*>  h_genPtTauEle;
-      std::vector<TH1D*>  h_genPtTauMu;
-      std::vector<TH1D*>  h_genPtTauHad;
-      std::vector<TH1D*>  h_genPtVEle;
-      std::vector<TH1D*>  h_genPtVMu;
-      std::vector<TH1D*>  h_genEtaTauEle;
-      std::vector<TH1D*>  h_genEtaTauMu;
-      std::vector<TH1D*>  h_genEtaTauHad;
-      std::vector<TH1D*>  h_genEtaVEle;
-      std::vector<TH1D*>  h_genEtaVMu;
+      std::vector<TH1D*>  h_ITGenEleN;
+      std::vector<TH1D*>  h_ITGenElePt;
+      std::vector<TH1D*>  h_ITGenEleEta;
+      std::vector<TH1D*>  h_ITGenMuN;
+      std::vector<TH1D*>  h_ITGenMuPt;
+      std::vector<TH1D*>  h_ITGenMuEta;
+      std::vector<TH1D*>  h_ITGenHadTauN;
+      std::vector<TH1D*>  h_ITGenHadTauPt;
+      std::vector<TH1D*>  h_ITGenHadTauEta;
+      std::vector<TH1D*>  h_ITGenHadTauPtDiff;
+      std::vector<TH1D*>  h_ITGenOtherN;
+      std::vector<TH1D*>  h_ITGenOtherPt;
+      std::vector<TH1D*>  h_ITGenOtherEta;
+      std::vector<TH1D*>  h_ITNoMatchN;
+      std::vector<TH1D*>  h_ITNoMatchPt;
+      std::vector<TH1D*>  h_ITNoMatchEta;
 
+      // std::vector<TH1D*>  h_tmpDR;
+      std::vector<TH1D*>  h_matchPtDiff;
 
   };
 
