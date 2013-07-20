@@ -19,10 +19,10 @@ def switches():
 
 ###-------------------------------------------------------------------###
 
-def getYield(inFile=None, hist="", dir="", bM=[0]):
+def getYield(inFile=None, hist="", dir="", dirPre="before", bM=[0]):
 
   ent = 0
-  dir = "before" + dir
+  dir = dirPre + dir
   for b in bM:
     h = inFile.Get("%s/%s_%s" % (dir, hist, b))
     # print hist
@@ -32,39 +32,55 @@ def getYield(inFile=None, hist="", dir="", bM=[0]):
 
 ###-------------------------------------------------------------------###
 
-def printPurity(before={}, veto={}):
+def printPurity(before={}, matched={}):
   print ""
 
-  totVeto = veto["All"]
+  totVeto = matched["All"]
 
-  for v in veto:
-    if v=="All": continue
-    outTxt = formatLabel(v) + " Purity"
-    for i in range(len(veto[v])):
-      pur = float(veto[v][i]/totVeto[i])
+  for m in matched:
+    if m=="All": continue
+    outTxt = formatLabel(m) + " Purity"
+    for i in range(len(matched[m])):
+      pur = float(matched[m][i]/totVeto[i])
       outTxt += "& %.3f " % pur
     
     print outTxt
   print ""
 ###-------------------------------------------------------------------###
 
-def printEff(before={}, veto={}):
-  pass
+def printEff(before={}, matched={}):
+  print ""
+
+  for process in before:
+    outTxt = formatLabel(process) + " Efficiency"
+    for i in range(len(matched[process])):
+      eff = float(matched[process][i]/beforeYld[process][i])
+      print process, matched[process][i], beforeYld[process][i]
+      outTxt += "& %.3f " % eff
+
+    print outTxt
+  print""
 
 ###-------------------------------------------------------------------###
 
-def printTotal(before={}, veto={}):
+def printTotal(before={}, matched={}):
   pass
 
 ###-------------------------------------------------------------------###
 
 def formatLabel(label=""):
 
-  label = label.replace("TauEle", r"$\tau \to e \nu$")
-  label = label.replace("TauMu", r"$\tau \to \mu \nu$")
-  label = label.replace("TauHad", r"$\tau \to had$")
-  label = label.replace("VEle", r"$W/Z \to e \nu$")
-  label = label.replace("VMu", r"$W/Z \to \mu \nu$")
+  # label = label.replace("TauEle", r"$\tau \to e \nu$")
+  # label = label.replace("TauMu", r"$\tau \to \mu \nu$")
+  label = label.replace("GenTauHad", r"$\tau \to had$")
+  label = label.replace("GenHadTau", r"$\tau \to had$")
+  label = label.replace("GenEle", r"$\tau/W/Z \to e$")
+  label = label.replace("GenMu", r"$\tau/W/Z \to \mu$")
+  label = label.replace("IT", "IT Matched ")
+  label = label.replace("N", "")
+  # label = label.replace("VEle", r"$W/Z \to e \nu$")
+  # label = label.replace("VMu", r"$W/Z \to \mu \nu$")
+  label = label.replace("isoTrack ", "")
 
   return label
 
@@ -77,51 +93,73 @@ if len(argv)<2:
 
 beforeYld = {
       "All":[],
-      "TauEle":[],
-      "TauMu":[],
-      "TauHad":[],
-      "VEle":[],
-      "VMu":[],
+      "Ele":[],
+      "Mu":[],
+      "HadTau":[],
 }
 
-vetoYld = {
+afterYld = {
       "All":[],
-      "TauEle":[],
-      "TauMu":[],
-      "TauHad":[],
-      "VEle":[],
-      "VMu":[],
+      "Ele":[],
+      "Mu":[],
+      "HadTau":[],
 }
 
-HTdirs = ["175_275", "275_325", "325_375", "375_475", "475_575", "575_675", "675_775", "775_875", "875"]
+matchedYld = {
+      "All":[],
+      "Ele":[],
+      "Mu":[],
+      "HadTau":[],
+}
 
-iF = r.TFile.Open("../../rootfiles/isoTrackPlots/outTTbar_isoTrackPlots.root")
+HTdirs = ["200_275", "275_325", "325_375", "375_475", "475_575", "575_675", "675_775", "775_875", "875_975", "975"]
+
+iF = r.TFile.Open("../../rootfiles/isoTrackPlots/outWJets_isoTrackPlots.root")
 
 for b in beforeYld:
   for ht in HTdirs:
-    hName = "n_Events%s" % (b if b!="All" else "")
+    if b!="All":
+      hName = "Gen%sN" % (b if b!="HadTau" else "TauHad")
+    else:
+      hName = "n_Events"
+
     val = getYield(inFile=iF, hist=hName, dir=ht, bM=range(5) if b!="All" else [0])
     beforeYld[b].append(val)
 
-for i in range(len(HTdirs)):
-  vetoYld["All"].append(0)
+for a in afterYld:
+  for ht in HTdirs:
+    if a!="All":
+      hName = "Gen%sN" % (a if a!="HadTau" else "TauHad")
+    else:
+      hName = "n_Events"
 
-for v in vetoYld:
-  if v=="All": continue
-  hName = "n_Events%sITMatched" % (v if v!="All" else "")
+    val = getYield(inFile=iF, hist=hName, dir=ht, dirPre="after", bM=range(5) if a!="All" else [0])
+    afterYld[a].append(val)
+
+for i in range(len(HTdirs)):
+  matchedYld["All"].append(0)
+
+for m in matchedYld:
+  if m=="All": continue
+  hName = "ITGen%sN" % m
   ctr=0
   for ht in HTdirs:
     val = getYield(inFile=iF, hist=hName, dir=ht, bM=range(5) if b!="All" else [0])
-    vetoYld[v].append(val)
-    vetoYld["All"][ctr] += val
+    matchedYld[m].append(val)
+    matchedYld["All"][ctr] += val
     ctr+=1
 
+print beforeYld
+print ""
+print afterYld
+print ""
+print matchedYld
 
 if "p" in argv[1]:
-  printPurity(before=beforeYld, veto=vetoYld)
+  printPurity(before=beforeYld, matched=matchedYld)
 
 if "e" in argv[1]:
-  printEff(before=beforeYld, veto=vetoYld)
+  printEff(before=beforeYld, matched=matchedYld)
 
 if "t" in argv[1]:
-  printTotal(before=beforeYld, veto=vetoYld)
+  printTotal(before=beforeYld, matched=matchedYld)
