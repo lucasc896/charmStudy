@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-import os, sys
+import os
+import sys
 import commands
 import subprocess
 from time import time
@@ -12,10 +13,11 @@ def oldRemove(label="", ana="anaPlots"):
 
     cmd = []
 
-    c = commands.getstatusoutput("ls ../haddOut/out%s_%s.root"%(label, ana))
+    c = commands.getstatusoutput("ls ../haddOut/out%s_%s.root" % (label, ana))
     if "No such file" not in c[1]:
         cmd.append("rm")
-        cmd.append("../haddOut/out%s_%s.root"%(label, ana))
+        cmd.append("-v")
+        cmd.append("../haddOut/out%s_%s.root" % (label, ana))
         if query_yes_no("Remove out%s_%s.root" % (label, ana)):
             subprocess.call(cmd)
         cmd = []
@@ -32,6 +34,7 @@ def doHadd(fList=None, label="", ana="anaPlots"):
     cmd.append("hadd")
     cmd.append("-v")
     cmd.append("1")
+    # cmd.append("-f")
     cmd.append("../haddOut/out%s_%s.root"%(label, ana))
 
     for i in fList:
@@ -83,12 +86,14 @@ def main():
     lsOut = []
 
     samps = {
-        "WJets":    ["WJet"],
+        "WJets":    ["WJet", "wj_lv_"],
         "QCD":      ["_QCD_"],
         "ZJets":    ["ZJets"],
-        "SingTop":  ["_T_", "_Tbar_"],
+        "SinTop":  ["_T_", "_Tbar_"],
         "DiBoson":  ["_ZZ_", "_WW_", "_WZ_"],
         "TTbar":    ["_TT_CT10_"],
+	    "DY":	    ["DYJets"],
+        "Photon":   ["GJets"],
         }
 
     haddDict = {}
@@ -100,7 +105,7 @@ def main():
             haddDict[key] = tmp[1].split("\n")
 
     for s in haddDict:
-        doHadd(haddDict[s], s)
+        doHadd(haddDict[s], s, ana="isoTrackPlots")
         
 
 ###-------------------------------------------------------------------###
