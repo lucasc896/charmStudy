@@ -68,10 +68,10 @@ elif conf.mode() == "bTagEff":
    elif conf.switches()["runModeBTag"] == "charmPhi":
       bTagP.doCharmPhiStudy(debug=options.doDebug)
 
-elif conf.mode() == "ISRSystem":
+elif conf.mode() == "isoTrackPlots":
 
    print "\n%s" % line()
-   print "   ***// Running ISR Systematics \\***"
+   print "   ***// Running IsoTrack Analysis \\***"
    print line()+"\n"
 
    if conf.switches()["runMode"] == "plotting":
@@ -81,6 +81,8 @@ elif conf.mode() == "ISRSystem":
    elif conf.switches()["runMode"] == "yieldTables":
       Log.info(">>> Running yield tables\n")
       tabl.printTable(debug=options.doDebug)
+
+
 
 elif conf.mode() == "dev":
    pass
