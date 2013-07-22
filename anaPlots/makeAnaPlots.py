@@ -162,8 +162,7 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
       aPlot = anaPlot(histList, "%s_%s"%(hT, b))
       if debug: aPlot.Debug=True
       if doLogy: aPlot.SetLogy = True
-      if conf.switches()["norm"]=="lumi": aPlot.xSecNorm=True
-      hTot = aPlot.makeSinglePlot(rebinX=pDet["rebinX"], rebinY=pDet["rebinY"], norm=normVal)
+      hTot = aPlot.makeSinglePlot(rebinX=pDet["rebinX"], rebinY=pDet["rebinY"])
 
       del aPlot
       
@@ -187,7 +186,7 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
     aPlot = anaPlot(histList, hT)
     if debug: aPlot.Debug=True
     if doLogy: aPlot.SetLogy=True
-    hTot = aPlot.makeSinglePlot(rebinX=pDet["rebinX"], rebinY=pDet["rebinY"], norm=normVal)
+    hTot = aPlot.makeSinglePlot(rebinX=pDet["rebinX"], rebinY=pDet["rebinY"])
 
     del aPlot
     
@@ -209,11 +208,10 @@ def runStandPlots(printPlots=True, comparSamp=None, debug=False, doLogy=False):
         h_.Draw("hist")
       suf = ""
       if doLogy: suf="_log"
-
       if "noCut" not in conf.switches()["HTcuts"]:
-        c1.Print("plotDump/%s_%s_%s_%s%s.%s"%(sigSamp, h_.GetName(), b, jMulti, suf, conf.switches()["outFormat"]))
+        c1.Print("plotDump/%s_%s_%s_%s%s.%s"%(sigSamp, h_.GetName(), bMulti[0], jMulti, suf, conf.switches()["outFormat"]))
       else:
-        c1.Print("plotDump/%s_%s_%s_%s%s.%s"%(sigSamp, h_.GetName(), b, "noCuts", suf, conf.switches()["outFormat"]))
+        c1.Print("plotDump/%s_%s_%s_%s%s.%s"%(sigSamp, h_.GetName(), bMulti[0], "noCuts", suf, conf.switches()["outFormat"]))
   
   return outHists
 
