@@ -245,8 +245,9 @@ class anaPlot(object):
       try:
         scaleF = float(normVal/ent)
       except ZeroDivisionError:
-        Log.error("Zero entries found in plot when attempting to normalise.")
-        sys.exit()
+        Log.error("Zero entries found in %s plot when attempting to normalise." %
+                    h.GetName())
+        scaleF = 1.
 
     h.Scale( scaleF )
 
