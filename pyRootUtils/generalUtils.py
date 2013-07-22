@@ -126,7 +126,6 @@ class anaPlot(object):
     self.Debug = False
     self.DoGrid = False
     self.SetLogy = False
-    self.xSecNorm = False
     self.xRange = []
     self.yRange = []
     self.hTitles = []
@@ -185,7 +184,7 @@ class anaPlot(object):
         c1.Print(oFileName)
 
 
-  def makeSinglePlot(self, rebinX=None, rebinY=None, norm=None):
+  def makeSinglePlot(self, rebinX=None, rebinY=None):
     """docstring for makeSinglePlot"""
     c1 = r.TCanvas()
 
@@ -209,9 +208,10 @@ class anaPlot(object):
       if rebinX: h.RebinX(rebinX)
       if rebinY: h.RebinY(rebinY)
 
-    if norm and "n_Event" not in self.canvTitle: 
-      self.normHist(h, norm)
-    if "n_Event" in self.canvTitle: r.gStyle.SetOptStat("i")
+    if "n_Event" not in self.canvTitle: 
+      self.normHist(h)
+    if "n_Event" in self.canvTitle:
+      r.gStyle.SetOptStat("i")
 
     return h
 
@@ -230,28 +230,34 @@ class anaPlot(object):
     self.lg.SetLineColor(0)
     self.lg.SetLineStyle(0)
 
-  def normHist(self, h, normVal=1.):
+  def normHist(self, h):
     """docstring for normHist"""
     if float(h.GetEntries())==0: return 0
   
-    if self.xSecNorm:
-      scaleF = normVal
-    else:
-      ## unit normalisation here ##
+    method = conf.switches()["norm"]
+
+    if method=="xSec":
+      scaleF = 99999999.
+      Log.warning(">>> xSec Normalisation broken!!\n\n")
+    elif "lumi" in method:
+      scaleF = conf.switches()["lumiNorm"]*10.
+      Log.info("Scaling to luminosity of %.3ffb-1 with factor of %.3f" % 
+                  (conf.switches()["lumiNorm"], scaleF))
+    elif method=="Unitary":
       ent = 0
       for i in range(h.GetNbinsX()):
         # if h.GetBinLowEdge(i)>275: # hack line to normalise above certain bin value
-        ent += h.GetBinContent(i+1)
+          ent += h.GetBinContent(i+1)
       try:
-        scaleF = float(normVal/ent)
+        scaleF = float(1./ent)
       except ZeroDivisionError:
         Log.error("Zero entries found in %s plot when attempting to normalise." %
                     h.GetName())
         scaleF = 1.
 
-    h.Scale( scaleF )
+    if method != "None":
+      h.Scale( scaleF )
 
-    
 ###-------------------------------------------------------------------###
 ###-------------------------------------------------------------------###
 
@@ -646,7 +652,6 @@ def getHistOrder(hList=None):
   for i in range(len(tmpMax)):
     for k in range(len(maxVals)):
       if tmpMax[i] == maxVals[k]:
-        print maxVals[k]
         if k in myOrder:
           Log.error("Repeat in order list. Check plots are non-identical.")
           Log.error("Plot: %s"%hList[0].GetName())
