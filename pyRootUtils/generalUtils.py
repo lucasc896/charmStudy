@@ -241,7 +241,7 @@ class anaPlot(object):
       ent = 0
       for i in range(h.GetNbinsX()):
         # if h.GetBinLowEdge(i)>275: # hack line to normalise above certain bin value
-          ent += h.GetBinContent(i)
+        ent += h.GetBinContent(i+1)
       try:
         scaleF = float(normVal/ent)
       except ZeroDivisionError:
