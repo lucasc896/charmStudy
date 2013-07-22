@@ -122,7 +122,7 @@ def getSMPred(bM="inc", jM="inc"):
       "675-775",
       "775-875",
       "875-975",
-      "975-inf": [0., 0., 0., 0.],
+      "975-inf",
   ]
 
   #sum all dictionaries to make inclusive dict
