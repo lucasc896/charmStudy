@@ -359,10 +359,10 @@ def makeTable(bM="inc", debug=False):
     if "parked" not in conf.switches()["HTcuts"] and "225" in key:
       continue
     print "%s\t%f \\pm %f" % (key, val[0], val[1])
-    if not conf.switcheS()["BGComp"]:
+    if not conf.switches()["BGcomp"]:
       outTxt += "& %.1f $^{\pm %.1f }$ " % (val[0], val[1])
 
-  if not conf.switcheS()["BGComp"]:
+  if not conf.switches()["BGcomp"]:
     outTxt += " \\\\"
 
   print "\n*** %s Yields" % (sigSamp)
@@ -377,7 +377,7 @@ def makeTable(bM="inc", debug=False):
   outTxt += "\\\\"
 
   if conf.switches()["BGcomp"]:
-    hNames = ["GenEleN", "GenMuN", "GenTauHadN", "ITGenEleN", "ITGenMuN", "ITGenHadTauN"]
+    hNames = ["GenEleN", "GenMuN", "GenHadTauN", "ITGenEleN", "ITGenMuN", "ITGenHadTauN"]
     for hN in hNames:
       thisYield, tmp = getDataYields(bM=bM, hist="%s" % hN, debug=debug)
       thisTot = 0
