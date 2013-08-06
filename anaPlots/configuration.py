@@ -26,12 +26,12 @@ def switches():
           "runMode"       :["plotting", "yieldTables"][0],
           "plotMode"      :["anaPlots","standardPlots","comparisonPlots"][2],
           "runModeBTag"   :["charmFrac", "standardPlots", "charmPhi"][0],
-          "signalSample"  :"TTbar_isoTrack",
-          "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT","parkedHT"][3],
-          "jetMulti"      :["le3j","ge4j","inc","after","before"][-1],
+          "signalSample"  :"WJets_isoTrack",
+          "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT","parkedHT"][0],
+          "jetMulti"      :["le3j","ge4j","inc","after","before"][-3],
           "printLogy"     :[False, True][1],
           "norm"          :["None", "Unitary", "xSec", "lumi"][1],
-          "lumiNorm"      :[1, 10, 11.7][2],
+          "lumiNorm"      :[1, 10, 11.7, 20.][3],
           "hiRes"         :[False, True][1], #Warning: Slow for png!
           "outFormat"     :["png", "pdf"][1], #PDF for combinations
           "BGcomp"        :[False, True][1], #option to decompose BG in tables - requires isoTrackPlots file
@@ -58,6 +58,19 @@ def bMulti():
 def comparFiles():
 
   comparFiles = ["ZJets_Muon", "WJets_Muon"]
+  comparFiles = ["WNJets_Muon", "WJets_Muon", "WJets_Inc_Muon"]
+  # comparFiles = ["ZJets_Muon", "DY_Muon"]
+  comparFiles = ["DY_Muon", "DYN_Muon"]
+  # comparFiles = ["WNJets_Muon", "DYN_Muon"]
+  # comparFiles = ["W1Jets_Muon", "W2Jets_Muon", "W3Jets_Muon", "W4Jets_Muon", "WJets_Inc_Muon"]
+  # comparFiles = ["ZJets_isoTrack", "WJets_isoTrack", "TTbar_isoTrack"]
+  # comparFiles = ["WJets_isoTrack", "WJets_rootTest"]
+
+  # comparFiles = ["WJets_HT_0to150", "WJets_HT_150to200", 
+  #                 "WJets_HT_200to250", "WJets_HT_250to300", "WJets_HT_300to400",
+  #                 "WJets_HT_400toInf"]
+
+  comparFiles = ["TTbar_Muon", "TTbar_MG_Muon"]
 
   return comparFiles
 
@@ -123,7 +136,25 @@ def sigFile():
             "HT_2012"                   :["%sanaPlots_v3/outHT_2012_anaPlots.root"%inDir, 100.],
             "HT_Parked"                 :["%sanaPlots_v3/outParkedHT_OliverThresh_anaPlots.root"%inDir, 100.],
             "WJets_Muon"                :["%sanaPlots_v3/outWJets_MuonSele_anaPlots.root"%inDir, 100.],
+            "WNJets_Muon"               :["%sanaPlots_v3/outWNJets_MuonSele_anaPlots.root"%inDir, 100.],
             "ZJets_Muon"                :["%sanaPlots_v3/outZJets_MuonSele_anaPlots.root"%inDir, 100.],
+            "GJets_Muon"                :["%sanaPlots_v3/outGJets_MuonSele_anaPlots.root"%inDir, 100.],
+            "DY_Muon"                   :["%sanaPlots_v3/outDY_MuonSele_anaPlots.root"%inDir, 100.],
+            "DYN_Muon"                  :["%sanaPlots_v3/outDYN_MuonSele_anaPlots.root"%inDir, 100.],
+            "W1Jets_Muon"               :["%sanaPlots_v3/outW1Jets_MuonSele_anaPlots.root"%inDir, 100.],
+            "W2Jets_Muon"               :["%sanaPlots_v3/outW2Jets_MuonSele_anaPlots.root"%inDir, 100.],
+            "W3Jets_Muon"               :["%sanaPlots_v3/outW3Jets_MuonSele_anaPlots.root"%inDir, 100.],
+            "W4Jets_Muon"               :["%sanaPlots_v3/outW4Jets_MuonSele_anaPlots.root"%inDir, 100.],
+            "WJets_Inc_Muon"            :["%sanaPlots_v3/outWJetsInc_MuonSele_anaPlots.root"%inDir, 100.],
+            "WJets_HT_0to150"           :["%sanaPlots_v3/outWJets_HT0to150_MuonSele_anaPlots.root"%inDir, 100.],
+            "WJets_HT_150to200"         :["%sanaPlots_v3/outWJets_HT150to200_MuonSele_anaPlots.root"%inDir, 100.],
+            "WJets_HT_200to250"         :["%sanaPlots_v3/outWJets_HT200to250_MuonSele_anaPlots.root"%inDir, 100.],
+            "WJets_HT_250to300"         :["%sanaPlots_v3/outWJets_HT250to300_MuonSele_anaPlots.root"%inDir, 100.],
+            "WJets_HT_300to400"         :["%sanaPlots_v3/outWJets_HT300to400_MuonSele_anaPlots.root"%inDir, 100.],
+            "WJets_HT_400toInf"         :["%sanaPlots_v3/outWJets_HT400toInf_MuonSele_anaPlots.root"%inDir, 100.],
+            "TTbar_Muon"                :["%sanaPlots_v3/outTTbar_MuonSele_anaPlots.root"%inDir, 100.],
+            "TTbar_MG_Muon"             :["%sanaPlots_v3/outTTbarMG_MuonSele_anaPlots.root"%inDir, 100.],
+
             "TEST"       :["%sanaPlots_v3/outTEST.root"%inDir, 100.],
 
     }
@@ -145,6 +176,7 @@ def sigFile():
           "T1tttt_isoTrack"           :["%sisoTrackPlots/outT1tttt_isoTrackPlots.root"%inDir, 100.],
           "T2cc_175_165_isoTrack"     :["%sanaPlots_v3/outT2cc_175_165_isoTrackTest_anaPlots.root"%inDir, 100.],
           "T2cc_175_95_isoTrack"      :["%sanaPlots_v3/outT2cc_175_95_isoTrackTest_anaPlots.root"%inDir, 100.],
+          "WJets_rootTest"            :["%sisoTrackPlots/outWJets_rootTest_isoTrackPlots.root"%inDir, 100.],
     }
 
   else:
@@ -167,7 +199,7 @@ def inDirs():
 
   if switches()["jetMulti"]=="le3j":    pre = "le3j_"
   if switches()["jetMulti"]=="ge4j":    pre = "ge4j_"
-  if switches()["jetMulti"]=="inc":     pre = "inc_"
+  if switches()["jetMulti"]=="inc":     pre = "onemuon_inc_"
   if switches()["jetMulti"]=="before":  pre = "before"
   if switches()["jetMulti"]=="after":   pre = "after"  
 
@@ -191,11 +223,11 @@ def sinHists():
   if mode()=="anaPlots":
     singleHists={
         "n_Events_1"           :plotDetails(),
-        # "n_Jets"               :plotDetails(xRange=[0.,8.]),
+        "n_Jets"               :plotDetails(xRange=[0.,8.]),
         # "n_evWeight"         :plotDetails(xRange=[0.,10.]), 
         # "n_Jets_charm"               :plotDetails(xRange=[0.,8.]),
         # "n_Jets_ISR"               :plotDetails(xRange=[0.,8.]),
-        # "n_BTagged_Jets_all"   :plotDetails(xRange=[0.,6.]),
+        "n_BTagged_Jets_all"   :plotDetails(xRange=[0.,6.]),
         # "tmpDR"           :plotDetails(rebX=10),
         # "matchPtDiff"     :plotDetails(rebX=10),
     }
@@ -213,29 +245,35 @@ def sinHists():
             # "n_Truth_C"      :plotDetails(),
     }
   else:
-    singleHists={}
+    singleHists={
+            # "pfCandsPt_0"   :plotDetails(),
+            # "pfCandsEta_0"   :plotDetails(),
+            # "pfCandsDzPV_0"   :plotDetails(xRange=[0., 0.4]),
+            # "pfCandsDunno_0"   :plotDetails(),
+            # "pfCandsCharge"   :plotDetails(),
+            "n_Events_1"  :plotDetails(),
+    }
   
   return singleHists
 
 ###-------------------------------------------------------------------###
 
 def anaHists():  
-  
   if mode()=="anaPlots":
     hists={
-      # "MET"                   :plotDetails(xRange=[0.,900.], rebX=2),
-      # "MHT"                   :plotDetails(xRange=[0.,900.],rebX=2),
+      "MET"                   :plotDetails(xRange=[0.,900.], rebX=2),
+      "MHT"                   :plotDetails(xRange=[0.,900.],rebX=2),
       "commHT"                :plotDetails(xRange=[275.,1500.], rebX=1),
-      "genPartonHT"           :plotDetails(xRange=[275.,1200.], rebX=1),
+      "genPartonHT"           :plotDetails(xRange=[200., 1000.], rebX=1),
       # # "HT_charm"                :plotDetails(xRange=[0.,1000.], rebX=2),
       # # "HT_ISR"                :plotDetails(xRange=[0.,1000.], rebX=2),
-      # "hadronicAlphaTZoom"    :plotDetails(xRange=[0.3, 1.5], rebX=2),
+      "hadronicAlphaTZoom"    :plotDetails(xRange=[0.3, 1.5], rebX=2),
       # "leadJetdelPhi"        :plotDetails(xRange=[0.,3.2], rebX=2),
-      # "MHToverMET"            :plotDetails(xRange=[0.,2.], rebX=1),
-      # # "MHToverHT"            :plotDetails(xRange=[0.,2.], rebX=1),
-      # "jetPt"                 :plotDetails(xRange=[0.,800.], rebX=1),
-      # "leadJetPt"             :plotDetails(xRange=[0.,800.], rebX=1),
-      # "subLeadJetPt"          :plotDetails(xRange=[0.,800.], rebX=1),
+      "MHToverMET"            :plotDetails(xRange=[0.,2.], rebX=1),
+      # "MHToverHT"            :plotDetails(xRange=[0.,2.], rebX=1),
+      "jetPt"                 :plotDetails(xRange=[0.,800.], rebX=1),
+      "leadJetPt"             :plotDetails(xRange=[0.,800.], rebX=1),
+      "subLeadJetPt"          :plotDetails(xRange=[0.,800.], rebX=1),
       # "thirdJetPt"            :plotDetails(xRange=[0., 300.], rebX=1),
       # "leadISRJetPt"            :plotDetails(xRange=[0., 300.], rebX=1),
       # "subLeadISRJetPt"            :plotDetails(xRange=[0., 300.], rebX=1),
@@ -259,25 +297,35 @@ def anaHists():
     }
   if mode()=="isoTrackPlots":
     hists = {
-      "nIsoTrack"       :plotDetails(),
-      "ITGenEleN"       :plotDetails(),    
-      "ITGenElePt"      :plotDetails(),
-      "ITGenEleEta"     :plotDetails(),
-      "ITGenMuN"        :plotDetails(),
-      "ITGenMuPt"       :plotDetails(),
-      "ITGenMuEta"      :plotDetails(),
-      "ITGenHadTauN"        :plotDetails(),
-      "ITGenHadTauPt"       :plotDetails(),
-      "ITGenHadTauEta"      :plotDetails(),
-      "ITGenOtherN"        :plotDetails(),
-      "ITGenOtherPt"       :plotDetails(),
-      "ITGenOtherEta"      :plotDetails(),
+      "GenHadTauDR"     :plotDetails(rebX=2),
+      "GenEleDR"        :plotDetails(rebX=2),
+      "GenMuDR"         :plotDetails(rebX=2),
+      "GenOtherDR"      :plotDetails(rebX=2),
+      # # "nIsoTrack"       :plotDetails(),
+      # # "GenElePt"        :plotDetails(),
+      # "GenEleEta"        :plotDetails(),
+      # # "GenMuPt"        :plotDetails(),
+      # "GenMuEta"        :plotDetails(),
+      # # "GenHadTauPt"        :plotDetails(),
+      # "GenHadTauEta"        :plotDetails(),
+      # # "GenOtherPt"        :plotDetails(),
+      # "GenOtherEta"        :plotDetails(),
+      # # "ITGenEleN"       :plotDetails(),    
+      # "ITGenElePt"      :plotDetails(rebX=2),
+      # "ITGenEleEta"     :plotDetails(rebX=2),
+      # "ITGenMuN"        :plotDetails(),
+      # "ITGenMuPt"       :plotDetails(rebX=2),
+      # "ITGenMuEta"      :plotDetails(rebX=2),
+      # "ITGenHadTauN"    :plotDetails(),
+      # "ITGenHadTauPt"   :plotDetails(rebX=2),
+      # "ITGenHadTauEta"  :plotDetails(rebX=2),
+      # "ITGenOtherN"     :plotDetails(),
+      # "ITGenOtherPt"    :plotDetails(rebX=2),
+      # "ITGenOtherEta"   :plotDetails(rebX=2),
     }
   elif mode()=="bTagEff":
     hists={}
-  else:
-    hists={}
-  
+
   return hists
 
 ###-------------------------------------------------------------------###
