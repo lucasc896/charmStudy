@@ -77,6 +77,8 @@ elif conf.mode() == "isoTrackPlots":
    if conf.switches()["runMode"] == "plotting":
       if conf.switches()["plotMode"] == "standardPlots":
          anaP.runStandPlots(debug=options.doDebug)
+      elif conf.switches()["plotMode"] == "comparisonPlots":
+         anaP.runComparPlots(debug=options.doDebug, doLogy=conf.switches()["printLogy"])
 
    elif conf.switches()["runMode"] == "yieldTables":
       Log.info(">>> Running yield tables\n")
