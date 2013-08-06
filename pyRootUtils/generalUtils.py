@@ -14,6 +14,7 @@ import math
 import re
 import configuration as conf
 import xSec as xS
+from array import array
 from Log import *
 from sys import exit
 
@@ -213,6 +214,18 @@ class anaPlot(object):
     if "n_Event" in self.canvTitle:
       r.gStyle.SetOptStat("i")
 
+    # if "Eta" in h.GetName():
+    #   print h.GetName()
+    #   tot = 0.
+    #   out = 0.
+    #   for x in range(h.GetNbinsX()):
+    #     binCent = h.GetBinCenter(x)
+    #     binVal = h.GetBinContent(x)
+    #     tot += binVal
+    #     if (binCent < -2.4) or (binCent > 2.4):
+    #       out += binVal
+    #   print "Outside fraction: %.3f" % float(out/tot)
+
     return h
 
   def SetStyle(self):
@@ -246,7 +259,7 @@ class anaPlot(object):
     elif method=="Unitary":
       ent = 0
       for i in range(h.GetNbinsX()):
-        # if h.GetBinLowEdge(i)>275: # hack line to normalise above certain bin value
+        # if h.GetBinLowEdge(i)>200: # hack line to normalise above certain bin value
           ent += h.GetBinContent(i+1)
       try:
         scaleF = float(1./ent)
@@ -610,8 +623,12 @@ def comparPlots(hList=None, debug=None, doLogy=False):
     hRatio.Draw("pe1")
 
     fit = r.TF1("fit","pol0", hRatio.GetXaxis().GetBinLowEdge(1), hRatio.GetXaxis().GetBinUpEdge(hRatio.GetNbinsX()))
+    # fit1 = r.TF1("fit1","pol0", 275., 400.)
+    # fit2 = r.TF1("fit2","pol0", 400., 600.)
     r.gStyle.SetOptFit(1)
     hRatio.Fit(fit)
+    # hRatio.Fit(fit1, "R")
+    # hRatio.Fit(fit2, "R")
 
   if not doLogy:
     c1.Print("plotDump/compare_%s_%s_%s_%s%s.%s"%(hList[0].GetName(),bM[0], jM, sSamp[0].split("_")[0], 
@@ -684,8 +701,20 @@ def getRatioRanges(h=None):
   min = h.GetMinimum()
   max = h.GetMaximum()
 
-  # calculate a 10% whitespace for about and below
-  swing = (max-min)*0.1
+  min = 1.
+  max = 1.
+
+  for i in range(h.GetNbinsX()):
+    val = h.GetBinContent(i)
+    if val==0: continue
+    
+    if (val>max):
+      max = val
+    if (val<min):
+      min = val
+
+  # calculate a 15% whitespace for about and below
+  swing = (max-min)*0.15
 
   return [min-swing, max+swing]
 
@@ -709,11 +738,47 @@ def setChrisStyle(style="g"):
     pass
   pass
 
+###-------------------------------------------------------------------###
 
+class grapher(object):
+  """to make various types of TGraph plots"""
+  def __init__(self, inData=[]):
+    super(grapher, self).__init__()
+    self.plotTitle = ""
+    self.multiGraph_ = False
 
+    # check if more than one graph data passed
+    if "list" in str( type(inData[0][0]) ):
+      for d in inData:
+        self.makeSingleGraph(d)
+    else:
+      self.makeSingleGraph(inData)
 
+  def makeSingleGraph(self, valueMap=[]):
 
+    c1 = r.TCanvas()
 
+    xvals = array("d", valueMap[0])
+    yvals = array("d", valueMap[1])
+
+    if len(xvals) != len(yvals):
+      Log.error(">>> Input x,y lists are not the same length.")
+      sys.exit()
+    else:
+      n = len(xvals)
+
+    g1 = r.TGraph(n, xvals, yvals)
+
+    g1.Draw("AP*")
+
+    c1.Print("test.pdf")
+
+  def myFirstFunction(self):
+    """myFirstFunction docString"""
+    # loads of wicked code here
+    pass
+
+    
 
 
 
