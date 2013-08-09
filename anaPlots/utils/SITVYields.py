@@ -35,23 +35,6 @@ def getYield(inFile=None, hist="", dir="", dirPre="before", bM=[0]):
 
 ###-------------------------------------------------------------------###
 
-def printPurity(before={}, matched={}):
-  print ""
-
-  totVeto = matched["All"]
-
-  for m in matched:
-    if m=="All": continue
-    outTxt = formatLabel(m) + " Purity"
-    for i in range(len(matched[m])):
-      pur = float(matched[m][i]/totVeto[i])
-      outTxt += "& %.3f " % pur
-    
-    print outTxt
-  print ""
-
-###-------------------------------------------------------------------###
-
 def printEff(nom={}, denom={}, vetoes=[], label=""):
 
   effOut = {}
@@ -87,42 +70,33 @@ def printEff(nom={}, denom={}, vetoes=[], label=""):
 
 
 
-    for i in range(len(denomVals)):
+    for i in range(len(nom[process])):
 
       try:
         eff = float(nom[process][i]/denomVals[i])
         # if "Other" in process:
           # print nom[process]
       except ZeroDivisionError:
-        # print "*** Error: Zero Division for", process
+        print "*** Error: Zero Division for", process
         eff=0.
       effOut[process].append(eff)
       outTxt += "& %.3f " % eff
 
     outTxt += r" \\"
 
-  makeTable(vals=effOut, label=label)
+  # makeTable(vals=effOut, label=label)
 
   return effOut
 
 ###-------------------------------------------------------------------###
 
-def printTotal(before={}, matched={}):
-  pass
-
-###-------------------------------------------------------------------###
-
 def formatLabel(label=""):
 
-  # label = label.replace("TauEle", r"$\tau \to e \nu$")
-  # label = label.replace("TauMu", r"$\tau \to \mu \nu$")
   label = label.replace("GenHadTau", r"$\tau \to had$")
   label = label.replace("GenEle", r"$\tau/W/Z \to e$")
   label = label.replace("GenMu", r"$\tau/W/Z \to \mu$")
   label = label.replace("IT", "IT Matched ")
   label = label.replace("N", "")
-  # label = label.replace("VEle", r"$W/Z \to e \nu$")
-  # label = label.replace("VMu", r"$W/Z \to \mu \nu$")
   label = label.replace("isoTrack ", "")
   label = label.replace("All", "Cut")
 
@@ -133,14 +107,19 @@ def formatLabel(label=""):
 def makeTable(vals={}, label=""):
   
   out = ""
-
-  out += printHeader()
+  out += printHeader(label = label)
   out += printHT()
 
-  for key in vals:
-    out += formatLabel(key) + " "
-    for val in vals[key]:
-      out += "& %.3f " % val
+  # user-defined order of table contents
+  order = ["Cut", "Ele", "Mu", "Tau", "Other"]
+
+  for ord in order:
+    for key in vals:
+      if ord in formatLabel(key):
+        out += formatLabel(key) + " "
+        for val in vals[key]:
+          out += "& %.3f " % val
+
     out += r"\\"
     out += "\n"
 
@@ -152,12 +131,11 @@ def makeTable(vals={}, label=""):
 
 ###-------------------------------------------------------------------###
 
-def printCaption():
+def printCaption(label = ""):
 
   sample = switches()["sample"].replace("_", " ")
 
-  outTxt = "\\caption{Single Isolated Track yields for %s}\n" % sample
-  #add a bit more eventually
+  outTxt = "\\caption{Single Isolated Track %s efficiencies for %s}\n" % (label, sample)
 
   return outTxt
 
@@ -184,13 +162,13 @@ def printHT():
 
 ###-------------------------------------------------------------------###
 
-def printHeader():
+def printHeader(label = ""):
   outTxt = ""
   outTxt += "\\documentclass[a4paper,12pt]{article}\n"
   outTxt += "\\usepackage[margin=0.3in, landscape]{geometry}\n"
   outTxt += "\\begin{document}\n\n"
   outTxt += "\\begin{table}[lp{5cm}l]\n"
-  outTxt += printCaption()
+  outTxt += printCaption(label)
   outTxt += "\\begin{center}\n"
   outTxt += "\\begin{tabular}{ c|cccccccccc }\n"
 
@@ -198,10 +176,18 @@ def printHeader():
 
 ###-------------------------------------------------------------------###
 
-if len(argv)<2:
-  print "Whoah there young bucky...specificy a command line option, yeah?"
-  exit()
+def addDict(a={}, b={}):
 
+  for val in b:
+    a[val] = b[val]
+
+  return a
+
+###-------------------------------------------------------------------###
+##                                                                     ##
+###                       START OF MAIN CODE                          ###
+##                                                                     ##
+###-------------------------------------------------------------------###
 
 beforeYld = {
       "All":[],
@@ -218,14 +204,12 @@ afterYld = {
 }
 
 unmatchedYld = {
-      "All":[],
       "Ele":[],
       "Mu":[],
       "HadTau":[],
 }
 
 matchedYld = {
-      "All":[],
       "Ele":[],
       "Mu":[],
       "HadTau":[],
@@ -236,11 +220,16 @@ vetoes = []
 
 HTdirs = ["200_275", "275_325", "325_375", "375_475", "475_575", "575_675", "675_775", "775_875", "875_975", "975"]
 
+HTBinEdges = []
+for ht in HTdirs:
+  val = float(ht.split("_")[0])
+  HTBinEdges.append(val)
+
 inFileName = "../../rootfiles/isoTrackPlots/out%s_isoTrackPlots.root" % switches()["sample"]
 iF = r.TFile.Open(inFileName)
-print "\n", inFileName
 
-### generic, before SITV yields ###
+
+### genLevel, before SITV yields ###
 for b in beforeYld:
   for ht in HTdirs:
     if b!="All":
@@ -251,7 +240,8 @@ for b in beforeYld:
     val = getYield(inFile=iF, hist=hName, dir=ht, bM=range(5) if b!="All" else [0])
     beforeYld[b].append(val)
 
-### generic, after SITV yields ###
+
+### genLevel, after SITV yields ###
 for a in afterYld:
   for ht in HTdirs:
     if a!="All":
@@ -262,59 +252,52 @@ for a in afterYld:
     val = getYield(inFile=iF, hist=hName, dir=ht, dirPre="after", bM=range(5) if a!="All" else [0])
     afterYld[a].append(val)
 
-# get total number of vetoes
+
+# get total number of vetoes from the above
 for b, a in zip(beforeYld["All"], afterYld["All"]):
   vetoes.append(b-a)
 
-# zero out unecessary entries
-for i in range(len(HTdirs)):
-  unmatchedYld["All"].append(0)
-  matchedYld["All"].append(0)
 
 ### yields for processes in events with atleast one SIT ###
 for u in unmatchedYld:
-  if u=="All": continue
   hName = "Gen%sNoMatchN" % u
   ctr = 0
   for ht in HTdirs:
-    val = getYield(inFile=iF, hist=hName, dir=ht, bM=range(5) if b!="All" else [0])
+    val = getYield(inFile=iF, hist=hName, dir=ht, bM=range(5))
     unmatchedYld[u].append(val)
-    unmatchedYld["All"][ctr] += val
     ctr+=1
 
 ### yields for processes matched to SIT ###
 for m in matchedYld:
-  if m=="All": continue
   hName = "ITGen%sN" % m
   ctr=0
   for ht in HTdirs:
-    val = getYield(inFile=iF, hist=hName, dir=ht, bM=range(5) if b!="All" else [0])
+    val = getYield(inFile=iF, hist=hName, dir=ht, bM=range(5))
     matchedYld[m].append(val)
-    matchedYld["All"][ctr] += val
     ctr+=1
 
 
+totEff = printEff(nom=afterYld, denom=beforeYld, label="Total")
+eventEff = printEff(nom=matchedYld, denom=beforeYld, vetoes=vetoes, label="Event")
+procEff = printEff(nom=matchedYld, denom=beforeYld, label="Process")
 
-if "p" in argv[1]:
-  printPurity(before=beforeYld, matched=matchedYld)
+# matchEff = printEff(nom=matchedYld, denom=unmatchedYld, label = "Matching")
 
-if "e" in argv[1]:
-  # print "\n>>> Total Efficiency"
-  # totEff = printEff(nom=afterYld, denom=beforeYld, label="Total")
-  # print totEff
-  print "\n>>> Process Efficiency"
-  procEff = printEff(nom=matchedYld, denom=beforeYld, vetoes=vetoes, label="Process")
-  print procEff["HadTau"]
+# make some tables
+makeTable(vals = addDict(totEff, procEff), label="Total")
+makeTable(vals = eventEff, label="Event")
 
-  # print "\n>>> Matching Efficiency"
-  # printEff(nom=matchedYld, denom=unmatchedYld)
+# make a dict for graph plotting
+graphDict = {"Total Efficiency": [HTBinEdges, totEff["All"]]}
 
-if "t" in argv[1]:
-  printTotal(before=beforeYld, matched=matchedYld)
+for p in procEff:
+  if "Other" in p: continue
+  graphDict["Process Efficiency - " + formatLabel(p)] = [HTBinEdges, procEff[p]]
 
-HTBinEdges = []
-for ht in HTdirs:
-  val = float(ht.split("_")[0])
-  HTBinEdges.append(val)
+# plot efficiency graph
+myGrapher = gutils.grapher(inData=graphDict, multiGraph = True)
+myGrapher.xTitle = "H_T (GeV)"
+myGrapher.title = "SITV Efficiencies"
+myGrapher.outFileBase = "%s_sitvEffs" % switches()["sample"]
+myGrapher.paint()
 
-# gutils.grapher([HTBinEdges, totEff["Ele"]])
