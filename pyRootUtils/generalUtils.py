@@ -212,7 +212,7 @@ class anaPlot(object):
     if "n_Event" not in self.canvTitle: 
       self.normHist(h)
     if "n_Event" in self.canvTitle:
-      r.gStyle.SetOptStat("i")
+      r.gStyle.SetOptStat("iM")
 
     # if "Eta" in h.GetName():
     #   print h.GetName()
@@ -742,19 +742,31 @@ def setChrisStyle(style="g"):
 
 class grapher(object):
   """to make various types of TGraph plots"""
-  def __init__(self, inData=[]):
+  def __init__(self, inData=[], multiGraph = False):
     super(grapher, self).__init__()
     self.plotTitle = ""
-    self.multiGraph_ = False
+    self.multiGraph_ = multiGraph
+    self.data = inData
+    self.outFileBase = ""
+    self.xTitle = "x"
+    self.yTitle = "y"
+    self.title = "MyGraph"
+    self.varyColours_ = True
+    self.varyMarkers_ = False
+    self.canvas = r.TCanvas()
 
-    # check if more than one graph data passed
-    if "list" in str( type(inData[0][0]) ):
-      for d in inData:
-        self.makeSingleGraph(d)
+  def paint(self):
+    """function to do the actual plotting"""
+
+    if self.multiGraph_:
+      self.makeMultiGraph(self.data)
     else:
-      self.makeSingleGraph(inData)
+      for d in self.data:
+        self.yTitle = d
+        self.makeSingleGraph(valueMap=self.data[d])
 
-  def makeSingleGraph(self, valueMap=[]):
+  def makeSingleGraph(self, valueMap=[], print_=True):
+    """function to make single graphs"""
 
     c1 = r.TCanvas()
 
@@ -763,20 +775,73 @@ class grapher(object):
 
     if len(xvals) != len(yvals):
       Log.error(">>> Input x,y lists are not the same length.")
-      sys.exit()
+      return
     else:
       n = len(xvals)
 
-    g1 = r.TGraph(n, xvals, yvals)
+    g = r.TGraph(n, xvals, yvals)
+    g.GetXaxis().SetTitle(self.xTitle)
+    g.GetYaxis().SetTitle(self.yTitle)
+    g.SetTitle(self.title)
+    g.SetMinimum(0.)
+    g.Draw("AP*")
 
-    g1.Draw("AP*")
+    if print_:
+      c1.Print("graph_%s_%s.pdf" % (self.outFileBase, self.yTitle.replace(" ", "")))
+    else:
+      return g
 
-    c1.Print("test.pdf")
+  def makeMultiGraph(self, multiMap={}):
+    """to make multi graphs"""
 
-  def myFirstFunction(self):
-    """myFirstFunction docString"""
-    # loads of wicked code here
-    pass
+    graphs = {}
+    markers = [2, 5, 4, 26, 31]
+    colours = [r.kBlack, r.kRed, r.kBlue, r.kGreen, r.kAzure]
+    mg = r.TMultiGraph()
+    lg = r.TLegend(0.14, 0.64, 0.395, 0.89)
+
+    print "\nMaking a multigraph of:"
+    for i in multiMap:
+      print "\t> " + i
+      gTmp = self.makeSingleGraph(valueMap=multiMap[i], print_=False)
+      graphs[i] = gTmp
+    print ""
+
+    if len(graphs) > len(markers):
+      print "Oops...code not yet setup for that many plots. My bad."
+      return
+
+    self.setGenericStyle()
+
+    ctr = 0
+    for title, g in graphs.iteritems():
+      
+      if self.varyMarkers_:
+        g.SetMarkerStyle(markers[ctr])
+      if self.varyColours_:
+        g.SetMarkerColor(colours[ctr])
+    
+      mg.Add(g)
+      lg.AddEntry(g, title, "p")
+      ctr+=1
+
+    mg.Draw("APL")
+    mg.GetXaxis().SetTitle(self.xTitle)
+    mg.SetTitle(self.title)
+
+    lg.SetFillColor(0)
+    lg.SetFillStyle(0)
+    lg.Draw()
+
+    self.canvas.Print("multiGraph_%s.pdf" % (self.outFileBase))
+
+  def setGenericStyle(self):
+    """global style setter"""
+
+    r.gPad.SetRightMargin(0.05)
+    r.gPad.SetLeftMargin(0.07)
+    r.gPad.SetTopMargin(0.05)
+    r.gPad.SetBottomMargin(0.1)  
 
     
 
