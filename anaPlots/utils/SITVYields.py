@@ -3,6 +3,7 @@
 
 import ROOT as r
 import generalUtils as gutils
+import math as ma
 from sys import argv
 from sys import exit
 from Log import *
@@ -13,11 +14,13 @@ def switches():
 
   switches={
           "sample"        :["WJets", "TTbar", "DY", "ZJets", "T2tt_500_1", "T2tt_825_500",
-                            "T2tt_400_1", "T2cc_200_190", "T2cc_200_120"][1],
+                            "T2tt_400_1", "T2cc_200_190", "T2cc_200_120", "Muon"][1],
           "HTcuts"        :["noCutInc", "standardHT","highHT","lowHT","parkedHT"][1],
-          "jetMulti"      :["le3j","ge4j","inc"][-2],
+          "HTdirs"        :["200_275", "275_325", "325_375", "375_475", "475_575", "575_675", "675_775", "775_875", "875_975", "975"],
+          "jetMulti"      :["le3j","ge4j","inc"][2],
+          "bMulti"        :["0b", "1b", "2b", "ge0b"][-1],
           "SITV"          :["before", "after"][0],
-          "sele"          :["", "onemuon", "dimuon"][1],
+          "sele"          :["", "onemuon", "dimuon"][0],
           "norm"          :["None", "Unitary", "xSec", "lumi"][0],
           }
 
@@ -33,12 +36,12 @@ def getYield(inFile=None, hist="", dir="", sitv=False, bM=[0]):
       subStr = "sitv_" if sitv else ""
       string = switches()["sele"]+"_"+subStr+dir+"_"+switches()["jetMulti"]
     else:
-      subStr = "after_" if sitv else "before_"
-      string = subStr+dir+"_"+switches()["jetMulti"]
+      subStr = "after" if sitv else "before"
+      string = subStr+dir#+"_"+switches()["jetMulti"]
 
+    # print "%s/%s_%s" % (string, hist, b)
     h = inFile.Get("%s/%s_%s" % (string, hist, b))
     
-    # print "%s/%s_%s" % (string, hist, b)
     ent += h.GetEntries()
 
   return ent
@@ -91,7 +94,7 @@ def printEff(nom={}, denom={}, vetoes=[], label=""):
       continue
 
     outTxt = formatLabel(process) + " Efficiency "
-    effOut[process]=[]
+    effOut[process]=[[],[]]
 
     # if "Other" not in one of the dicts, skip
     try:
@@ -109,20 +112,29 @@ def printEff(nom={}, denom={}, vetoes=[], label=""):
 
 
 
-    for i in range(len(nom[process])):
+    for i in range(len(nom[process][0])):
 
       try:
-        eff = float(nom[process][i]/denomVals[i])
-        # print nom[process][i], denomVals[i]
+        eff = float(nom[process][0][i]/denomVals[0][i])
       except ZeroDivisionError:
         print "*** Error: Zero Division for", process
         eff=0.
-      effOut[process].append(eff)
-      outTxt += "& %.3f " % eff
 
-    outTxt += r" \\"
+      ### calc the error
+      if eff != 0.:
+        n = nom[process][0][i]
+        en = nom[process][1][i]
+        d = denomVals[0][i]
+        ed = denomVals[1][i]
+        
+        err = eff * ma.sqrt( ma.pow(en/n,2) + ma.pow(ed/d,2) )
+      
+      else:
+        err = 0.
 
-  # makeTable(vals=effOut, label=label)
+
+      effOut[process][0].append(eff)
+      effOut[process][1].append(err)
 
   return effOut
 
@@ -157,7 +169,7 @@ def makeTable(vals={}, sample = "", label=""):
     for key in vals:
       if ord in formatLabel(key):
         out += formatLabel(key) + " "
-        for val in vals[key]:
+        for val in vals[key][0]:
           out += "& %.3f " % val
 
     out += r"\\"
@@ -217,11 +229,53 @@ def printHeader(label = ""):
 ###-------------------------------------------------------------------###
 
 def addDict(a={}, b={}):
+  
+  out = {}
+  keys = a.keys() + b.keys()
+  
+  for key in keys:
+    out[key] = [[],[]]
+    
+    try:
+      lista = a[key]
+    except KeyError:
+      noa = True
+    else:
+      noa = False
 
-  for val in b:
-    a[val] = b[val]
+    try:
+      listb = b[key]
+    except KeyError:
+      nob = True
+    else:
+      nob = False
+
+    if noa and not nob:
+      out[key][0] = b[key][0]
+      out[key][1] = b[key][1]
+    elif nob and not noa:
+      out[key][0] = a[key][0]
+      out[key][1] = a[key][1]
+    else:
+      if len(lista)!=len(listb):
+        print "Error: lists diff length"
+        exit()
+      for vala, valb in zip(lista, listb):
+        out[key][0].append(vala+valb)
+        out[key][1].append(ma.sqrt( inverse(vala)+inverse(valb) ))
 
   return a
+
+###-------------------------------------------------------------------###
+
+def inverse(val=0.):
+
+  try:
+    tmpVal = 1./val
+  except ZeroDivisionError:
+    return 0.
+  else:
+    return tmpVal 
 
 ###-------------------------------------------------------------------###
 
@@ -234,41 +288,39 @@ def addDict(a={}, b={}):
 def main(samp = ""):
 
   beforeYld = {
-        "All":[],
-        "Ele":[],
-        "Mu":[],
-        "HadTau":[],
-        "Other":[],
+        "All":[[],[]],
+        "Ele":[[],[]],
+        "Mu":[[],[]],
+        "HadTau":[[],[]],
+        "Other":[[],[]],
   }
 
   afterYld = {
-        "All":[],
-        "Ele":[],
-        "Mu":[],
-        "HadTau":[],
+        "All":[[],[]],
+        "Ele":[[],[]],
+        "Mu":[[],[]],
+        "HadTau":[[],[]],
   }
 
   unmatchedYld = {
-        "Ele":[],
-        "Mu":[],
-        "HadTau":[],
+        "Ele":[[],[]],
+        "Mu":[[],[]],
+        "HadTau":[[],[]],
   }
 
   matchedYld = {
-        "Ele":[],
-        "Mu":[],
-        "HadTau":[],
-        "Other":[],
-        "NoMatch":[],
+        "Ele":[[],[]],
+        "Mu":[[],[]],
+        "HadTau":[[],[]],
+        "Other":[[],[]],
+        "NoMatch":[[],[]],
   }
 
-  vetoes = []
-
-  nSIT = []
-
-  HTdirs = ["200_275", "275_325", "325_375", "375_475", "475_575", "575_675", "675_775", "775_875", "875_975", "975"]
-
+  vetoes = [[],[]]
+  nSIT = [[],[]]
   HTBinEdges = []
+  HTdirs = switches()["HTdirs"]
+  
   for ht in HTdirs:
     val = float(ht.split("_")[0])
     HTBinEdges.append(val)
@@ -276,9 +328,23 @@ def main(samp = ""):
   inFileName = "../../rootfiles/isoTrackPlots/out%s_%sisoTrackPlots.root" % (samp,"muonSele_" if "muon" in switches()["sele"] else "")
   iF = r.TFile.Open(inFileName)
 
-  # get number of SIT per ht bin
+  ### get btag multiplicity
+  if switches()["bMulti"] == "0b":
+    bMulti = [0]
+  elif switches()["bMulti"] == "1b":
+    bMulti = [1]
+  elif switches()["bMulti"] == "2b":
+    bMulti = [2]
+  elif switches()["bMulti"] == "ge0b":
+    bMulti = range(5)
+
+
+  ### get number of SIT per ht bin
   for ht in HTdirs:
-    nSIT.append(getYield(inFile=iF, hist="anySIT", dir=ht, bM=range(5)))
+    val = getYield(inFile=iF, hist="anySIT", dir=ht, bM=bMulti)
+    nSIT[0].append(val)
+    nSIT[1].append(inverse( ma.sqrt(val) ))
+
 
   ### genLevel, before SITV yields ###
   for b in beforeYld:
@@ -288,8 +354,9 @@ def main(samp = ""):
       else:
         hName = "n_Events"
 
-      val = getYield(inFile=iF, hist=hName, dir=ht, bM=range(5) if b!="All" else [0])
-      beforeYld[b].append(val)
+      val = getYield(inFile=iF, hist=hName, dir=ht, bM=bMulti if b!="All" else [0])
+      beforeYld[b][0].append(val)
+      beforeYld[b][1].append(inverse( ma.sqrt(val) ))
 
 
   ### genLevel, after SITV yields ###
@@ -300,23 +367,27 @@ def main(samp = ""):
       else:
         hName = "n_Events"
 
-      val = getYield(inFile=iF, hist=hName, dir=ht, sitv=True, bM=range(5) if a!="All" else [0])
-      afterYld[a].append(val)
+      val = getYield(inFile=iF, hist=hName, dir=ht, sitv=True, bM=bMulti if a!="All" else [0])
+      afterYld[a][0].append(val)
+      afterYld[a][1].append(inverse( ma.sqrt(val) ))
 
 
-  # get total number of vetoes from the above
-  for b, a in zip(beforeYld["All"], afterYld["All"]):
-    vetoes.append(b-a)
-
+  ### get total number of vetoes from the above
+  for b, a in zip(beforeYld["All"][0], afterYld["All"][0]):
+    # print b
+    vetoes[0].append(b-a)
+    vetoes[1].append(ma.sqrt( inverse(a)+inverse(b) ))
 
   ### yields for processes in events with atleast one SIT ###
   for u in unmatchedYld:
     hName = "Gen%sNoMatchN" % u
     ctr = 0
     for ht in HTdirs:
-      val = getYield(inFile=iF, hist=hName, dir=ht, bM=range(5))
-      unmatchedYld[u].append(val)
+      val = getYield(inFile=iF, hist=hName, dir=ht, bM=bMulti)
+      unmatchedYld[u][0].append(val)
+      unmatchedYld[u][1].append(inverse( ma.sqrt(val) ))
       ctr+=1
+
 
   ### yields for processes matched to SIT ###
   for m in matchedYld:
@@ -325,29 +396,32 @@ def main(samp = ""):
       hName = "ITNoMatchN"
     ctr=0
     for ht in HTdirs:
-      val = getYield(inFile=iF, hist=hName, dir=ht, bM=range(5))
-      matchedYld[m].append(val)
+      val = getYield(inFile=iF, hist=hName, dir=ht, bM=bMulti)
+      matchedYld[m][0].append(val)
+      matchedYld[m][1].append(inverse(ma.sqrt(val)))
       ctr+=1
 
+
+
+  ### Calculate efficiencies
   totEff = printEff(nom=afterYld, denom=beforeYld, label="Total")
   eventEff = printEff(nom=matchedYld, denom=beforeYld, vetoes=vetoes, label="Event")
   procEff = printEff(nom=matchedYld, denom=beforeYld, vetoes=nSIT, label="Process")
 
-  # matchEff = printEff(nom=matchedYld, denom=unmatchedYld, label = "Matching")
-
-  # make some tables
+  ### Make some tables
   makeTable(vals = addDict(totEff, procEff), sample = samp, label="Total")
-  # makeTable(vals = eventEff, sample = samp, label="Event")
-  # makeTable(vals = beforeYld, sample = samp, label="Processes")
+  makeTable(vals = eventEff, sample = samp, label="Event")
+  makeTable(vals = beforeYld, sample = samp, label="Processes")
 
-  # make a dict for graph plotting
-  graphDict = {"Total Efficiency": [HTBinEdges, totEff["All"]]}
+  HT = [HTBinEdges, [5.] * len(HTBinEdges)]
+
+  ### make a dict for graph plotting
+  graphDict = {"Total Efficiency": [HT, totEff["All"]]}
 
   for p in procEff:
-    # if "Other" in p: continue
-    graphDict["Process Fraction - " + formatLabel(p)] = [HTBinEdges, procEff[p]]
+    graphDict["Process Fraction - " + formatLabel(p)] = [HT, procEff[p]]
 
-  # plot efficiency graph
+  ### plot efficiency graph
   myGrapher = gutils.grapher(inData=graphDict, multiGraph = True)
   myGrapher.xTitle = "H_T (GeV)"
   myGrapher.title = "SITV Efficiencies"
@@ -360,11 +434,8 @@ def main(samp = ""):
 
 allDict = {}
 
-# get a better way of doing this...
-HTdirs = ["200_275", "275_325", "325_375", "375_475", "475_575", "575_675", "675_775", "775_875", "875_975", "975"]
-
 HTBinEdges = []
-for ht in HTdirs:
+for ht in switches()["HTdirs"]:
   val = float(ht.split("_")[0])
   HTBinEdges.append(val)
 
