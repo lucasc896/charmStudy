@@ -259,7 +259,7 @@ class anaPlot(object):
     elif method=="Unitary":
       ent = 0
       for i in range(h.GetNbinsX()):
-        # if h.GetBinLowEdge(i)>200: # hack line to normalise above certain bin value
+        if h.GetBinLowEdge(i)>200: # hack line to normalise above certain bin value
           ent += h.GetBinContent(i+1)
       try:
         scaleF = float(1./ent)
@@ -713,6 +713,9 @@ def getRatioRanges(h=None):
     if (val<min):
       min = val
 
+  if max>10.:
+    max = 10.
+
   # calculate a 15% whitespace for about and below
   swing = (max-min)*0.15
 
@@ -751,6 +754,7 @@ class grapher(object):
     self.xTitle = "x"
     self.yTitle = "y"
     self.title = "MyGraph"
+    self.SetGrid = True
     self.varyColours_ = True
     self.varyMarkers_ = False
     self.canvas = r.TCanvas()
@@ -770,8 +774,10 @@ class grapher(object):
 
     c1 = r.TCanvas()
 
-    xvals = array("d", valueMap[0])
-    yvals = array("d", valueMap[1])
+    xvals = array("d", valueMap[0][0])
+    xerrs = array("d", valueMap[0][1])
+    yvals = array("d", valueMap[1][0])
+    yerrs = array("d", valueMap[1][1])
 
     if len(xvals) != len(yvals):
       Log.error(">>> Input x,y lists are not the same length.")
@@ -779,12 +785,27 @@ class grapher(object):
     else:
       n = len(xvals)
 
-    g = r.TGraph(n, xvals, yvals)
+    if len(xerrs) != len(yerrs):
+      Log.error(">>> Input x,y error lists are not the same length.")
+      return
+    else:
+      nerr = len(xerrs)    
+
+    if n!=nerr:
+      Log.error(">>> Mismatch in value/error list length.")
+      return
+
+    g = r.TGraphErrors(n, xvals, yvals, xerrs, yerrs)
     g.GetXaxis().SetTitle(self.xTitle)
     g.GetYaxis().SetTitle(self.yTitle)
     g.SetTitle(self.title)
     g.SetMinimum(0.)
+    # g.GetYaxis().SetRangeUser(0., 1.1)
     g.Draw("AP*")
+
+    if self.SetGrid:
+      self.canvas.SetGridx(1)
+      self.canvas.SetGridy(1)
 
     if print_:
       c1.Print("graph_%s_%s.pdf" % (self.outFileBase, self.yTitle.replace(" ", "")))
@@ -795,8 +816,8 @@ class grapher(object):
     """to make multi graphs"""
 
     graphs = {}
-    markers = [2, 5, 4, 26, 31]
-    colours = [r.kBlack, r.kRed, r.kBlue, r.kGreen, r.kAzure]
+    markers = [2, 5, 4, 26, 31, 6]
+    colours = [r.kBlack, r.kRed, r.kBlue, r.kGreen, r.kAzure, r.kOrange]
     mg = r.TMultiGraph()
     lg = r.TLegend(0.14, 0.64, 0.395, 0.89)
 
@@ -809,38 +830,47 @@ class grapher(object):
 
     if len(graphs) > len(markers):
       print "Oops...code not yet setup for that many plots. My bad."
-      return
+      # return
 
     self.setGenericStyle()
 
     ctr = 0
     for title, g in graphs.iteritems():
-      
-      if self.varyMarkers_:
-        g.SetMarkerStyle(markers[ctr])
-      if self.varyColours_:
-        g.SetMarkerColor(colours[ctr])
     
+      if "T2cc" in title:
+        # g.SetMarkerStyle(28)
+        g.SetMarkerColor(r.kMagenta)
+        g.SetLineStyle(2)
+      elif "T2tt" in title:
+        # g.SetMarkerStyle(26)
+        g.SetMarkerColor(r.kGreen)
+        g.SetLineStyle(2)
+      else:
+        if self.varyMarkers_:
+          g.SetMarkerStyle(markers[ctr])
+        if self.varyColours_:
+          g.SetMarkerColor(colours[ctr])
+        ctr += 1
+
       mg.Add(g)
       lg.AddEntry(g, title, "p")
-      ctr+=1
 
     mg.Draw("APL")
     mg.GetXaxis().SetTitle(self.xTitle)
     mg.SetTitle(self.title)
+    mg.GetYaxis().SetRangeUser(0., 1.05)
 
     lg.SetFillColor(0)
-    lg.SetFillStyle(0)
     lg.Draw()
 
-    self.canvas.Print("multiGraph_%s.pdf" % (self.outFileBase))
+    self.canvas.Print("yields/multiGraph_%s.pdf" % (self.outFileBase))
 
   def setGenericStyle(self):
     """global style setter"""
 
     r.gPad.SetRightMargin(0.05)
     r.gPad.SetLeftMargin(0.07)
-    r.gPad.SetTopMargin(0.05)
+    r.gPad.SetTopMargin(0.08)
     r.gPad.SetBottomMargin(0.1)  
 
     
