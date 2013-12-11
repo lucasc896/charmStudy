@@ -1125,7 +1125,7 @@ def harvest(hist=None):
 
   return out
 
-def get_hcp_sf(sample = ""):
+def get_hcp_sf(sample = "", debug=False):
 
   dict = {
     "WJets": {
@@ -1151,10 +1151,12 @@ def get_hcp_sf(sample = ""):
   for proc in ["WJets", "DYJets", "ZJets"]:
     if proc in sample:
       this_proc = proc
+      if debug: Log.debug("[get_hcp_sf] Found process: %s" % this_proc)
       break
 
   # determine the sample bin
   for bin in dict[this_proc]:
     if bin in sample:
       # when bin is determined, return the sf
+      if debug: Log.debug("[get_hcp_sf] Found bin: %s" % bin)
       return dict[this_proc][bin]
