@@ -76,7 +76,7 @@ elif conf.mode() == "isoTrackPlots":
 
    if conf.switches()["runMode"] == "plotting":
       if conf.switches()["plotMode"] == "standardPlots":
-         anaP.runStandPlots(debug=options.doDebug)
+         anaP.runStandPlots(debug=options.doDebug, doLogy=conf.switches()["printLogy"])
       elif conf.switches()["plotMode"] == "comparisonPlots":
          anaP.runComparPlots(debug=options.doDebug, doLogy=conf.switches()["printLogy"])
 
