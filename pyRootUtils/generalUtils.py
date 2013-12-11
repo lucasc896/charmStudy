@@ -10,7 +10,7 @@ Copyright (c) 2012 University of Bristol. All rights reserved.
 import sys
 import os
 import ROOT as r
-import math
+import math as m
 import re
 import configuration as conf
 import xSec as xS
@@ -172,7 +172,7 @@ class anaPlot(object):
           h1.Rebin(rebin)
           h1.SetLineWidth(2)
           h1.GetYaxis().SetTitleOffset(1.4)
-    
+
           self.lg.AddEntry(h1, samp, "L")
     
           st1.Add(h)
@@ -188,7 +188,7 @@ class anaPlot(object):
   def makeSinglePlot(self, rebinX=None, rebinY=None):
     """docstring for makeSinglePlot"""
     c1 = r.TCanvas()
-
+    
     for i in range( len(self.hists) ):
       if i == 0: h=self.hists[i].Clone()
       else: h.Add(self.hists[i])   
@@ -252,15 +252,18 @@ class anaPlot(object):
     if method=="xSec":
       scaleF = 99999999.
       Log.warning(">>> xSec Normalisation broken!!\n\n")
+    
     elif "lumi" in method:
       scaleF = conf.switches()["lumiNorm"]*10.
       Log.info("Scaling to luminosity of %.3ffb-1 with factor of %.3f" % 
                   (conf.switches()["lumiNorm"], scaleF))
+    
     elif method=="Unitary":
       ent = 0
       for i in range(h.GetNbinsX()):
-        if h.GetBinLowEdge(i)>200: # hack line to normalise above certain bin value
+        # if h.GetBinLowEdge(i)>400: # hack line to normalise above certain bin value
           ent += h.GetBinContent(i+1)
+      Log.info("Normalising: "+str(h))
       try:
         scaleF = float(1./ent)
       except ZeroDivisionError:
@@ -556,9 +559,9 @@ def comparPlots(hList=None, debug=None, doLogy=False):
 
     pd1.cd()
 
-  ctr=0
-  for i in hOrder:
+  for ctr, i in enumerate(hOrder):
     hList[i].SetLineColor(colors[i])
+    hList[i].SetLineWidth(1)
     entTitle = sSamp[i]
 
     if entTitle == "T2cc_200": entTitle="Pythia"
@@ -578,8 +581,6 @@ def comparPlots(hList=None, debug=None, doLogy=False):
 
     if conf.switches()["printLogy"]:
       c1.SetLogy(r.kTRUE)
-
-    ctr+=1
 
   hList[hOrder[0]].SetLabelSize(0.04,"Y")
   hList[hOrder[0]].SetTitleOffset(1.2, "Y")
@@ -623,12 +624,10 @@ def comparPlots(hList=None, debug=None, doLogy=False):
     hRatio.Draw("pe1")
 
     fit = r.TF1("fit","pol0", hRatio.GetXaxis().GetBinLowEdge(1), hRatio.GetXaxis().GetBinUpEdge(hRatio.GetNbinsX()))
-    # fit1 = r.TF1("fit1","pol0", 275., 400.)
-    # fit2 = r.TF1("fit2","pol0", 400., 600.)
+    # print hRatio.GetXaxis().GetBinLowEdge(1), hRatio.GetXaxis().GetBinUpEdge(hRatio.GetNbinsX())
+    # fit = r.TF1("fit","pol0", .)
     r.gStyle.SetOptFit(1)
-    hRatio.Fit(fit)
-    # hRatio.Fit(fit1, "R")
-    # hRatio.Fit(fit2, "R")
+    hRatio.Fit(fit, "R")
 
   if not doLogy:
     c1.Print("plotDump/compare_%s_%s_%s_%s%s.%s"%(hList[0].GetName(),bM[0], jM, sSamp[0].split("_")[0], 
@@ -640,12 +639,13 @@ def comparPlots(hList=None, debug=None, doLogy=False):
 
 ###-------------------------------------------------------------------###
 
-def getPlotsFromFile(histName="", dirs=None, bSufs=None, inFile=None, scale=None):
+def getPlotsFromFile(histName="", dirs=None, bSufs=None, inFile=None, scale=None, debug=False):
 
   h1=None
   for d in dirs:
     for suf in bSufs:
-      h = inFile.Get("%s/%s%s"%(d, histName, suf))
+      if debug: Log.debug("%s/%s_%s"%(d, histName, suf))
+      h = inFile.Get("%s/%s_%s"%(d, histName, suf))
       if not h1:
         h1 = h.Clone()
       else:
@@ -674,6 +674,7 @@ def getHistOrder(hList=None):
           Log.error("Plot: %s"%hList[0].GetName())
           #exit()
         myOrder.append(k)
+
   return myOrder[0:len(hList)]
 
 ###-------------------------------------------------------------------###
@@ -701,11 +702,11 @@ def getRatioRanges(h=None):
   min = h.GetMinimum()
   max = h.GetMaximum()
 
-  min = 1.
-  max = 1.
+  len = h.GetNbinsX()
 
-  for i in range(h.GetNbinsX()):
+  for i in range(len):
     val = h.GetBinContent(i)
+    
     if val==0: continue
     
     if (val>max):
@@ -719,7 +720,11 @@ def getRatioRanges(h=None):
   # calculate a 15% whitespace for about and below
   swing = (max-min)*0.15
 
-  return [min-swing, max+swing]
+  print min, max, swing
+
+  # return [min-swing, max+swing]
+  return [8.,10.]
+  # return [0.5, 0.56]
 
 ###-------------------------------------------------------------------###
 
@@ -755,8 +760,9 @@ class grapher(object):
     self.yTitle = "y"
     self.title = "MyGraph"
     self.SetGrid = True
-    self.varyColours_ = True
-    self.varyMarkers_ = False
+    self._varyColours = True
+    self._varyMarkers = False
+    self._ratioPlot = False
     self.canvas = r.TCanvas()
 
   def paint(self):
@@ -800,7 +806,6 @@ class grapher(object):
     g.GetYaxis().SetTitle(self.yTitle)
     g.SetTitle(self.title)
     g.SetMinimum(0.)
-    # g.GetYaxis().SetRangeUser(0., 1.1)
     g.Draw("AP*")
 
     if self.SetGrid:
@@ -817,9 +822,9 @@ class grapher(object):
 
     graphs = {}
     markers = [2, 5, 4, 26, 31, 6]
-    colours = [r.kBlack, r.kRed, r.kBlue, r.kGreen, r.kAzure, r.kOrange]
+    colours = [r.kBlack, r.kRed, r.kBlue, r.kGreen, r.kAzure, r.kOrange, r.kYellow-1]
     mg = r.TMultiGraph()
-    lg = r.TLegend(0.14, 0.64, 0.395, 0.89)
+    lg = r.TLegend(0.1, 0.05, 0.35, 0.3)
 
     print "\nMaking a multigraph of:"
     for i in multiMap:
@@ -828,11 +833,37 @@ class grapher(object):
       graphs[i] = gTmp
     print ""
 
+    minx = gTmp.GetXaxis().GetBinLowEdge(1)
+    maxx = gTmp.GetXaxis().GetBinUpEdge(gTmp.GetXaxis().GetNbins())
+
     if len(graphs) > len(markers):
       print "Oops...code not yet setup for that many plots. My bad."
-      # return
+      exit()
 
     self.setGenericStyle()
+
+    if len(multiMap) == 2 and self._ratioPlot:
+      vals = multiMap.values()
+      ratios, ratioRanges = self.calculateRatios(nom = vals[0], denom = vals[1])
+
+
+      pd1 = r.TPad("pd1", "pd1", 0., 0.3, 1., 1.)
+      pd1.SetBottomMargin(0.005)
+      pd1.SetLeftMargin(0.07)
+      pd1.SetRightMargin(0.05)
+      pd1.SetTopMargin(0.05)
+      pd1.Draw()
+
+      pd2 = r.TPad("pd2", "pd2", 0., 0.02, 1., 0.3)
+      pd2.SetTopMargin(0.05)
+      pd2.SetBottomMargin(0.26)
+      pd2.SetLeftMargin(0.07)
+      pd2.SetRightMargin(0.05)
+      pd2.SetGridx(1)
+      pd2.SetGridy(1)
+      pd2.Draw()
+
+      pd1.cd()
 
     ctr = 0
     for title, g in graphs.iteritems():
@@ -846,13 +877,15 @@ class grapher(object):
         g.SetMarkerColor(r.kGreen)
         g.SetLineStyle(2)
       else:
-        if self.varyMarkers_:
+        if self._varyMarkers:
           g.SetMarkerStyle(markers[ctr])
-        if self.varyColours_:
+        if self._varyColours:
           g.SetMarkerColor(colours[ctr])
+          g.SetLineColor(colours[ctr])
         ctr += 1
 
       mg.Add(g)
+      if title == "Muon": title = "Data"
       lg.AddEntry(g, title, "p")
 
     mg.Draw("APL")
@@ -863,7 +896,85 @@ class grapher(object):
     lg.SetFillColor(0)
     lg.Draw()
 
+    if self._ratioPlot:
+      pd2.cd()
+      # print ratios
+      gRatio = g.Clone()
+
+      for i in range(gRatio.GetN()):
+        gRatio.RemovePoint(i)
+        gRatio.SetPoint(i, ratios[0][0][i], ratios[1][0][i])
+        gRatio.SetPointError(i, ratios[0][1][i], ratios[1][1][i])
+
+      # gRatio.SetMarkerStyle(4)
+      gRatio.SetMarkerSize(.7)
+      gRatio.SetLineWidth(1)
+      gRatio.SetLineColor(r.kBlue)
+      gRatio.GetYaxis().SetTitle("Ratio")
+
+      gRatio.SetTitle("")
+      
+      # gRatio.GetYaxis().SetRangeUser(0.5, 1.5)
+      gRatio.GetYaxis().SetRangeUser(ratioRanges[0], ratioRanges[1])
+
+      gRatio.GetXaxis().SetLabelSize(0.12)
+      gRatio.GetYaxis().SetLabelSize(0.07)
+      gRatio.GetXaxis().SetTitleSize(0.13)
+      gRatio.GetYaxis().SetTitleSize(0.11)
+      gRatio.GetYaxis().SetTitleOffset(0.25)
+      gRatio.GetXaxis().SetTitleOffset(.9)
+      gRatio.Draw("APL")
+
+      fit = r.TF1("fit","pol0", gRatio.GetXaxis().GetBinLowEdge(1), 
+                    gRatio.GetXaxis().GetBinUpEdge(gRatio.GetXaxis().GetNbins()))
+      r.gStyle.SetOptFit(1)
+      gRatio.Fit(fit)
+
     self.canvas.Print("yields/multiGraph_%s.pdf" % (self.outFileBase))
+
+  def calculateRatios(self, nom=[], denom=[]):
+    """calculate the vals and errs for ratio plot"""
+
+    # confirm the two x-axes are the same
+    if nom[0] != denom[0]:
+      print ">> Ratio plot error: x-axes not the same!"
+      print "> Numerator xvals:", nom[0]
+      print "> Denominator xvals:", denom[0]
+      exit()
+
+    # get ratio values
+    # vals = [a/b for a, b in zip(nom[1][0], denom[1][0])]
+
+    vals = []
+    errs = []
+
+    # define initial bounds for ratio axis range
+    min = 0.9
+    max = 1.1
+
+    # iterate over all points
+    for i in range( len(nom[0][0]) ):
+      nomy = nom[1]
+      denomy = denom[1]
+
+      try:
+        val = nomy[0][i]/denomy[0][i]
+      except ZeroDivisionError:
+        val = 0.
+
+      if val != 0.:
+        err = val * m.sqrt( m.pow(nomy[1][i]/nomy[0][i], 2) + m.pow(denomy[1][i]/denomy[0][i], 2) )
+      else:
+        err = 0.
+
+      if val-err < min: min = val-err
+      if val+err > max: max = val+err
+
+      vals.append(val)
+      errs.append(err)
+
+    # return xvals and yvals (ratios+errors), and yranges with 7% swing
+    return [nom[0],[vals, errs]], [min*0.93, max*1.07]
 
   def setGenericStyle(self):
     """global style setter"""
@@ -873,10 +984,177 @@ class grapher(object):
     r.gPad.SetTopMargin(0.08)
     r.gPad.SetBottomMargin(0.1)  
 
+###-------------------------------------------------------------------###
+
+def addDict(a={}, b={}):
+  
+  out = {}
+  keys = a.keys() + b.keys()
+  
+  for key in keys:
+    out[key] = [[],[]]
     
+    try:
+      lista = a[key]
+    except KeyError:
+      noa = True
+    else:
+      noa = False
 
+    try:
+      listb = b[key]
+    except KeyError:
+      nob = True
+    else:
+      nob = False
 
+    if noa and not nob:
+      out[key][0] = b[key][0]
+      out[key][1] = b[key][1]
+    elif nob and not noa:
+      out[key][0] = a[key][0]
+      out[key][1] = a[key][1]
+    else:
+      if len(lista)!=len(listb):
+        print "Error: lists diff length"
+        exit()
+      for vala, valb in zip(lista, listb):
+        out[key][0].append(vala+valb)
+        out[key][1].append(ma.sqrt( inverse(vala)+inverse(valb) ))
 
+  return a
 
+###-------------------------------------------------------------------###
 
+def inverse(val=0.):
 
+  try:
+    tmpVal = 1./val
+  except ZeroDivisionError:
+    # Log.warning("Inverse returning zero for division by %f" % val)
+    return 0.
+  else:
+    return tmpVal 
+
+###-------------------------------------------------------------------###
+
+class tabler(object):
+  """to make tables"""
+  def __init__(self, inData = {}):
+    super(tabler, self).__init__()
+    self.data = inData
+    self.tableTitle = "Table1"
+    self.caption = ""
+    self.tableText = ""
+
+  def printTable(self, fileName = "default_table1"):
+    # get header
+    self.printHeader()
+    # get top row
+    self.printTopRow()
+    # fill in data
+    self.printData()
+    # get end
+    self.printEnd()
+
+    f = open("%s.tex" % fileName, "w")
+    f.write(self.tableText)
+    f.close()
+
+  def printCaption(self):
+    return "\\caption{%s}\n\n" % self.caption
+
+  def printEnd(self):
+    self.tableText += "\n\n\n"
+    self.tableText += "\\end{tabular}\n"
+    self.tableText += "\\end{center}\n"
+    self.tableText += "\\end{table}\n"
+    self.tableText += "\\end{document}"
+
+  def printTopRow(self):
+    self.tableText += " HT Bins (GeV) & 200-275 & 275-325 & 325-375 & 375-475 & 475-575 & 575-675 & 675-775 & 775-875 & 875-975 & 975-$\\inf$ \\\\ \n"
+    self.tableText += "\hline\n"
+
+  def printHeader(self):
+    self.tableText += "\\documentclass[a4paper,12pt]{article}\n"
+    self.tableText += "\\usepackage[margin=0.3in, landscape]{geometry}\n"
+    self.tableText += "\\begin{document}\n\n"
+    self.tableText += "\\begin{table}[lp{5cm}l]\n"
+    
+    if self.caption:
+      self.tableText += self.printCaption()
+    
+    self.tableText += "\\begin{center}\n"
+    self.tableText += "\\begin{tabular}{ c|cccccccccc }\n"
+
+  
+  def printData(self):
+
+    for key in self.data:
+      self.tableText += key+" "
+
+      # loop data and errors to fill table
+      for val, err in zip(self.data[key][0], self.data[key][1]):
+        self.tableText += "& %.2f $^{\pm %.2f }$ " % (val, err)
+
+      self.tableText += r" \\"
+      self.tableText += "\n"
+
+def harvest(hist=None):
+  """ function to extract all useful information from a root TH1 object """
+
+  if "TH1" not in str(type(hist)):
+    print "Error in harvest of %s. Object does not derive from TH1 class." % str(type(hist))
+    return None
+
+  out = {}
+
+  xvals = []
+  xerrs = []
+  for x in range( hist.GetNbinsX() ):
+    xvals.append( hist.GetBinContent(x+1) )
+    # xerrs.append( hist.GetBinErorr(x+1) )
+  out["x"] = xvals
+  out["x_error"] = xerrs
+  out["n_x"] = hist.GetNbinsX() #check this is the same as len(xvals)
+
+  out["x_title"] = hist.GetXaxis().GetTitle()
+  out["y_title"] = hist.GetYaxis().GetTitle()
+
+  out["title"] = hist.GetTitle()
+
+  return out
+
+def get_hcp_sf(sample = ""):
+
+  dict = {
+    "WJets": {
+      "250to300": 1.,
+      "300to400": 1.,
+      "400toInf": 1.,
+      "skim":     1.,
+              }
+    "DYJets": {
+      "200to400": 1.,
+      "400toInf": 1.,
+      "skim":     1.
+    }
+    "ZJets": {
+      "50to100":  1.,
+      "100to200": 1.,
+      "200to400": 1.,
+      "400toInf": 1.,
+    }
+  }
+
+  # determine the process
+  for proc in ["WJets", "DYJets", "ZJets"]:
+    if proc in sample:
+      this_proc = proc
+      break
+
+  # determine the sample bin
+  for bin in dict[this_proc]:
+    if bin in sample:
+      # when bin is determined, return the sf
+      return dict[this_proc][bin]
